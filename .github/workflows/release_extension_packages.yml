@@ -20,6 +20,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag_name || github.ref }}
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -41,11 +44,14 @@ jobs:
           playwright install --with-deps chromium
 
       - name: Build packages
+        env:
+          EXPECTED_VERSION: ${{ github.event.inputs.tag_name }}
         run: npm run build
 
       - name: Create GitHub Release and Upload Assets
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          target_commitish: ${{ github.sha }}
           generate_release_notes: true
           files: releases/*.zip

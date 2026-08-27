@@ -8,6 +8,8 @@ def create_package():
         version = json.load(f)['version']
 
     expected_version = os.environ.get('EXPECTED_VERSION')
+    if expected_version and expected_version.startswith('v'):
+        expected_version = expected_version[1:]
     if not expected_version and os.environ.get('GITHUB_REF', '').startswith('refs/tags/v'):
         expected_version = os.environ['GITHUB_REF'].replace('refs/tags/v', '')
 
