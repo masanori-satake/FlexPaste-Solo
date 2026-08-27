@@ -1,14 +1,35 @@
 // background.js - FlexPaste-Solo Service Worker
 import { DEFAULT_DATA, resolveVariables } from './utils.js';
 
+let isRebuilding = false;
+let pendingRebuild = false;
+
 // Build Context Menus from Storage
 function rebuildContextMenus() {
+  if (isRebuilding) {
+    pendingRebuild = true;
+    return;
+  }
+  isRebuilding = true;
+
   chrome.contextMenus.removeAll(() => {
+    if (chrome.runtime.lastError) {
+      // Ignore removeAll errors if any
+    }
+
     chrome.storage.local.get(['categories'], (result) => {
       const categories = result.categories || DEFAULT_DATA.categories;
 
+      const safeCreate = (options) => {
+        chrome.contextMenus.create(options, () => {
+          if (chrome.runtime.lastError) {
+            // Check runtime.lastError to prevent Unchecked runtime.lastError logs
+          }
+        });
+      };
+
       // Parent menu [FlexPaste]
-      chrome.contextMenus.create({
+      safeCreate({
         id: 'flexpaste_root',
         title: 'FlexPaste',
         contexts: ['all']
@@ -17,20 +38,20 @@ function rebuildContextMenus() {
       // Categories and Templates
       categories.forEach((cat) => {
         const catMenuId = `cat_${cat.id}`;
-        chrome.contextMenus.create({
+        safeCreate({
           id: catMenuId,
           parentId: 'flexpaste_root',
-          title: cat.title,
+          title: cat.title || '（無題のカテゴリ）',
           contexts: ['all']
         });
 
         if (Array.isArray(cat.templates)) {
           cat.templates.forEach((tpl) => {
             const tplMenuId = `tpl_${cat.id}_${tpl.id}`;
-            chrome.contextMenus.create({
+            safeCreate({
               id: tplMenuId,
               parentId: catMenuId,
-              title: tpl.title,
+              title: tpl.title || '（無題のテンプレート）',
               contexts: ['all']
             });
           });
@@ -38,19 +59,25 @@ function rebuildContextMenus() {
       });
 
       // Separator and Options
-      chrome.contextMenus.create({
+      safeCreate({
         id: 'flexpaste_sep',
         parentId: 'flexpaste_root',
         type: 'separator',
         contexts: ['all']
       });
 
-      chrome.contextMenus.create({
+      safeCreate({
         id: 'flexpaste_options',
         parentId: 'flexpaste_root',
         title: '⚙ 設定',
         contexts: ['all']
       });
+
+      isRebuilding = false;
+      if (pendingRebuild) {
+        pendingRebuild = false;
+        rebuildContextMenus();
+      }
     });
   });
 }
@@ -67,9 +94,8 @@ chrome.runtime.onInstalled.addListener(() => {
     }
 
     if (Object.keys(dataToSet).length > 0) {
-      chrome.storage.local.set(dataToSet, () => {
-        rebuildContextMenus();
-      });
+      // Storage change will trigger chrome.storage.onChanged listener automatically
+      chrome.storage.local.set(dataToSet);
     } else {
       rebuildContextMenus();
     }

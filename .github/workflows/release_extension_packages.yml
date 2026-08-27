@@ -10,10 +10,6 @@ on:
         description: 'Tag name to release (e.g. v0.1.0)'
         required: true
         type: string
-      source_ref:
-        description: 'Branch, tag, or SHA to build from (defaults to current branch)'
-        required: false
-        type: string
 
 jobs:
   release:
@@ -25,7 +21,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.source_ref || github.ref }}
           persist-credentials: false
 
       - name: Get checked-out commit SHA
