@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlexPaste-Solo 設定</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-icon">📋</div>
+        <div>
+          <h1>FlexPaste-Solo</h1>
+          <p class="subtitle">カテゴリ別定型文 ＆ 動的変数 マネジメント</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-export" class="btn btn-outlined">
+          <span class="icon">📤</span> エクスポート
+        </button>
+        <button id="btn-import" class="btn btn-outlined">
+          <span class="icon">📥</span> インポート
+        </button>
+        <input type="file" id="file-import" accept=".json" style="display: none;">
+        <button id="btn-reset" class="btn btn-text text-danger">
+          <span class="icon">🔄</span> 初期化
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="app-main">
+      <!-- Sidebar: Categories -->
+      <aside class="sidebar-card card">
+        <div class="card-header">
+          <h2>カテゴリ一覧</h2>
+          <button id="btn-add-category" class="btn btn-filled-tonal icon-btn" title="カテゴリ追加">
+            <span>＋</span>
+          </button>
+        </div>
+        <div id="category-list" class="category-list">
+          <!-- Dynamically populated categories -->
+        </div>
+      </aside>
+
+      <!-- Main Editor Area -->
+      <section class="editor-area">
+        <!-- System Settings Section -->
+        <div class="card settings-card">
+          <div class="card-header">
+            <h2>⚙ システム設定 (稼働曜日)</h2>
+          </div>
+          <div class="card-body">
+            <p class="setting-desc"><code>{{month_last_workday}}</code> (月最終稼働日) の計算対象とする曜日を選択してください。</p>
+            <div class="workday-checkboxes">
+              <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="1"> 月</label>
+              <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="2"> 火</label>
+              <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="3"> 水</label>
+              <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="4"> 木</label>
+              <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="5"> 金</label>
+              <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="6"> 土</label>
+              <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="7"> 日</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Category & Templates Management -->
+        <div id="category-editor" class="card category-editor-card">
+          <div class="category-header-bar">
+            <div class="input-field cat-title-field">
+              <label for="current-cat-title">カテゴリ名</label>
+              <input type="text" id="current-cat-title" placeholder="カテゴリ名を入力...">
+            </div>
+            <div class="cat-header-actions">
+              <button id="btn-add-template" class="btn btn-filled">
+                <span class="icon">＋</span> テンプレート追加
+              </button>
+              <button id="btn-delete-category" class="btn btn-outlined text-danger" title="カテゴリ削除">
+                削除
+              </button>
+            </div>
+          </div>
+
+          <!-- Variable Chips Toolbar -->
+          <div class="variable-toolbar-card">
+            <div class="toolbar-header">
+              <span>ノーコード変数挿入チップ (クリックまたはドラッグ＆ドロップで挿入)</span>
+            </div>
+            <div class="chips-container">
+              <div class="chip" draggable="true" data-tag="{{date_with_day}}">📅 日付(曜日有)</div>
+              <div class="chip" draggable="true" data-tag="{{date}}">📅 日付</div>
+              <div class="chip" draggable="true" data-tag="{{time}}">⏰ 時刻</div>
+              <div class="chip" draggable="true" data-tag="{{time_with_sec}}">⏰ 時刻(秒有)</div>
+              <div class="chip" draggable="true" data-tag="{{yesterday_with_day}}">◀️ 昨日(曜日有)</div>
+              <div class="chip" draggable="true" data-tag="{{yesterday}}">◀️ 昨日</div>
+              <div class="chip" draggable="true" data-tag="{{tomorrow_with_day}}">▶️ 明日(曜日有)</div>
+              <div class="chip" draggable="true" data-tag="{{tomorrow}}">▶️ 明日</div>
+              <div class="chip" draggable="true" data-tag="{{next_week_with_day}}">⏩ 来週(曜日有)</div>
+              <div class="chip" draggable="true" data-tag="{{next_week}}">⏩ 来週</div>
+              <div class="chip" draggable="true" data-tag="{{month_end}}">📅 月末</div>
+              <div class="chip" draggable="true" data-tag="{{month_last_workday}}">🏢 月最終稼働日</div>
+              <div class="chip" draggable="true" data-tag="{{selection}}">✂️ 選択テキスト</div>
+              <div class="chip" draggable="true" data-tag="{{page_title}}">📄 ページタイトル</div>
+              <div class="chip" draggable="true" data-tag="{{page_url}}">🔗 ページURL</div>
+            </div>
+          </div>
+
+          <!-- Templates List -->
+          <div id="templates-container" class="templates-container">
+            <!-- Dynamically populated template cards -->
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>
