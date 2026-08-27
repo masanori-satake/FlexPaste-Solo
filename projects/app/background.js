@@ -1,55 +1,102 @@
 // background.js - FlexPaste-Solo Service Worker
 import { DEFAULT_DATA, resolveVariables } from './utils.js';
 
+let isRebuilding = false;
+let pendingRebuild = false;
+
 // Build Context Menus from Storage
 function rebuildContextMenus() {
+  if (isRebuilding) {
+    pendingRebuild = true;
+    return;
+  }
+  isRebuilding = true;
+
+  const checkRebuildComplete = (itemsToCreate, trackingState) => {
+    if (trackingState.completedCount >= itemsToCreate.length) {
+      isRebuilding = false;
+      if (pendingRebuild) {
+        pendingRebuild = false;
+        rebuildContextMenus();
+      }
+    }
+  };
+
   chrome.contextMenus.removeAll(() => {
+    if (chrome.runtime.lastError) {
+      isRebuilding = false;
+      if (pendingRebuild) {
+        pendingRebuild = false;
+        rebuildContextMenus();
+      }
+      return;
+    }
+
     chrome.storage.local.get(['categories'], (result) => {
       const categories = result.categories || DEFAULT_DATA.categories;
 
-      // Parent menu [FlexPaste]
-      chrome.contextMenus.create({
-        id: 'flexpaste_root',
-        title: 'FlexPaste',
-        contexts: ['all']
-      });
+      const itemsToCreate = [
+        {
+          id: 'flexpaste_root',
+          title: 'FlexPaste',
+          contexts: ['all']
+        }
+      ];
 
-      // Categories and Templates
+      const createdIds = new Set(['flexpaste_root']);
+
       categories.forEach((cat) => {
         const catMenuId = `cat_${cat.id}`;
-        chrome.contextMenus.create({
-          id: catMenuId,
-          parentId: 'flexpaste_root',
-          title: cat.title,
-          contexts: ['all']
-        });
-
-        if (Array.isArray(cat.templates)) {
-          cat.templates.forEach((tpl) => {
-            const tplMenuId = `tpl_${cat.id}_${tpl.id}`;
-            chrome.contextMenus.create({
-              id: tplMenuId,
-              parentId: catMenuId,
-              title: tpl.title,
-              contexts: ['all']
-            });
+        if (!createdIds.has(catMenuId)) {
+          createdIds.add(catMenuId);
+          itemsToCreate.push({
+            id: catMenuId,
+            parentId: 'flexpaste_root',
+            title: cat.title || '（無題のカテゴリ）',
+            contexts: ['all']
           });
+
+          if (Array.isArray(cat.templates)) {
+            cat.templates.forEach((tpl) => {
+              const tplMenuId = `tpl_${cat.id}_${tpl.id}`;
+              if (!createdIds.has(tplMenuId)) {
+                createdIds.add(tplMenuId);
+                itemsToCreate.push({
+                  id: tplMenuId,
+                  parentId: catMenuId,
+                  title: tpl.title || '（無題のテンプレート）',
+                  contexts: ['all']
+                });
+              }
+            });
+          }
         }
       });
 
-      // Separator and Options
-      chrome.contextMenus.create({
+      itemsToCreate.push({
         id: 'flexpaste_sep',
         parentId: 'flexpaste_root',
         type: 'separator',
         contexts: ['all']
       });
 
-      chrome.contextMenus.create({
+      itemsToCreate.push({
         id: 'flexpaste_options',
         parentId: 'flexpaste_root',
         title: '⚙ 設定',
         contexts: ['all']
+      });
+
+      const trackingState = { completedCount: 0, hasErrors: false };
+
+      itemsToCreate.forEach((itemOptions) => {
+        chrome.contextMenus.create(itemOptions, () => {
+          if (chrome.runtime.lastError) {
+            trackingState.hasErrors = true;
+          }
+          trackingState.completedCount++;
+          checkRebuildComplete(itemsToCreate, trackingState);
+        });
       });
     });
   });
@@ -67,8 +114,12 @@ chrome.runtime.onInstalled.addListener(() => {
     }
 
     if (Object.keys(dataToSet).length > 0) {
+      // Storage change will trigger chrome.storage.onChanged listener automatically on success.
+      // If saving fails, fallback to rebuilding context menus manually.
       chrome.storage.local.set(dataToSet, () => {
-        rebuildContextMenus();
+        if (chrome.runtime.lastError) {
+          rebuildContextMenus();
+        }
       });
     } else {
       rebuildContextMenus();
