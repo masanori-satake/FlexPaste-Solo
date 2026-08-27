@@ -63,20 +63,32 @@ def check_consistency():
 def check_version_bump():
     try:
         base_ref = os.environ.get('GITHUB_BASE_REF') or os.environ.get('BEFORE_SHA') or os.environ.get('BASE_SHA') or os.environ.get('COMPARE_REF')
-        if not base_ref or base_ref == '0000000000000000000000000000000000000000':
+
+        candidates = []
+        if base_ref and base_ref != '0000000000000000000000000000000000000000':
+            candidates.extend([base_ref, f"origin/{base_ref}"])
+        candidates.extend(['HEAD~1', 'origin/main', 'main'])
+
+        target_ref = None
+        for candidate in candidates:
             try:
-                subprocess.check_output(['git', 'rev-parse', '--verify', 'HEAD~1'], stderr=subprocess.STDOUT)
-                base_ref = 'HEAD~1'
+                subprocess.check_output(['git', 'rev-parse', '--verify', candidate], stderr=subprocess.STDOUT)
+                target_ref = candidate
+                break
             except Exception:
-                return True
+                pass
+
+        if not target_ref:
+            print("No valid comparison ref found in git repository; skipping version bump check.")
+            return True
 
         try:
             changed_files = subprocess.check_output(
-                ['git', 'diff', '--name-only', base_ref],
+                ['git', 'diff', '--name-only', target_ref],
                 stderr=subprocess.STDOUT
             ).decode('utf-8').splitlines()
         except subprocess.CalledProcessError as e:
-            print(f"Git diff failed: {e}")
+            print(f"Git diff failed against {target_ref}: {e}")
             return False
 
         source_changed = any(
@@ -89,7 +101,7 @@ def check_version_bump():
 
         try:
             old_pkg_json = subprocess.check_output(
-                ['git', 'show', f'{base_ref}:package.json'],
+                ['git', 'show', f'{target_ref}:package.json'],
                 stderr=subprocess.STDOUT
             ).decode('utf-8')
             old_version = json.loads(old_pkg_json)['version']
