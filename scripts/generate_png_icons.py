@@ -17,37 +17,48 @@ def generate_icons(output_dir=None):
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
-        print("Error: playwright not found. Please install it with 'pip install playwright' and 'playwright install chromium'.")
+        print("Error: playwright not found. Please install it with 'pip install playwright' and 'python -m playwright install chromium'.")
         return False
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    with sync_playwright() as p:
-        with p.chromium.launch() as browser:
-            page = browser.new_page(viewport={"width": 512, "height": 512})
-            html_content = f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <style>
-                    body {{ margin: 0; padding: 0; overflow: hidden; background: transparent; }}
-                    svg {{ width: 100%; height: 100%; display: block; }}
-                </style>
-            </head>
-            <body>
-                {svg_content}
-            </body>
-            </html>
-            """
-            page.set_content(html_content)
+    try:
+        with sync_playwright() as p:
+            try:
+                browser = p.chromium.launch()
+            except Exception as e:
+                print(f"Error launching Chromium: {e}")
+                print("Please run 'python -m playwright install chromium' before generating icons.")
+                return False
 
-            for size in [16, 32, 48, 128]:
-                out = os.path.join(output_dir, f"icon{size}.png")
-                page.set_viewport_size({"width": size, "height": size})
-                page.wait_for_timeout(100)
-                page.screenshot(path=out, omit_background=True)
-                print(f"Generated {out}")
+            with browser:
+                page = browser.new_page(viewport={"width": 512, "height": 512})
+                html_content = f"""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body {{ margin: 0; padding: 0; overflow: hidden; background: transparent; }}
+                        svg {{ width: 100%; height: 100%; display: block; }}
+                    </style>
+                </head>
+                <body>
+                    {svg_content}
+                </body>
+                </html>
+                """
+                page.set_content(html_content)
+
+                for size in [16, 32, 48, 128]:
+                    out = os.path.join(output_dir, f"icon{size}.png")
+                    page.set_viewport_size({"width": size, "height": size})
+                    page.wait_for_timeout(100)
+                    page.screenshot(path=out, omit_background=True)
+                    print(f"Generated {out}")
+    except Exception as e:
+        print(f"Error during icon generation: {e}")
+        return False
 
     return True
 

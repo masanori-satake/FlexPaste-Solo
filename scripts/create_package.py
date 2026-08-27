@@ -1,10 +1,19 @@
 import zipfile
 import os
 import json
+import sys
 
 def create_package():
     with open('projects/app/version.json', 'r', encoding='utf-8') as f:
         version = json.load(f)['version']
+
+    expected_version = os.environ.get('EXPECTED_VERSION')
+    if not expected_version and os.environ.get('GITHUB_REF', '').startswith('refs/tags/v'):
+        expected_version = os.environ['GITHUB_REF'].replace('refs/tags/v', '')
+
+    if expected_version and expected_version != version:
+        print(f"Error: Expected version '{expected_version}' does not match projects/app/version.json version '{version}'.")
+        sys.exit(1)
 
     output_filename = f"FlexPaste-Solo-v{version}.zip"
     os.makedirs('releases', exist_ok=True)

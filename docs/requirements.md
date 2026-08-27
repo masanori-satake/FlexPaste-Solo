@@ -16,19 +16,36 @@
 
 ```text
 flexpaste-solo/
-├── manifest.json
-├── background.js       # コンテキストメニュー生成・動的変数解決・ページ注入処理
-├── options.html        # 設定画面 (管理エディタ)
-├── options.css
-├── options.js
-├── icons/
-│   ├── icon16.png
-│   ├── icon48.png
-│   └── icon128.png
-└── requirements.md
+├── projects/
+│   └── app/
+│       ├── manifest.json
+│       ├── background.js       # コンテキストメニュー生成・動的変数解決・ページ注入処理
+│       ├── options.html        # 設定画面 (管理エディタ)
+│       ├── options.css
+│       ├── options.js
+│       ├── utils.js
+│       ├── version.json
+│       ├── assets/
+│       │   └── icon.svg
+│       └── icons/
+│           ├── icon16.png
+│           ├── icon32.png
+│           ├── icon48.png
+│           └── icon128.png
+├── docs/
+│   └── requirements.md
+├── scripts/
+│   ├── check_version.py
+│   ├── bump_version.py
+│   ├── create_package.py
+│   └── generate_png_icons.py
+└── .github/
+    └── workflows/
+        ├── ci.yml
+        └── release.yml
 ```
 
-### Manifest 仕様 (`manifest.json`)
+### Manifest 仕様 (`projects/app/manifest.json`)
 
 * **Manifest Version:** 3
 * **Permissions:** `contextMenus`, `storage`, `activeTab`, `scripting`

@@ -352,8 +352,14 @@ function validateAndNormalizeBackup(data) {
 
   // Validate categories
   if (Array.isArray(data.categories)) {
+    const seenCatIds = new Set();
     validData.categories = data.categories.map((cat, catIdx) => {
-      const catId = typeof cat?.id === 'string' && cat.id ? cat.id : generateId('cat');
+      let catId = typeof cat?.id === 'string' && cat.id ? cat.id : generateId('cat');
+      if (seenCatIds.has(catId)) {
+        catId = generateId('cat');
+      }
+      seenCatIds.add(catId);
+
       const catTitle = typeof cat?.title === 'string' ? cat.title : `カテゴリ ${catIdx + 1}`;
       const templates = Array.isArray(cat?.templates) ? cat.templates.map((tpl, tplIdx) => ({
         id: typeof tpl?.id === 'string' && tpl.id ? tpl.id : generateId('tpl'),

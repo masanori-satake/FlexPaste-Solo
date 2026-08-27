@@ -32,7 +32,9 @@ def check_consistency():
     if os.path.exists('README.md'):
         with open('README.md', 'r', encoding='utf-8') as f:
             content = f.read()
-            match = re.search(r'version-(\d+\.\d+\.\d+)-blue', content)
+            match = re.search(r'Version:\s*(\d+\.\d+\.\d+)', content)
+            if not match:
+                match = re.search(r'version-(\d+\.\d+\.\d+)-blue', content)
             if match:
                 readme_version = match.group(1)
 
@@ -60,18 +62,22 @@ def check_consistency():
 
 def check_version_bump():
     try:
-        base_ref = os.environ.get('GITHUB_BASE_REF')
-        if not base_ref:
+        base_ref = os.environ.get('GITHUB_BASE_REF') or os.environ.get('BEFORE_SHA') or os.environ.get('BASE_SHA') or os.environ.get('COMPARE_REF')
+        if not base_ref or base_ref == '0000000000000000000000000000000000000000':
             try:
-                subprocess.check_output(['git', 'rev-parse', '--verify', 'HEAD'], stderr=subprocess.STDOUT)
-                base_ref = 'HEAD'
+                subprocess.check_output(['git', 'rev-parse', '--verify', 'HEAD~1'], stderr=subprocess.STDOUT)
+                base_ref = 'HEAD~1'
             except Exception:
                 return True
 
-        changed_files = subprocess.check_output(
-            ['git', 'diff', '--name-only', base_ref],
-            stderr=subprocess.STDOUT
-        ).decode('utf-8').splitlines()
+        try:
+            changed_files = subprocess.check_output(
+                ['git', 'diff', '--name-only', base_ref],
+                stderr=subprocess.STDOUT
+            ).decode('utf-8').splitlines()
+        except subprocess.CalledProcessError as e:
+            print(f"Git diff failed: {e}")
+            return False
 
         source_changed = any(
             f.startswith('projects/app/')
@@ -97,8 +103,9 @@ def check_version_bump():
             return False
 
         return True
-    except subprocess.CalledProcessError:
-        return True
+    except Exception as e:
+        print(f"Error checking version bump: {e}")
+        return False
 
 if __name__ == "__main__":
     if not check_consistency():
