@@ -106,8 +106,13 @@ chrome.runtime.onInstalled.addListener(() => {
     }
 
     if (Object.keys(dataToSet).length > 0) {
-      // Storage change will trigger chrome.storage.onChanged listener automatically
-      chrome.storage.local.set(dataToSet);
+      // Storage change will trigger chrome.storage.onChanged listener automatically on success.
+      // If saving fails, fallback to rebuilding context menus manually.
+      chrome.storage.local.set(dataToSet, () => {
+        if (chrome.runtime.lastError) {
+          rebuildContextMenus();
+        }
+      });
     } else {
       rebuildContextMenus();
     }
