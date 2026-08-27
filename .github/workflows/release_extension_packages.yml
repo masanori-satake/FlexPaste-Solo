@@ -28,6 +28,10 @@ jobs:
           ref: ${{ github.event.inputs.source_ref || github.ref }}
           persist-credentials: false
 
+      - name: Get checked-out commit SHA
+        id: get_sha
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -56,6 +60,6 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
-          target_commitish: ${{ github.event.inputs.source_ref || github.sha }}
+          target_commitish: ${{ steps.get_sha.outputs.sha }}
           generate_release_notes: true
           files: releases/*.zip
