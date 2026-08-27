@@ -12,33 +12,40 @@ function rebuildContextMenus() {
   }
   isRebuilding = true;
 
+  const checkRebuildComplete = (itemsToCreate, completedCount) => {
+    if (completedCount.count >= itemsToCreate.length) {
+      isRebuilding = false;
+      if (pendingRebuild) {
+        pendingRebuild = false;
+        rebuildContextMenus();
+      }
+    }
+  };
+
   chrome.contextMenus.removeAll(() => {
     if (chrome.runtime.lastError) {
-      // Ignore removeAll errors if any
+      isRebuilding = false;
+      if (pendingRebuild) {
+        pendingRebuild = false;
+        rebuildContextMenus();
+      }
+      return;
     }
 
     chrome.storage.local.get(['categories'], (result) => {
       const categories = result.categories || DEFAULT_DATA.categories;
 
-      const safeCreate = (options) => {
-        chrome.contextMenus.create(options, () => {
-          if (chrome.runtime.lastError) {
-            // Check runtime.lastError to prevent Unchecked runtime.lastError logs
-          }
-        });
-      };
+      const itemsToCreate = [
+        {
+          id: 'flexpaste_root',
+          title: 'FlexPaste',
+          contexts: ['all']
+        }
+      ];
 
-      // Parent menu [FlexPaste]
-      safeCreate({
-        id: 'flexpaste_root',
-        title: 'FlexPaste',
-        contexts: ['all']
-      });
-
-      // Categories and Templates
       categories.forEach((cat) => {
         const catMenuId = `cat_${cat.id}`;
-        safeCreate({
+        itemsToCreate.push({
           id: catMenuId,
           parentId: 'flexpaste_root',
           title: cat.title || '（無題のカテゴリ）',
@@ -48,7 +55,7 @@ function rebuildContextMenus() {
         if (Array.isArray(cat.templates)) {
           cat.templates.forEach((tpl) => {
             const tplMenuId = `tpl_${cat.id}_${tpl.id}`;
-            safeCreate({
+            itemsToCreate.push({
               id: tplMenuId,
               parentId: catMenuId,
               title: tpl.title || '（無題のテンプレート）',
@@ -58,26 +65,31 @@ function rebuildContextMenus() {
         }
       });
 
-      // Separator and Options
-      safeCreate({
+      itemsToCreate.push({
         id: 'flexpaste_sep',
         parentId: 'flexpaste_root',
         type: 'separator',
         contexts: ['all']
       });
 
-      safeCreate({
+      itemsToCreate.push({
         id: 'flexpaste_options',
         parentId: 'flexpaste_root',
         title: '⚙ 設定',
         contexts: ['all']
       });
 
-      isRebuilding = false;
-      if (pendingRebuild) {
-        pendingRebuild = false;
-        rebuildContextMenus();
-      }
+      const completedCount = { count: 0 };
+
+      itemsToCreate.forEach((itemOptions) => {
+        chrome.contextMenus.create(itemOptions, () => {
+          if (chrome.runtime.lastError) {
+            // Handle lastError to prevent Unchecked runtime.lastError logs
+          }
+          completedCount.count++;
+          checkRebuildComplete(itemsToCreate, completedCount);
+        });
+      });
     });
   });
 }
