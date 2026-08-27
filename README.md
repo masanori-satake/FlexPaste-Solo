@@ -1,6 +1,10 @@
 # FlexPaste-Solo
 
-**[ Version: 0.1.0 ]** | **[ License: MIT ]** | **[ Privacy: Local Only ]** | **[ Manifest: V3 ]** | **[ CI: Active ]**
+[![version](https://img.shields.io/badge/version-0.1.0-blue)](projects/app/manifest.json)
+[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Privacy-Local Only](https://img.shields.io/badge/Privacy-Local%20Only-brightgreen)](PRIVACY.md)
+[![Manifest V3](https://img.shields.io/badge/Manifest-V3-orange)](projects/app/manifest.json)
+[![CI](https://github.com/masanori-satake/FlexPaste-Solo/actions/workflows/ci.yml/badge.svg)](https://github.com/masanori-satake/FlexPaste-Solo/actions/workflows/ci.yml)
 
 右クリックからカテゴリ別定型文と動的変数を組み合わせて即座にペースト挿入するChrome拡張機能。
 
