@@ -12,8 +12,8 @@ function rebuildContextMenus() {
   }
   isRebuilding = true;
 
-  const checkRebuildComplete = (itemsToCreate, completedCount) => {
-    if (completedCount.count >= itemsToCreate.length) {
+  const checkRebuildComplete = (itemsToCreate, trackingState) => {
+    if (trackingState.completedCount >= itemsToCreate.length) {
       isRebuilding = false;
       if (pendingRebuild) {
         pendingRebuild = false;
@@ -43,25 +43,33 @@ function rebuildContextMenus() {
         }
       ];
 
+      const createdIds = new Set(['flexpaste_root']);
+
       categories.forEach((cat) => {
         const catMenuId = `cat_${cat.id}`;
-        itemsToCreate.push({
-          id: catMenuId,
-          parentId: 'flexpaste_root',
-          title: cat.title || '（無題のカテゴリ）',
-          contexts: ['all']
-        });
-
-        if (Array.isArray(cat.templates)) {
-          cat.templates.forEach((tpl) => {
-            const tplMenuId = `tpl_${cat.id}_${tpl.id}`;
-            itemsToCreate.push({
-              id: tplMenuId,
-              parentId: catMenuId,
-              title: tpl.title || '（無題のテンプレート）',
-              contexts: ['all']
-            });
+        if (!createdIds.has(catMenuId)) {
+          createdIds.add(catMenuId);
+          itemsToCreate.push({
+            id: catMenuId,
+            parentId: 'flexpaste_root',
+            title: cat.title || '（無題のカテゴリ）',
+            contexts: ['all']
           });
+
+          if (Array.isArray(cat.templates)) {
+            cat.templates.forEach((tpl) => {
+              const tplMenuId = `tpl_${cat.id}_${tpl.id}`;
+              if (!createdIds.has(tplMenuId)) {
+                createdIds.add(tplMenuId);
+                itemsToCreate.push({
+                  id: tplMenuId,
+                  parentId: catMenuId,
+                  title: tpl.title || '（無題のテンプレート）',
+                  contexts: ['all']
+                });
+              }
+            });
+          }
         }
       });
 
@@ -79,15 +87,15 @@ function rebuildContextMenus() {
         contexts: ['all']
       });
 
-      const completedCount = { count: 0 };
+      const trackingState = { completedCount: 0, hasErrors: false };
 
       itemsToCreate.forEach((itemOptions) => {
         chrome.contextMenus.create(itemOptions, () => {
           if (chrome.runtime.lastError) {
-            // Handle lastError to prevent Unchecked runtime.lastError logs
+            trackingState.hasErrors = true;
           }
-          completedCount.count++;
-          checkRebuildComplete(itemsToCreate, completedCount);
+          trackingState.completedCount++;
+          checkRebuildComplete(itemsToCreate, trackingState);
         });
       });
     });
