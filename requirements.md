@@ -119,10 +119,11 @@ flexpaste-solo/
 1. **Context Menu Dynamic Generation:** `chrome.storage.local` に保存されたテンプレートデータ構造に基づき、`chrome.contextMenus.create` を使用して起動時および設定変更時にコンテキストメニューを動的に再構築する。
 2. **Text Injection:** アクティブタブのフォーカス要素に対し、`chrome.scripting.executeScript` を用いてテキストを直接代入し、`input` / `change` イベントを発火させてモダンWebアプリケーション（React/Vue等）に正常認識させる。
 3. **Storage Schema:**
+（注: settings.workdays は `1: Mon, 5: Fri` を示します）
 ```json
 {
   "settings": {
-    "workdays": [1, 2, 3, 4, 5] // 1: Mon, 5: Fri
+    "workdays": [1, 2, 3, 4, 5]
   },
   "categories": [
     {

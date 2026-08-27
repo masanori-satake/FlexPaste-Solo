@@ -1,39 +1,5 @@
 // options.js - Options Page Script for FlexPaste-Solo
-
-const DEFAULT_DATA = {
-  settings: {
-    workdays: [1, 2, 3, 4, 5]
-  },
-  categories: [
-    {
-      id: "cat_1",
-      title: "業務連絡",
-      templates: [
-        {
-          id: "tpl_1",
-          title: "日報フォーマット",
-          content: "【日報】{{date_with_day}}\n\n■ 本日の業務内容\n- {{selection}}\n\n■ 明日の予定\n- \n\n退勤時刻: {{time}}"
-        },
-        {
-          id: "tpl_2",
-          title: "業務終了報告",
-          content: "本日の業務を終了します。\n稼働時間: 9:00-{{time}}\n対象: {{selection}}"
-        }
-      ]
-    },
-    {
-      id: "cat_2",
-      title: "日程調整",
-      templates: [
-        {
-          id: "tpl_3",
-          title: "会議開催案内",
-          content: "お世話になっております。\n以下の件について会議を設定させていただきます。\n\n件名: {{page_title}}\n参考URL: {{page_url}}\n候補日時: {{tomorrow_with_day}} 10:00〜\n\nご確認のほどよろしくお願いいたします。"
-        }
-      ]
-    }
-  ]
-};
+import { DEFAULT_DATA, resolveVariables } from './utils.js';
 
 let appState = {
   settings: { workdays: [1, 2, 3, 4, 5] },
@@ -41,87 +7,7 @@ let appState = {
   selectedCategoryId: null
 };
 
-// Variable Resolution Engine (for preview)
-function padZero(num) {
-  return String(num).padStart(2, '0');
-}
-
-function formatDateWithDay(date) {
-  const weekdaysJa = ['日', '月', '火', '水', '木', '金', '土'];
-  const y = date.getFullYear();
-  const m = date.getMonth() + 1;
-  const d = date.getDate();
-  const w = weekdaysJa[date.getDay()];
-  return `${y}年${m}月${d}日(${w})`;
-}
-
-function formatDate(date) {
-  const y = date.getFullYear();
-  const m = padZero(date.getMonth() + 1);
-  const d = padZero(date.getDate());
-  return `${y}/${m}/${d}`;
-}
-
-function formatTime(date) {
-  const h = padZero(date.getHours());
-  const m = padZero(date.getMinutes());
-  return `${h}:${m}`;
-}
-
-function formatTimeWithSec(date) {
-  const h = padZero(date.getHours());
-  const m = padZero(date.getMinutes());
-  const s = padZero(date.getSeconds());
-  return `${h}:${m}:${s}`;
-}
-
-function calculateMonthLastWorkday(now, workdays) {
-  const activeWorkdays = Array.isArray(workdays) && workdays.length > 0 ? workdays : [1, 2, 3, 4, 5];
-  let d = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  while (d.getDate() > 0) {
-    const day = d.getDay();
-    const isoDay = day === 0 ? 7 : day;
-    if (activeWorkdays.includes(isoDay)) {
-      return formatDate(d);
-    }
-    d.setDate(d.getDate() - 1);
-  }
-  return formatDate(new Date(now.getFullYear(), now.getMonth() + 1, 0));
-}
-
-function resolveVariables(templateContent, contextData = {}, now = new Date()) {
-  const workdays = contextData.workdays || [1, 2, 3, 4, 5];
-  const selection = contextData.selection || '（サンプル選択テキスト）';
-  const pageTitle = contextData.page_title || 'サンプルページタイトル';
-  const pageUrl = contextData.page_url || 'https://example.com/sample';
-
-  const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, now.getHours(), now.getMinutes(), now.getSeconds());
-  const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, now.getHours(), now.getMinutes(), now.getSeconds());
-  const nextWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7, now.getHours(), now.getMinutes(), now.getSeconds());
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-  const replacements = {
-    'date_with_day': formatDateWithDay(now),
-    'date': formatDate(now),
-    'time': formatTime(now),
-    'time_with_sec': formatTimeWithSec(now),
-    'yesterday_with_day': formatDateWithDay(yesterday),
-    'yesterday': formatDate(yesterday),
-    'tomorrow_with_day': formatDateWithDay(tomorrow),
-    'tomorrow': formatDate(tomorrow),
-    'next_week_with_day': formatDateWithDay(nextWeek),
-    'next_week': formatDate(nextWeek),
-    'month_end': formatDate(monthEnd),
-    'month_last_workday': calculateMonthLastWorkday(now, workdays),
-    'selection': selection,
-    'page_title': pageTitle,
-    'page_url': pageUrl
-  };
-
-  return templateContent.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (match, varName) => {
-    return Object.prototype.hasOwnProperty.call(replacements, varName) ? replacements[varName] : match;
-  });
-}
+let saveDebounceTimer = null;
 
 // Toast notification
 function showToast(message) {
@@ -138,7 +24,7 @@ function loadStorage(callback) {
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
     chrome.storage.local.get(['categories', 'settings'], (result) => {
       appState.settings = result.settings || DEFAULT_DATA.settings;
-      appState.categories = result.categories || DEFAULT_DATA.categories;
+      appState.categories = Array.isArray(result.categories) ? result.categories : DEFAULT_DATA.categories;
       if (!appState.selectedCategoryId && appState.categories.length > 0) {
         appState.selectedCategoryId = appState.categories[0].id;
       }
@@ -166,6 +52,15 @@ function saveStorage(showNotification = true) {
   }
 }
 
+function debouncedSaveStorage(delay = 300) {
+  if (saveDebounceTimer) {
+    clearTimeout(saveDebounceTimer);
+  }
+  saveDebounceTimer = setTimeout(() => {
+    saveStorage(false);
+  }, delay);
+}
+
 // Render Functions
 function renderWorkdays() {
   const checkboxes = document.querySelectorAll('.workday-cb');
@@ -178,6 +73,10 @@ function renderWorkdays() {
 function renderCategoryList() {
   const container = document.getElementById('category-list');
   container.innerHTML = '';
+
+  if (!Array.isArray(appState.categories)) {
+    appState.categories = [];
+  }
 
   appState.categories.forEach((cat, index) => {
     const item = document.createElement('div');
@@ -240,6 +139,10 @@ function renderCategoryList() {
 
 function renderCategoryEditor() {
   const editorArea = document.getElementById('category-editor');
+  if (!Array.isArray(appState.categories)) {
+    appState.categories = [];
+  }
+
   const currentCat = appState.categories.find(c => c.id === appState.selectedCategoryId);
 
   if (!currentCat) {
@@ -269,7 +172,12 @@ function renderCategoryEditor() {
     card.dataset.index = tplIndex;
     card.draggable = true;
 
-    const previewResolved = resolveVariables(tpl.content || '', { workdays: appState.settings.workdays });
+    const previewResolved = resolveVariables(tpl.content || '', {
+      workdays: appState.settings.workdays,
+      selection: '（サンプル選択テキスト）',
+      page_title: 'サンプルページタイトル',
+      page_url: 'https://example.com/sample'
+    });
 
     card.innerHTML = `
       <div class="template-card-header">
@@ -294,17 +202,22 @@ function renderCategoryEditor() {
     const previewEl = card.querySelector('.preview-content');
     const deleteBtn = card.querySelector('.btn-delete-tpl');
 
-    // Title edit
+    // Title edit with debounced save
     titleEl.addEventListener('input', (e) => {
       tpl.title = e.target.value;
-      saveStorage(false);
+      debouncedSaveStorage();
     });
 
-    // Content edit with live preview update
+    // Content edit with immediate live preview update and debounced save
     contentEl.addEventListener('input', (e) => {
       tpl.content = e.target.value;
-      previewEl.textContent = resolveVariables(tpl.content, { workdays: appState.settings.workdays });
-      saveStorage(false);
+      previewEl.textContent = resolveVariables(tpl.content, {
+        workdays: appState.settings.workdays,
+        selection: '（サンプル選択テキスト）',
+        page_title: 'サンプルページタイトル',
+        page_url: 'https://example.com/sample'
+      });
+      debouncedSaveStorage();
     });
 
     // Allow drop on textarea for variable chips
@@ -325,8 +238,13 @@ function renderCategoryEditor() {
         if (data.type === 'chip' && data.tag) {
           insertTagAtCursor(contentEl, data.tag);
           tpl.content = contentEl.value;
-          previewEl.textContent = resolveVariables(tpl.content, { workdays: appState.settings.workdays });
-          saveStorage(false);
+          previewEl.textContent = resolveVariables(tpl.content, {
+            workdays: appState.settings.workdays,
+            selection: '（サンプル選択テキスト）',
+            page_title: 'サンプルページタイトル',
+            page_url: 'https://example.com/sample'
+          });
+          debouncedSaveStorage();
         }
       } catch (err) {
         // Not a chip drag
@@ -344,7 +262,6 @@ function renderCategoryEditor() {
 
     // Template Drag & Drop Reordering
     card.addEventListener('dragstart', (e) => {
-      // Avoid starting template drag when dragging handle or child elements if clicking textareas
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
         e.preventDefault();
         return;
@@ -412,6 +329,49 @@ function generateId(prefix) {
   return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
 }
 
+// Normalize and validate imported data
+function validateAndNormalizeBackup(data) {
+  if (!data || typeof data !== 'object') return null;
+
+  const validData = {
+    settings: { workdays: [1, 2, 3, 4, 5] },
+    categories: []
+  };
+
+  // Validate workdays
+  if (data.settings && Array.isArray(data.settings.workdays)) {
+    const workdays = data.settings.workdays
+      .map(d => Number(d))
+      .filter(d => Number.isInteger(d) && d >= 1 && d <= 7);
+    validData.settings.workdays = workdays.length > 0 ? Array.from(new Set(workdays)) : [1, 2, 3, 4, 5];
+  } else if (appState.settings && Array.isArray(appState.settings.workdays)) {
+    validData.settings.workdays = [...appState.settings.workdays];
+  }
+
+  // Validate categories
+  if (Array.isArray(data.categories)) {
+    validData.categories = data.categories.map((cat, catIdx) => {
+      const catId = typeof cat?.id === 'string' && cat.id ? cat.id : generateId('cat');
+      const catTitle = typeof cat?.title === 'string' ? cat.title : `カテゴリ ${catIdx + 1}`;
+      const templates = Array.isArray(cat?.templates) ? cat.templates.map((tpl, tplIdx) => ({
+        id: typeof tpl?.id === 'string' && tpl.id ? tpl.id : generateId('tpl'),
+        title: typeof tpl?.title === 'string' ? tpl.title : `定型文 ${tplIdx + 1}`,
+        content: typeof tpl?.content === 'string' ? tpl.content : ''
+      })) : [];
+
+      return {
+        id: catId,
+        title: catTitle,
+        templates
+      };
+    });
+  } else {
+    return null;
+  }
+
+  return validData;
+}
+
 // Setup Event Handlers
 function setupEventHandlers() {
   // Category Title Change
@@ -419,13 +379,16 @@ function setupEventHandlers() {
     const currentCat = appState.categories.find(c => c.id === appState.selectedCategoryId);
     if (currentCat) {
       currentCat.title = e.target.value;
-      saveStorage(false);
+      debouncedSaveStorage();
       renderCategoryList();
     }
   });
 
   // Add Category
   document.getElementById('btn-add-category').addEventListener('click', () => {
+    if (!Array.isArray(appState.categories)) {
+      appState.categories = [];
+    }
     const newCat = {
       id: generateId('cat'),
       title: '新しいカテゴリ',
@@ -478,7 +441,6 @@ function setupEventHandlers() {
         .map(el => parseInt(el.value, 10));
       appState.settings.workdays = selected;
       saveStorage(true);
-      // Re-render preview for updated month_last_workday calculation
       renderCategoryEditor();
     });
   });
@@ -487,7 +449,6 @@ function setupEventHandlers() {
   document.querySelectorAll('.chip').forEach(chip => {
     const tag = chip.dataset.tag;
 
-    // Click insertion target: active text area or last focused text area in templates
     chip.addEventListener('click', () => {
       const activeEl = document.activeElement;
       let targetTextarea = null;
@@ -539,10 +500,12 @@ function setupEventHandlers() {
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const data = JSON.parse(event.target.result);
-        if (data && (data.categories || data.settings)) {
-          if (data.settings) appState.settings = data.settings;
-          if (data.categories) appState.categories = data.categories;
+        const rawData = JSON.parse(event.target.result);
+        const normalized = validateAndNormalizeBackup(rawData);
+
+        if (normalized) {
+          appState.settings = normalized.settings;
+          appState.categories = normalized.categories;
           appState.selectedCategoryId = appState.categories.length > 0 ? appState.categories[0].id : null;
           saveStorage(true);
           renderWorkdays();
@@ -550,7 +513,7 @@ function setupEventHandlers() {
           renderCategoryEditor();
           showToast('設定を復元しました');
         } else {
-          alert('無効なバックアップファイルフォーマットです。');
+          alert('無効なバックアップファイルフォーマットです。カテゴリが配列構造になっていることを確認してください。');
         }
       } catch (err) {
         alert('JSONファイルの読み込みに失敗しました: ' + err.message);
