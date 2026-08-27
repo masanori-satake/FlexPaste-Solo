@@ -23,8 +23,10 @@ function showToast(message) {
 function loadStorage(callback) {
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
     chrome.storage.local.get(['categories', 'settings'], (result) => {
-      appState.settings = result.settings || DEFAULT_DATA.settings;
-      appState.categories = Array.isArray(result.categories) ? result.categories : DEFAULT_DATA.categories;
+      appState.settings = result.settings || JSON.parse(JSON.stringify(DEFAULT_DATA.settings));
+      appState.categories = Array.isArray(result.categories)
+        ? result.categories
+        : JSON.parse(JSON.stringify(DEFAULT_DATA.categories));
       if (!appState.selectedCategoryId && appState.categories.length > 0) {
         appState.selectedCategoryId = appState.categories[0].id;
       }
@@ -32,8 +34,8 @@ function loadStorage(callback) {
     });
   } else {
     // Fallback for standalone/local testing
-    appState.settings = DEFAULT_DATA.settings;
-    appState.categories = DEFAULT_DATA.categories;
+    appState.settings = JSON.parse(JSON.stringify(DEFAULT_DATA.settings));
+    appState.categories = JSON.parse(JSON.stringify(DEFAULT_DATA.categories));
     appState.selectedCategoryId = appState.categories[0].id;
     if (callback) callback();
   }
