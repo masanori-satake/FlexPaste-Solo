@@ -1,0 +1,12 @@
+{
+  "name": "flexpaste-solo",
+  "version": "0.1.0",
+  "description": "右クリックからカテゴリ別定型文と動的変数を組み合わせて即座にペースト挿入するChrome拡張機能",
+  "type": "module",
+  "scripts": {
+    "test": "python3 scripts/check_version.py",
+    "build": "python3 scripts/check_version.py && python3 scripts/create_package.py",
+    "version:bump": "python3 scripts/bump_version.py",
+    "generate-icons": "python3 scripts/generate_png_icons.py"
+  }
+}

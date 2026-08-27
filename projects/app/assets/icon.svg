@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Background Squircle (Material 3) -->
+  <rect width="512" height="512" rx="112" fill="#006A6A" />
+
+  <!-- Signature Central Ring -->
+  <circle cx="256" cy="256" r="176" fill="none" stroke="#FFFFFF" stroke-width="24" />
+
+  <!-- Clipboard + 'F' Symbol -->
+  <!-- Clipboard Board -->
+  <rect x="180" y="156" width="152" height="196" rx="20" fill="none" stroke="#FFFFFF" stroke-width="20" />
+
+  <!-- Clipboard Clip -->
+  <rect x="220" y="132" width="72" height="38" rx="10" fill="#FFFFFF" />
+
+  <!-- Letter 'F' inside Clipboard -->
+  <path d="M 216 200 H 292 M 216 200 V 312 M 216 252 H 276" stroke="#FFFFFF" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+</svg>
