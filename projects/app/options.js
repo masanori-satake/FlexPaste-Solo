@@ -36,7 +36,7 @@ function createChipNode(tag) {
   span.innerHTML = `
     <span class="material-symbols-outlined tpl-chip-icon">${meta.icon}</span>
     <span class="tpl-chip-label">${escapeHtml(meta.label)}</span>
-    <span class="tpl-chip-remove" title="削除">×</span>
+    <button type="button" class="tpl-chip-remove" title="削除" aria-label="${escapeHtml(meta.label)}チップを削除">×</button>
   `;
 
   return span;
@@ -328,11 +328,60 @@ function renderCategoryEditor() {
 
     // Handle click on chip 'x' remove button
     contentEl.addEventListener('click', (e) => {
-      if (e.target.classList.contains('tpl-chip-remove')) {
-        const chip = e.target.closest('.tpl-chip');
+      const removeBtn = e.target.closest('.tpl-chip-remove');
+      if (removeBtn) {
+        const chip = removeBtn.closest('.tpl-chip');
         if (chip) {
           chip.remove();
           updateContent();
+        }
+      }
+    });
+
+    // Handle keydown for explicit Backspace/Delete removal of adjacent chips
+    contentEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' || e.key === 'Delete') {
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return;
+        const range = sel.getRangeAt(0);
+
+        if (range.collapsed) {
+          const container = range.startContainer;
+          const offset = range.startOffset;
+
+          if (e.key === 'Backspace') {
+            if (container.nodeType === Node.ELEMENT_NODE) {
+              const prevChild = container.childNodes[offset - 1];
+              if (prevChild && prevChild.nodeType === Node.ELEMENT_NODE && prevChild.classList.contains('tpl-chip')) {
+                e.preventDefault();
+                prevChild.remove();
+                updateContent();
+              }
+            } else if (container.nodeType === Node.TEXT_NODE && offset === 0) {
+              let prevNode = container.previousSibling;
+              if (prevNode && prevNode.nodeType === Node.ELEMENT_NODE && prevNode.classList.contains('tpl-chip')) {
+                e.preventDefault();
+                prevNode.remove();
+                updateContent();
+              }
+            }
+          } else if (e.key === 'Delete') {
+            if (container.nodeType === Node.ELEMENT_NODE) {
+              const nextChild = container.childNodes[offset];
+              if (nextChild && nextChild.nodeType === Node.ELEMENT_NODE && nextChild.classList.contains('tpl-chip')) {
+                e.preventDefault();
+                nextChild.remove();
+                updateContent();
+              }
+            } else if (container.nodeType === Node.TEXT_NODE && offset === container.nodeValue.length) {
+              let nextNode = container.nextSibling;
+              if (nextNode && nextNode.nodeType === Node.ELEMENT_NODE && nextNode.classList.contains('tpl-chip')) {
+                e.preventDefault();
+                nextNode.remove();
+                updateContent();
+              }
+            }
+          }
         }
       }
     });

@@ -515,6 +515,9 @@ body {
   width: 16px;
   height: 16px;
   margin-left: 2px;
+  border: none;
+  background: transparent;
+  padding: 0;
   border-radius: 50%;
   cursor: pointer;
   font-size: 12px;
