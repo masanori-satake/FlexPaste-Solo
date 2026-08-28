@@ -26,11 +26,30 @@
           <span class="material-symbols-outlined icon">upload</span> インポート
         </button>
         <input type="file" id="file-import" accept=".json" style="display: none;">
-        <button id="btn-reset" class="btn btn-text text-danger">
-          <span class="material-symbols-outlined icon">refresh</span> 初期化
+        <button id="btn-reset" class="btn btn-text text-danger icon-btn" title="初期化" aria-label="初期化">
+          <span class="material-symbols-outlined">refresh</span>
         </button>
       </div>
     </header>
+
+    <!-- Common Settings Section -->
+    <section class="card settings-card">
+      <div class="card-header">
+        <h2><span class="material-symbols-outlined icon-inline">settings</span> 共通設定(稼働曜日)</h2>
+      </div>
+      <div class="card-body">
+        <p class="setting-desc"><code>{{month_last_workday}}</code> (月最終稼働日) の計算対象とする曜日を選択してください。</p>
+        <div class="workday-checkboxes">
+          <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="1"> 月</label>
+          <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="2"> 火</label>
+          <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="3"> 水</label>
+          <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="4"> 木</label>
+          <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="5"> 金</label>
+          <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="6"> 土</label>
+          <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="7"> 日</label>
+        </div>
+      </div>
+    </section>
 
     <!-- Main Content Grid -->
     <main class="app-main">
@@ -49,25 +68,6 @@
 
       <!-- Main Editor Area -->
       <section class="editor-area">
-        <!-- System Settings Section -->
-        <div class="card settings-card">
-          <div class="card-header">
-            <h2><span class="material-symbols-outlined icon-inline">settings</span> システム設定 (稼働曜日)</h2>
-          </div>
-          <div class="card-body">
-            <p class="setting-desc"><code>{{month_last_workday}}</code> (月最終稼働日) の計算対象とする曜日を選択してください。</p>
-            <div class="workday-checkboxes">
-              <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="1"> 月</label>
-              <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="2"> 火</label>
-              <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="3"> 水</label>
-              <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="4"> 木</label>
-              <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="5"> 金</label>
-              <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="6"> 土</label>
-              <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="7"> 日</label>
-            </div>
-          </div>
-        </div>
-
         <!-- Selected Category & Templates Management -->
         <div id="category-editor" class="card category-editor-card">
           <div class="category-header-bar">
@@ -76,11 +76,8 @@
               <input type="text" id="current-cat-title" placeholder="カテゴリ名を入力...">
             </div>
             <div class="cat-header-actions">
-              <button id="btn-add-template" class="btn btn-filled">
-                <span class="material-symbols-outlined icon">add</span> テンプレート追加
-              </button>
-              <button id="btn-delete-category" class="btn btn-outlined text-danger" title="カテゴリ削除">
-                <span class="material-symbols-outlined icon">delete</span> 削除
+              <button id="btn-delete-category" class="btn btn-outlined text-danger icon-btn" title="カテゴリ削除" aria-label="カテゴリ削除">
+                <span class="material-symbols-outlined">delete</span>
               </button>
             </div>
           </div>
@@ -112,6 +109,13 @@
           <!-- Templates List -->
           <div id="templates-container" class="templates-container">
             <!-- Dynamically populated template cards -->
+          </div>
+
+          <!-- Add Template Button Container (Bottom Center) -->
+          <div class="add-template-wrapper">
+            <button id="btn-add-template" class="btn btn-filled icon-btn" title="テンプレート追加" aria-label="テンプレート追加">
+              <span class="material-symbols-outlined">add</span>
+            </button>
           </div>
         </div>
       </section>
