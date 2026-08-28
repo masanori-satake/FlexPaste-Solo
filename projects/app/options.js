@@ -264,7 +264,7 @@ function renderCategoryEditor() {
     return;
   }
 
-  editorArea.style.display = 'block';
+  editorArea.style.display = 'flex';
 
   // Category Title
   const titleInput = document.getElementById('current-cat-title');
@@ -682,14 +682,19 @@ function setupEventHandlers() {
     saveStorage(true);
     renderCategoryEditor();
 
-    // Smooth scroll to the newly created template card or bottom of templates scroll area
+    // Scroll to newly created template card
     setTimeout(() => {
-      const scrollArea = document.querySelector('.templates-scroll-area');
-      if (scrollArea) {
-        scrollArea.scrollTo({
-          top: scrollArea.scrollHeight,
-          behavior: 'smooth'
-        });
+      const lastCard = document.querySelector(`.template-card[data-id="${newTpl.id}"]`);
+      if (lastCard) {
+        lastCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        const scrollArea = document.querySelector('.templates-scroll-area');
+        if (scrollArea) {
+          scrollArea.scrollTo({
+            top: scrollArea.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
       }
     }, 0);
   });
