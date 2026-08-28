@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FlexPaste-Solo 設定</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
@@ -11,7 +12,7 @@
     <!-- Top Header -->
     <header class="app-header">
       <div class="header-brand">
-        <div class="brand-icon">📋</div>
+        <span class="material-symbols-outlined brand-icon">content_paste</span>
         <div>
           <h1>FlexPaste-Solo</h1>
           <p class="subtitle">カテゴリ別定型文 ＆ 動的変数 マネジメント</p>
@@ -19,14 +20,14 @@
       </div>
       <div class="header-actions">
         <button id="btn-export" class="btn btn-outlined">
-          <span class="icon">📤</span> エクスポート
+          <span class="material-symbols-outlined icon">upload</span> エクスポート
         </button>
         <button id="btn-import" class="btn btn-outlined">
-          <span class="icon">📥</span> インポート
+          <span class="material-symbols-outlined icon">download</span> インポート
         </button>
         <input type="file" id="file-import" accept=".json" style="display: none;">
         <button id="btn-reset" class="btn btn-text text-danger">
-          <span class="icon">🔄</span> 初期化
+          <span class="material-symbols-outlined icon">refresh</span> 初期化
         </button>
       </div>
     </header>
@@ -38,7 +39,7 @@
         <div class="card-header">
           <h2>カテゴリ一覧</h2>
           <button id="btn-add-category" class="btn btn-filled-tonal icon-btn" title="カテゴリ追加">
-            <span>＋</span>
+            <span class="material-symbols-outlined">add</span>
           </button>
         </div>
         <div id="category-list" class="category-list">
@@ -51,7 +52,7 @@
         <!-- System Settings Section -->
         <div class="card settings-card">
           <div class="card-header">
-            <h2>⚙ システム設定 (稼働曜日)</h2>
+            <h2><span class="material-symbols-outlined icon-inline">settings</span> システム設定 (稼働曜日)</h2>
           </div>
           <div class="card-body">
             <p class="setting-desc"><code>{{month_last_workday}}</code> (月最終稼働日) の計算対象とする曜日を選択してください。</p>
@@ -76,10 +77,10 @@
             </div>
             <div class="cat-header-actions">
               <button id="btn-add-template" class="btn btn-filled">
-                <span class="icon">＋</span> テンプレート追加
+                <span class="material-symbols-outlined icon">add</span> テンプレート追加
               </button>
               <button id="btn-delete-category" class="btn btn-outlined text-danger" title="カテゴリ削除">
-                削除
+                <span class="material-symbols-outlined icon">delete</span> 削除
               </button>
             </div>
           </div>
@@ -90,21 +91,21 @@
               <span>ノーコード変数挿入チップ (クリックまたはドラッグ＆ドロップで挿入)</span>
             </div>
             <div class="chips-container">
-              <div class="chip" draggable="true" data-tag="{{date_with_day}}">📅 日付(曜日有)</div>
-              <div class="chip" draggable="true" data-tag="{{date}}">📅 日付</div>
-              <div class="chip" draggable="true" data-tag="{{time}}">⏰ 時刻</div>
-              <div class="chip" draggable="true" data-tag="{{time_with_sec}}">⏰ 時刻(秒有)</div>
-              <div class="chip" draggable="true" data-tag="{{yesterday_with_day}}">◀️ 昨日(曜日有)</div>
-              <div class="chip" draggable="true" data-tag="{{yesterday}}">◀️ 昨日</div>
-              <div class="chip" draggable="true" data-tag="{{tomorrow_with_day}}">▶️ 明日(曜日有)</div>
-              <div class="chip" draggable="true" data-tag="{{tomorrow}}">▶️ 明日</div>
-              <div class="chip" draggable="true" data-tag="{{next_week_with_day}}">⏩ 来週(曜日有)</div>
-              <div class="chip" draggable="true" data-tag="{{next_week}}">⏩ 来週</div>
-              <div class="chip" draggable="true" data-tag="{{month_end}}">📅 月末</div>
-              <div class="chip" draggable="true" data-tag="{{month_last_workday}}">🏢 月最終稼働日</div>
-              <div class="chip" draggable="true" data-tag="{{selection}}">✂️ 選択テキスト</div>
-              <div class="chip" draggable="true" data-tag="{{page_title}}">📄 ページタイトル</div>
-              <div class="chip" draggable="true" data-tag="{{page_url}}">🔗 ページURL</div>
+              <div class="chip" draggable="true" data-tag="{{date_with_day}}"><span class="material-symbols-outlined chip-icon">calendar_today</span>日付(曜日有)</div>
+              <div class="chip" draggable="true" data-tag="{{date}}"><span class="material-symbols-outlined chip-icon">calendar_today</span>日付</div>
+              <div class="chip" draggable="true" data-tag="{{time}}"><span class="material-symbols-outlined chip-icon">schedule</span>時刻</div>
+              <div class="chip" draggable="true" data-tag="{{time_with_sec}}"><span class="material-symbols-outlined chip-icon">schedule</span>時刻(秒有)</div>
+              <div class="chip" draggable="true" data-tag="{{yesterday_with_day}}"><span class="material-symbols-outlined chip-icon">arrow_back</span>昨日(曜日有)</div>
+              <div class="chip" draggable="true" data-tag="{{yesterday}}"><span class="material-symbols-outlined chip-icon">arrow_back</span>昨日</div>
+              <div class="chip" draggable="true" data-tag="{{tomorrow_with_day}}"><span class="material-symbols-outlined chip-icon">arrow_forward</span>明日(曜日有)</div>
+              <div class="chip" draggable="true" data-tag="{{tomorrow}}"><span class="material-symbols-outlined chip-icon">arrow_forward</span>明日</div>
+              <div class="chip" draggable="true" data-tag="{{next_week_with_day}}"><span class="material-symbols-outlined chip-icon">fast_forward</span>来週(曜日有)</div>
+              <div class="chip" draggable="true" data-tag="{{next_week}}"><span class="material-symbols-outlined chip-icon">fast_forward</span>来週</div>
+              <div class="chip" draggable="true" data-tag="{{month_end}}"><span class="material-symbols-outlined chip-icon">calendar_month</span>月末</div>
+              <div class="chip" draggable="true" data-tag="{{month_last_workday}}"><span class="material-symbols-outlined chip-icon">domain</span>月最終稼働日</div>
+              <div class="chip" draggable="true" data-tag="{{selection}}"><span class="material-symbols-outlined chip-icon">content_cut</span>選択テキスト</div>
+              <div class="chip" draggable="true" data-tag="{{page_title}}"><span class="material-symbols-outlined chip-icon">description</span>ページタイトル</div>
+              <div class="chip" draggable="true" data-tag="{{page_url}}"><span class="material-symbols-outlined chip-icon">link</span>ページURL</div>
             </div>
           </div>
 
