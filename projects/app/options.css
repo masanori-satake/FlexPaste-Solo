@@ -14,6 +14,7 @@
 
   --md-sys-color-surface: #F4FAF9;
   --md-sys-color-surface-dim: #D5DBDA;
+  --md-sys-color-surface-container-low: #FFFFFF;
   --md-sys-color-surface-container: #EAEFEF;
   --md-sys-color-surface-container-high: #E4E9E9;
   --md-sys-color-surface-container-highest: #DDE4E3;
@@ -173,7 +174,7 @@ body {
 }
 
 .card {
-  background-color: var(--md-sys-color-surface-container-low, #FAF7FD);
+  background-color: #FFFFFF;
   border-radius: var(--md-shape-corner-large);
   border: 1px solid var(--md-sys-color-outline-variant);
   padding: 20px;
@@ -187,9 +188,19 @@ body {
 }
 
 .card-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 16px;
   font-weight: 600;
   color: var(--md-sys-color-on-surface);
+}
+
+.icon-inline {
+  font-size: 20px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Sidebar Category List */
@@ -382,6 +393,13 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.add-template-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
 }
 
 .template-card {

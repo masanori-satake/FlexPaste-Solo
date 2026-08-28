@@ -186,8 +186,8 @@ function renderCategoryEditor() {
         <div class="input-field template-title-input">
           <input type="text" class="tpl-title-val" value="${escapeHtml(tpl.title || '')}" placeholder="テンプレート名...">
         </div>
-        <button class="btn btn-outlined text-danger btn-delete-tpl" title="テンプレート削除">
-          <span class="material-symbols-outlined icon">delete</span> 削除
+        <button class="btn btn-outlined text-danger icon-btn btn-delete-tpl" title="テンプレート削除" aria-label="テンプレート削除">
+          <span class="material-symbols-outlined">delete</span>
         </button>
       </div>
       <div class="input-field template-content-field">
@@ -195,7 +195,7 @@ function renderCategoryEditor() {
         <textarea class="tpl-content-val" placeholder="本文を入力... マスタッシュタグ {{variable}} が使えます">${escapeHtml(tpl.content || '')}</textarea>
       </div>
       <div class="template-preview-field">
-        <label class="preview-field-label"><span class="material-symbols-outlined icon-inline">bolt</span> リアルタイムプレビュー</label>
+        <label class="preview-field-label">リアルタイムプレビュー</label>
         <div class="preview-box">
           <div class="preview-content">${escapeHtml(previewResolved)}</div>
         </div>
