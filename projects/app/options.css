@@ -375,6 +375,12 @@ body {
 
 .chips-container {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chips-row {
+  display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
@@ -535,16 +541,40 @@ body {
 .template-preview-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
-.preview-field-label {
+.preview-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+  color: var(--md-sys-color-on-surface-variant);
+  font-family: inherit;
   font-size: 12px;
   font-weight: 600;
-  color: var(--md-sys-color-on-surface-variant);
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  text-align: left;
+  user-select: none;
+  transition: color 0.15s;
+  width: fit-content;
+}
+
+.preview-toggle-btn:hover {
+  color: var(--md-sys-color-primary);
+}
+
+.preview-toggle-btn .toggle-icon {
+  font-size: 18px;
+  transition: transform 0.2s;
+}
+
+.preview-toggle-btn .toggle-status {
+  font-size: 11px;
+  font-weight: normal;
+  color: var(--md-sys-color-outline);
 }
 
 .preview-box {
@@ -552,6 +582,11 @@ body {
   border-radius: var(--md-shape-corner-small);
   padding: 12px;
   border-left: 4px solid var(--md-sys-color-primary);
+  transition: max-height 0.2s ease;
+}
+
+.preview-box.hidden {
+  display: none;
 }
 
 .preview-content {

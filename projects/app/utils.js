@@ -68,6 +68,46 @@ export function formatTimeWithSec(date) {
   return `${h}:${m}:${s}`;
 }
 
+export function calculateNextWorkday(now, workdays) {
+  let activeWorkdays = Array.isArray(workdays)
+    ? workdays
+        .filter(d => (typeof d === 'number' || (typeof d === 'string' && d.trim() !== '')) && !Array.isArray(d))
+        .map(d => Number(d))
+        .filter(d => Number.isInteger(d) && d >= 1 && d <= 7)
+    : [1, 2, 3, 4, 5];
+
+  if (activeWorkdays.length === 0) {
+    activeWorkdays = [1, 2, 3, 4, 5];
+  }
+
+  let d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, now.getHours(), now.getMinutes(), now.getSeconds());
+  for (let i = 0; i < 366; i++) {
+    const day = d.getDay();
+    const isoDay = day === 0 ? 7 : day;
+    if (activeWorkdays.includes(isoDay)) {
+      return d;
+    }
+    d.setDate(d.getDate() + 1);
+  }
+  return d;
+}
+
+export function getNextWeekDays(now) {
+  const day = now.getDay();
+  const isoDay = day === 0 ? 7 : day;
+  const daysUntilNextMonday = 8 - isoDay;
+
+  const result = {};
+  const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+  for (let i = 0; i < 7; i++) {
+    const targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilNextMonday + i, now.getHours(), now.getMinutes(), now.getSeconds());
+    result[`next_week_${dayNames[i]}_with_day`] = formatDateWithDay(targetDate);
+  }
+
+  return result;
+}
+
 export function calculateMonthLastWorkday(now, workdays) {
   let activeWorkdays = Array.isArray(workdays)
     ? workdays
@@ -107,6 +147,9 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
   const nextWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7, now.getHours(), now.getMinutes(), now.getSeconds());
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
+  const nextWorkdayDate = calculateNextWorkday(now, workdays);
+  const nextWeekDays = getNextWeekDays(now);
+
   const replacements = {
     'date_with_day': formatDateWithDay(now),
     'date': formatDate(now),
@@ -116,8 +159,11 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
     'yesterday': formatDate(yesterday),
     'tomorrow_with_day': formatDateWithDay(tomorrow),
     'tomorrow': formatDate(tomorrow),
+    'next_workday_with_day': formatDateWithDay(nextWorkdayDate),
+    'next_workday': formatDate(nextWorkdayDate),
     'next_week_with_day': formatDateWithDay(nextWeek),
     'next_week': formatDate(nextWeek),
+    ...nextWeekDays,
     'month_end': formatDate(monthEnd),
     'month_last_workday': calculateMonthLastWorkday(now, workdays),
     'selection': selection,

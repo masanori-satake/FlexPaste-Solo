@@ -2,21 +2,30 @@
 import { DEFAULT_DATA, resolveVariables } from './utils.js';
 
 const VARIABLE_MAP = {
-  '{{date_with_day}}': { label: '日付(曜日有)', icon: 'calendar_today' },
-  '{{date}}': { label: '日付', icon: 'calendar_today' },
-  '{{time}}': { label: '時刻', icon: 'schedule' },
-  '{{time_with_sec}}': { label: '時刻(秒有)', icon: 'schedule' },
-  '{{yesterday_with_day}}': { label: '昨日(曜日有)', icon: 'arrow_back' },
-  '{{yesterday}}': { label: '昨日', icon: 'arrow_back' },
-  '{{tomorrow_with_day}}': { label: '明日(曜日有)', icon: 'arrow_forward' },
+  '{{date}}': { label: '今日', icon: 'calendar_today' },
+  '{{date_with_day}}': { label: '今日(曜日有)', icon: 'calendar_today' },
   '{{tomorrow}}': { label: '明日', icon: 'arrow_forward' },
-  '{{next_week_with_day}}': { label: '来週(曜日有)', icon: 'fast_forward' },
-  '{{next_week}}': { label: '来週', icon: 'fast_forward' },
+  '{{tomorrow_with_day}}': { label: '明日(曜日有)', icon: 'arrow_forward' },
+  '{{next_workday}}': { label: '次稼働日', icon: 'work' },
+  '{{next_workday_with_day}}': { label: '次稼働日(曜日有)', icon: 'work' },
+  '{{next_week}}': { label: '一週間後', icon: 'fast_forward' },
+  '{{next_week_with_day}}': { label: '一週間後(曜日有)', icon: 'fast_forward' },
+  '{{yesterday}}': { label: '昨日', icon: 'arrow_back' },
+  '{{yesterday_with_day}}': { label: '昨日(曜日有)', icon: 'arrow_back' },
+  '{{next_week_monday_with_day}}': { label: '次月曜日', icon: 'event' },
+  '{{next_week_tuesday_with_day}}': { label: '次火曜日', icon: 'event' },
+  '{{next_week_wednesday_with_day}}': { label: '次水曜日', icon: 'event' },
+  '{{next_week_thursday_with_day}}': { label: '次木曜日', icon: 'event' },
+  '{{next_week_friday_with_day}}': { label: '次金曜日', icon: 'event' },
+  '{{next_week_saturday_with_day}}': { label: '次土曜日', icon: 'event' },
+  '{{next_week_sunday_with_day}}': { label: '次日曜日', icon: 'event' },
   '{{month_end}}': { label: '月末', icon: 'calendar_month' },
-  '{{month_last_workday}}': { label: '月最終稼働日', icon: 'domain' },
+  '{{month_last_workday}}': { label: '月末最終稼働日', icon: 'domain' },
   '{{selection}}': { label: '選択テキスト', icon: 'content_cut' },
   '{{page_title}}': { label: 'ページタイトル', icon: 'description' },
-  '{{page_url}}': { label: 'ページURL', icon: 'link' }
+  '{{page_url}}': { label: 'ページURL', icon: 'link' },
+  '{{time}}': { label: '時刻', icon: 'schedule' },
+  '{{time_with_sec}}': { label: '時刻(秒有)', icon: 'schedule' }
 };
 
 let appState = {
@@ -298,12 +307,36 @@ function renderCategoryEditor() {
         <div class="tpl-content-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="テンプレート本文" aria-placeholder="本文を入力... チップを配置できます"></div>
       </div>
       <div class="template-preview-field">
-        <label class="preview-field-label">リアルタイムプレビュー</label>
-        <div class="preview-box">
+        <button type="button" class="preview-toggle-btn" aria-expanded="false" title="リアルタイムプレビューを切り替え">
+          <span class="material-symbols-outlined toggle-icon">chevron_right</span>
+          <span class="preview-field-label">リアルタイムプレビュー</span>
+          <span class="toggle-status">(クリックして開く)</span>
+        </button>
+        <div class="preview-box hidden">
           <div class="preview-content">${escapeHtml(previewResolved)}</div>
         </div>
       </div>
     `;
+
+    const previewToggleBtn = card.querySelector('.preview-toggle-btn');
+    const previewBox = card.querySelector('.preview-box');
+    const toggleIcon = card.querySelector('.toggle-icon');
+    const toggleStatus = card.querySelector('.toggle-status');
+
+    previewToggleBtn.addEventListener('click', () => {
+      const isHidden = previewBox.classList.contains('hidden');
+      if (isHidden) {
+        previewBox.classList.remove('hidden');
+        previewToggleBtn.setAttribute('aria-expanded', 'true');
+        toggleIcon.textContent = 'expand_more';
+        toggleStatus.textContent = '(クリックして閉じる)';
+      } else {
+        previewBox.classList.add('hidden');
+        previewToggleBtn.setAttribute('aria-expanded', 'false');
+        toggleIcon.textContent = 'chevron_right';
+        toggleStatus.textContent = '(クリックして開く)';
+      }
+    });
 
     const handleEl = card.querySelector('.tpl-drag-handle');
     const titleEl = card.querySelector('.tpl-title-val');
@@ -648,6 +681,17 @@ function setupEventHandlers() {
     currentCat.templates.push(newTpl);
     saveStorage(true);
     renderCategoryEditor();
+
+    // Smooth scroll to the newly created template card or bottom of templates scroll area
+    setTimeout(() => {
+      const scrollArea = document.querySelector('.templates-scroll-area');
+      if (scrollArea) {
+        scrollArea.scrollTo({
+          top: scrollArea.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
+    }, 0);
   });
 
   // Workday Checkboxes
