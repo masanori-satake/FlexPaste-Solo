@@ -264,7 +264,7 @@ function renderCategoryEditor() {
     return;
   }
 
-  editorArea.style.display = 'block';
+  editorArea.style.display = 'flex';
 
   // Category Title
   const titleInput = document.getElementById('current-cat-title');
@@ -682,14 +682,19 @@ function setupEventHandlers() {
     saveStorage(true);
     renderCategoryEditor();
 
-    // Smooth scroll to the newly created template card or bottom of templates scroll area
+    // Scroll to newly created template card
     setTimeout(() => {
-      const scrollArea = document.querySelector('.templates-scroll-area');
-      if (scrollArea) {
-        scrollArea.scrollTo({
-          top: scrollArea.scrollHeight,
-          behavior: 'smooth'
-        });
+      const lastCard = document.querySelector(`.template-card[data-id="${newTpl.id}"]`);
+      if (lastCard) {
+        lastCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        const scrollArea = document.querySelector('.templates-scroll-area');
+        if (scrollArea) {
+          scrollArea.scrollTo({
+            top: scrollArea.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
       }
     }, 0);
   });
@@ -704,6 +709,29 @@ function setupEventHandlers() {
       renderCategoryEditor();
     });
   });
+
+  // Variable Toolbar Toggle
+  const btnToggleChips = document.getElementById('btn-toggle-chips');
+  const chipsContainer = document.getElementById('chips-container');
+  if (btnToggleChips && chipsContainer) {
+    btnToggleChips.addEventListener('click', () => {
+      const isHidden = chipsContainer.classList.contains('hidden');
+      const toggleIcon = btnToggleChips.querySelector('.toggle-icon');
+      const toggleStatus = btnToggleChips.querySelector('.toggle-status');
+
+      if (isHidden) {
+        chipsContainer.classList.remove('hidden');
+        btnToggleChips.setAttribute('aria-expanded', 'true');
+        if (toggleIcon) toggleIcon.textContent = 'expand_more';
+        if (toggleStatus) toggleStatus.textContent = '(クリックして閉じる)';
+      } else {
+        chipsContainer.classList.add('hidden');
+        btnToggleChips.setAttribute('aria-expanded', 'false');
+        if (toggleIcon) toggleIcon.textContent = 'chevron_right';
+        if (toggleStatus) toggleStatus.textContent = '(クリックして開く)';
+      }
+    });
+  }
 
   // Variable Chips (Click & Drag)
   document.querySelectorAll('.chip').forEach(chip => {

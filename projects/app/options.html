@@ -85,9 +85,13 @@
           <!-- Variable Chips Toolbar -->
           <div class="variable-toolbar-card">
             <div class="toolbar-header">
-              <span>変数チップ (キャレット位置にクリックまたはドラッグで挿入)</span>
+              <button type="button" id="btn-toggle-chips" class="preview-toggle-btn" aria-expanded="true" title="変数チップエリアの開閉">
+                <span class="material-symbols-outlined toggle-icon">expand_more</span>
+                <span>変数チップ (キャレット位置にクリックまたはドラッグで挿入)</span>
+                <span class="toggle-status">(クリックして閉じる)</span>
+              </button>
             </div>
-            <div class="chips-container">
+            <div id="chips-container" class="chips-container">
               <!-- Row 1: 1..6 -->
               <div class="chips-row">
                 <div class="chip" draggable="true" data-tag="{{date}}"><span class="material-symbols-outlined chip-icon">calendar_today</span>今日</div>
@@ -130,19 +134,19 @@
             </div>
           </div>
 
-          <!-- Scrollable area for templates and add button -->
+          <!-- Scrollable area for templates -->
           <div class="templates-scroll-area">
             <!-- Templates List -->
             <div id="templates-container" class="templates-container">
               <!-- Dynamically populated template cards -->
             </div>
+          </div>
 
-            <!-- Add Template Button Container (Bottom Center) -->
-            <div class="add-template-wrapper">
-              <button id="btn-add-template" class="btn btn-filled icon-btn" title="テンプレート追加" aria-label="テンプレート追加">
-                <span class="material-symbols-outlined">add</span>
-              </button>
-            </div>
+          <!-- Add Template Button Container (Fixed at Bottom Center of Editor Card) -->
+          <div class="add-template-wrapper">
+            <button id="btn-add-template" class="btn btn-filled icon-btn" title="テンプレート追加" aria-label="テンプレート追加">
+              <span class="material-symbols-outlined">add</span>
+            </button>
           </div>
         </div>
       </section>
