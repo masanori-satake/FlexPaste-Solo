@@ -1,11 +1,114 @@
 // options.js - Options Page Script for FlexPaste-Solo
 import { DEFAULT_DATA, resolveVariables } from './utils.js';
 
+const VARIABLE_MAP = {
+  '{{date_with_day}}': { label: '日付(曜日有)', icon: 'calendar_today' },
+  '{{date}}': { label: '日付', icon: 'calendar_today' },
+  '{{time}}': { label: '時刻', icon: 'schedule' },
+  '{{time_with_sec}}': { label: '時刻(秒有)', icon: 'schedule' },
+  '{{yesterday_with_day}}': { label: '昨日(曜日有)', icon: 'arrow_back' },
+  '{{yesterday}}': { label: '昨日', icon: 'arrow_back' },
+  '{{tomorrow_with_day}}': { label: '明日(曜日有)', icon: 'arrow_forward' },
+  '{{tomorrow}}': { label: '明日', icon: 'arrow_forward' },
+  '{{next_week_with_day}}': { label: '来週(曜日有)', icon: 'fast_forward' },
+  '{{next_week}}': { label: '来週', icon: 'fast_forward' },
+  '{{month_end}}': { label: '月末', icon: 'calendar_month' },
+  '{{month_last_workday}}': { label: '月最終稼働日', icon: 'domain' },
+  '{{selection}}': { label: '選択テキスト', icon: 'content_cut' },
+  '{{page_title}}': { label: 'ページタイトル', icon: 'description' },
+  '{{page_url}}': { label: 'ページURL', icon: 'link' }
+};
+
 let appState = {
   settings: { workdays: [1, 2, 3, 4, 5] },
   categories: [],
   selectedCategoryId: null
 };
+
+// Helper: Create inline variable chip element
+function createChipNode(tag) {
+  const meta = VARIABLE_MAP[tag] || { label: tag.replace(/[\{\}]/g, ''), icon: 'code' };
+  const span = document.createElement('span');
+  span.className = 'tpl-chip';
+  span.contentEditable = 'false';
+  span.dataset.tag = tag;
+
+  span.innerHTML = `
+    <span class="material-symbols-outlined tpl-chip-icon">${meta.icon}</span>
+    <span class="tpl-chip-label">${escapeHtml(meta.label)}</span>
+    <button type="button" class="tpl-chip-remove" title="削除" aria-label="${escapeHtml(meta.label)}チップを削除">×</button>
+  `;
+
+  return span;
+}
+
+// Helper: Convert raw template content text (containing {{variable}}) into DOM nodes with inline chips
+function populateEditorFromText(container, text) {
+  container.innerHTML = '';
+  if (!text) return;
+
+  const regex = /\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      const textNode = document.createTextNode(text.substring(lastIndex, match.index));
+      container.appendChild(textNode);
+    }
+    const fullTag = `{{${match[1]}}}`;
+    const chipNode = createChipNode(fullTag);
+    container.appendChild(chipNode);
+    lastIndex = regex.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    const textNode = document.createTextNode(text.substring(lastIndex));
+    container.appendChild(textNode);
+  }
+}
+
+// Helper: Convert contenteditable element's DOM back to raw template text string (with {{variable}})
+function getEditorContentString(container) {
+  let result = '';
+
+  function processNode(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      result += node.nodeValue;
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      if (node.classList && node.classList.contains('tpl-chip')) {
+        result += node.dataset.tag || '';
+      } else if (node.tagName === 'BR') {
+        result += '\n';
+      } else if (node.tagName === 'DIV' || node.tagName === 'P') {
+        if (result.length > 0 && !result.endsWith('\n')) {
+          result += '\n';
+        }
+        // If the block contains only a single BR, ensure a newline is added even if result is empty or ends with a newline
+        const children = Array.from(node.childNodes);
+        if (children.length === 1 && children[0].tagName === 'BR') {
+          if (!result.endsWith('\n')) {
+            result += '\n';
+          }
+        } else {
+          for (const child of children) {
+            processNode(child);
+          }
+        }
+      } else {
+        for (const child of node.childNodes) {
+          processNode(child);
+        }
+      }
+    }
+  }
+
+  for (const child of container.childNodes) {
+    processNode(child);
+  }
+
+  return result;
+}
 
 let saveDebounceTimer = null;
 
@@ -192,7 +295,7 @@ function renderCategoryEditor() {
       </div>
       <div class="input-field template-content-field">
         <label>テンプレート本文</label>
-        <textarea class="tpl-content-val" placeholder="本文を入力... マスタッシュタグ {{variable}} が使えます">${escapeHtml(tpl.content || '')}</textarea>
+        <div class="tpl-content-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="テンプレート本文" aria-placeholder="本文を入力... チップを配置できます"></div>
       </div>
       <div class="template-preview-field">
         <label class="preview-field-label">リアルタイムプレビュー</label>
@@ -204,9 +307,12 @@ function renderCategoryEditor() {
 
     const handleEl = card.querySelector('.tpl-drag-handle');
     const titleEl = card.querySelector('.tpl-title-val');
-    const contentEl = card.querySelector('.tpl-content-val');
+    const contentEl = card.querySelector('.tpl-content-editor');
     const previewEl = card.querySelector('.preview-content');
     const deleteBtn = card.querySelector('.btn-delete-tpl');
+
+    // Populate contenteditable editor with text and chips
+    populateEditorFromText(contentEl, tpl.content || '');
 
     // Title edit with debounced save
     titleEl.addEventListener('input', (e) => {
@@ -214,9 +320,9 @@ function renderCategoryEditor() {
       debouncedSaveStorage();
     });
 
-    // Content edit with immediate live preview update and debounced save
-    contentEl.addEventListener('input', (e) => {
-      tpl.content = e.target.value;
+    // Update model and preview from contenteditable editor
+    const updateContent = () => {
+      tpl.content = getEditorContentString(contentEl);
       previewEl.textContent = resolveVariables(tpl.content, {
         workdays: appState.settings.workdays,
         selection: '（サンプル選択テキスト）',
@@ -224,9 +330,102 @@ function renderCategoryEditor() {
         page_url: 'https://example.com/sample'
       });
       debouncedSaveStorage();
+    };
+
+    contentEl.addEventListener('input', updateContent);
+
+    // Handle click on chip 'x' remove button
+    contentEl.addEventListener('click', (e) => {
+      const removeBtn = e.target.closest('.tpl-chip-remove');
+      if (removeBtn) {
+        const chip = removeBtn.closest('.tpl-chip');
+        if (chip) {
+          chip.remove();
+          updateContent();
+        }
+      }
     });
 
-    // Allow drop on textarea for variable chips
+    // Handle keydown for explicit Backspace/Delete removal of adjacent chips
+    contentEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' || e.key === 'Delete') {
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return;
+        const range = sel.getRangeAt(0);
+
+        if (range.collapsed) {
+          const container = range.startContainer;
+          const offset = range.startOffset;
+
+          if (e.key === 'Backspace') {
+            if (container.nodeType === Node.ELEMENT_NODE) {
+              const prevChild = container.childNodes[offset - 1];
+              if (prevChild && prevChild.nodeType === Node.ELEMENT_NODE && prevChild.classList.contains('tpl-chip')) {
+                e.preventDefault();
+                prevChild.remove();
+                updateContent();
+              }
+            } else if (container.nodeType === Node.TEXT_NODE && offset === 0) {
+              let prevNode = container.previousSibling;
+              if (prevNode && prevNode.nodeType === Node.ELEMENT_NODE && prevNode.classList.contains('tpl-chip')) {
+                e.preventDefault();
+                prevNode.remove();
+                updateContent();
+              }
+            }
+          } else if (e.key === 'Delete') {
+            if (container.nodeType === Node.ELEMENT_NODE) {
+              const nextChild = container.childNodes[offset];
+              if (nextChild && nextChild.nodeType === Node.ELEMENT_NODE && nextChild.classList.contains('tpl-chip')) {
+                e.preventDefault();
+                nextChild.remove();
+                updateContent();
+              }
+            } else if (container.nodeType === Node.TEXT_NODE && offset === container.nodeValue.length) {
+              let nextNode = container.nextSibling;
+              if (nextNode && nextNode.nodeType === Node.ELEMENT_NODE && nextNode.classList.contains('tpl-chip')) {
+                e.preventDefault();
+                nextNode.remove();
+                updateContent();
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Handle paste event in contenteditable: convert plain text Mustache tags to chips automatically
+    contentEl.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+      if (!text) return;
+
+      const sel = window.getSelection();
+      if (!sel.rangeCount) return;
+      sel.deleteFromDocument();
+      const range = sel.getRangeAt(0);
+
+      const tempDiv = document.createElement('div');
+      populateEditorFromText(tempDiv, text);
+
+      const frag = document.createDocumentFragment();
+      let lastNode = null;
+      while (tempDiv.firstChild) {
+        lastNode = tempDiv.firstChild;
+        frag.appendChild(lastNode);
+      }
+
+      range.insertNode(frag);
+      if (lastNode) {
+        range.setStartAfter(lastNode);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+      updateContent();
+    });
+
+    // Allow drop on contenteditable editor for variable chips
     contentEl.addEventListener('dragover', (e) => {
       e.preventDefault();
       contentEl.classList.add('drag-over');
@@ -243,14 +442,7 @@ function renderCategoryEditor() {
         const data = JSON.parse(e.dataTransfer.getData('text/plain'));
         if (data.type === 'chip' && data.tag) {
           insertTagAtCursor(contentEl, data.tag);
-          tpl.content = contentEl.value;
-          previewEl.textContent = resolveVariables(tpl.content, {
-            workdays: appState.settings.workdays,
-            selection: '（サンプル選択テキスト）',
-            page_title: 'サンプルページタイトル',
-            page_url: 'https://example.com/sample'
-          });
-          debouncedSaveStorage();
+          updateContent();
         }
       } catch (err) {
         // Not a chip drag
@@ -305,16 +497,32 @@ function renderCategoryEditor() {
   });
 }
 
-// Cursor Insertion Helper
-function insertTagAtCursor(textarea, tag) {
-  textarea.focus();
-  const start = textarea.selectionStart ?? textarea.value.length;
-  const end = textarea.selectionEnd ?? textarea.value.length;
-  const val = textarea.value;
-  textarea.value = val.substring(0, start) + tag + val.substring(end);
-  const newPos = start + tag.length;
-  textarea.setSelectionRange(newPos, newPos);
-  textarea.dispatchEvent(new Event('input', { bubbles: true }));
+// Cursor Insertion Helper for contenteditable editor
+function insertTagAtCursor(editor, tag) {
+  editor.focus();
+  const chipNode = createChipNode(tag);
+  const sel = window.getSelection();
+
+  if (sel && sel.rangeCount > 0 && editor.contains(sel.getRangeAt(0).commonAncestorContainer)) {
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(chipNode);
+    range.setStartAfter(chipNode);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else {
+    editor.appendChild(chipNode);
+    const range = document.createRange();
+    range.setStartAfter(chipNode);
+    range.collapse(true);
+    if (sel) {
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }
+
+  editor.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
 // Utility
@@ -459,16 +667,16 @@ function setupEventHandlers() {
 
     chip.addEventListener('click', () => {
       const activeEl = document.activeElement;
-      let targetTextarea = null;
+      let targetEditor = null;
 
-      if (activeEl && activeEl.tagName === 'TEXTAREA') {
-        targetTextarea = activeEl;
+      if (activeEl && activeEl.classList && activeEl.classList.contains('tpl-content-editor')) {
+        targetEditor = activeEl;
       } else {
-        targetTextarea = document.querySelector('.template-content-field textarea');
+        targetEditor = document.querySelector('.tpl-content-editor');
       }
 
-      if (targetTextarea) {
-        insertTagAtCursor(targetTextarea, tag);
+      if (targetEditor) {
+        insertTagAtCursor(targetEditor, tag);
       } else {
         showToast('テンプレート本文に入力カーソルを合わせてからクリックしてください');
       }
