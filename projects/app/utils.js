@@ -69,8 +69,11 @@ export function formatTimeWithSec(date) {
 }
 
 export function calculateMonthLastWorkday(now, workdays) {
-  let activeWorkdays = Array.isArray(workdays) && workdays.length > 0
-    ? workdays.filter(d => typeof d === 'number' && d >= 1 && d <= 7)
+  let activeWorkdays = Array.isArray(workdays)
+    ? workdays
+        .filter(d => (typeof d === 'number' || (typeof d === 'string' && d.trim() !== '')) && !Array.isArray(d))
+        .map(d => Number(d))
+        .filter(d => Number.isInteger(d) && d >= 1 && d <= 7)
     : [1, 2, 3, 4, 5];
 
   if (activeWorkdays.length === 0) {

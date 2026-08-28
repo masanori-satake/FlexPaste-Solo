@@ -1,30 +1,30 @@
 /* options.css - Material Design 3 (M3) Native CSS */
 
 :root {
-  /* Material Design 3 Color Tokens */
-  --md-sys-color-primary: #6750A4;
+  /* Material Design 3 Color Tokens (Teal / FlexPaste Theme) */
+  --md-sys-color-primary: #006A6A;
   --md-sys-color-on-primary: #FFFFFF;
-  --md-sys-color-primary-container: #EADDFF;
-  --md-sys-color-on-primary-container: #21005D;
+  --md-sys-color-primary-container: #CCE7E7;
+  --md-sys-color-on-primary-container: #002020;
 
-  --md-sys-color-secondary: #625B71;
+  --md-sys-color-secondary: #4A6363;
   --md-sys-color-on-secondary: #FFFFFF;
-  --md-sys-color-secondary-container: #E8DEF8;
-  --md-sys-color-on-secondary-container: #1D192B;
+  --md-sys-color-secondary-container: #CCE8E8;
+  --md-sys-color-on-secondary-container: #051F1F;
 
-  --md-sys-color-surface: #FEF7FF;
-  --md-sys-color-surface-dim: #DED8E1;
-  --md-sys-color-surface-container: #F3EDF7;
-  --md-sys-color-surface-container-high: #ECE6F0;
-  --md-sys-color-surface-container-highest: #E6E0E9;
-  --md-sys-color-on-surface: #1D1B20;
-  --md-sys-color-on-surface-variant: #49454F;
-  --md-sys-color-outline: #79747E;
-  --md-sys-color-outline-variant: #CAC4D0;
+  --md-sys-color-surface: #F4FAF9;
+  --md-sys-color-surface-dim: #D5DBDA;
+  --md-sys-color-surface-container: #EAEFEF;
+  --md-sys-color-surface-container-high: #E4E9E9;
+  --md-sys-color-surface-container-highest: #DDE4E3;
+  --md-sys-color-on-surface: #161D1D;
+  --md-sys-color-on-surface-variant: #3F4948;
+  --md-sys-color-outline: #6F7978;
+  --md-sys-color-outline-variant: #BEC9C8;
 
-  --md-sys-color-error: #B3261E;
-  --md-sys-color-error-container: #F9DEDC;
-  --md-sys-color-on-error-container: #410E0B;
+  --md-sys-color-error: #BA1A1A;
+  --md-sys-color-error-container: #FFDAD6;
+  --md-sys-color-on-error-container: #410002;
 
   /* Typography & Geometry */
   --md-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -113,7 +113,7 @@ body {
 }
 
 .btn-filled:hover {
-  background-color: #553E92;
+  background-color: #005050;
   box-shadow: var(--md-elevation-1);
 }
 
@@ -123,7 +123,7 @@ body {
 }
 
 .btn-filled-tonal:hover {
-  background-color: #D3C4EA;
+  background-color: #B5DCDA;
 }
 
 .btn-outlined {
@@ -133,7 +133,7 @@ body {
 }
 
 .btn-outlined:hover {
-  background-color: rgba(103, 80, 164, 0.08);
+  background-color: rgba(0, 106, 106, 0.08);
 }
 
 .btn-text {
@@ -142,7 +142,7 @@ body {
 }
 
 .btn-text:hover {
-  background-color: rgba(103, 80, 164, 0.08);
+  background-color: rgba(0, 106, 106, 0.08);
 }
 
 .icon-btn {
@@ -329,7 +329,7 @@ body {
 .input-field input[type="text"]:focus,
 .input-field textarea:focus {
   border-color: var(--md-sys-color-primary);
-  box-shadow: 0 0 0 2px rgba(103, 80, 164, 0.2);
+  box-shadow: 0 0 0 2px rgba(0, 106, 106, 0.2);
 }
 
 /* Variable Chips Toolbar */
@@ -420,6 +420,21 @@ body {
 }
 
 /* Preview Section */
+.template-preview-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.preview-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface-variant);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .preview-box {
   background-color: var(--md-sys-color-surface-container-high);
   border-radius: var(--md-shape-corner-small);
@@ -427,20 +442,12 @@ body {
   border-left: 4px solid var(--md-sys-color-primary);
 }
 
-.preview-title {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--md-sys-color-primary);
-  margin-bottom: 6px;
-}
-
 .preview-content {
   font-size: 13px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   color: var(--md-sys-color-on-surface);
+  user-select: text;
 }
 
 /* Dragging state styling */
@@ -456,7 +463,8 @@ body {
 .toast {
   position: fixed;
   bottom: 24px;
-  right: 24px;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: var(--md-sys-color-on-surface);
   color: var(--md-sys-color-surface);
   padding: 12px 20px;
@@ -464,7 +472,7 @@ body {
   font-size: 14px;
   box-shadow: var(--md-elevation-2);
   z-index: 1000;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .toast.hidden {

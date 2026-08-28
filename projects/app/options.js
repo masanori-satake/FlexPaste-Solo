@@ -89,7 +89,7 @@ function renderCategoryList() {
 
     item.innerHTML = `
       <div class="category-item-content">
-        <span class="drag-handle">⋮⋮</span>
+        <span class="material-symbols-outlined drag-handle">drag_indicator</span>
         <span class="category-title">${escapeHtml(cat.title || '（無題のカテゴリ）')}</span>
       </div>
     `;
@@ -172,7 +172,6 @@ function renderCategoryEditor() {
     card.className = 'template-card';
     card.dataset.id = tpl.id;
     card.dataset.index = tplIndex;
-    card.draggable = true;
 
     const previewResolved = resolveVariables(tpl.content || '', {
       workdays: appState.settings.workdays,
@@ -183,22 +182,27 @@ function renderCategoryEditor() {
 
     card.innerHTML = `
       <div class="template-card-header">
-        <span class="tpl-drag-handle">⋮⋮</span>
+        <span class="material-symbols-outlined tpl-drag-handle" draggable="true" title="ドラッグして順序変更">drag_indicator</span>
         <div class="input-field template-title-input">
           <input type="text" class="tpl-title-val" value="${escapeHtml(tpl.title || '')}" placeholder="テンプレート名...">
         </div>
-        <button class="btn btn-outlined text-danger btn-delete-tpl" title="テンプレート削除">削除</button>
+        <button class="btn btn-outlined text-danger btn-delete-tpl" title="テンプレート削除">
+          <span class="material-symbols-outlined icon">delete</span> 削除
+        </button>
       </div>
       <div class="input-field template-content-field">
         <label>テンプレート本文</label>
         <textarea class="tpl-content-val" placeholder="本文を入力... マスタッシュタグ {{variable}} が使えます">${escapeHtml(tpl.content || '')}</textarea>
       </div>
-      <div class="preview-box">
-        <div class="preview-title">⚡ リアルタイムプレビュー</div>
-        <div class="preview-content">${escapeHtml(previewResolved)}</div>
+      <div class="template-preview-field">
+        <label class="preview-field-label"><span class="material-symbols-outlined icon-inline">bolt</span> リアルタイムプレビュー</label>
+        <div class="preview-box">
+          <div class="preview-content">${escapeHtml(previewResolved)}</div>
+        </div>
       </div>
     `;
 
+    const handleEl = card.querySelector('.tpl-drag-handle');
     const titleEl = card.querySelector('.tpl-title-val');
     const contentEl = card.querySelector('.tpl-content-val');
     const previewEl = card.querySelector('.preview-content');
@@ -262,17 +266,13 @@ function renderCategoryEditor() {
       }
     });
 
-    // Template Drag & Drop Reordering
-    card.addEventListener('dragstart', (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        e.preventDefault();
-        return;
-      }
+    // Template Drag & Drop Reordering (Initiated strictly from the handle)
+    handleEl.addEventListener('dragstart', (e) => {
       e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'template', index: tplIndex }));
       card.classList.add('dragging');
     });
 
-    card.addEventListener('dragend', () => {
+    handleEl.addEventListener('dragend', () => {
       card.classList.remove('dragging');
     });
 
