@@ -84,10 +84,12 @@ function getEditorContentString(container) {
         if (result.length > 0 && !result.endsWith('\n')) {
           result += '\n';
         }
-        // If the block contains only a single BR, processing the block boundary added '\n', so ignore the inner BR to prevent duplicate newlines.
+        // If the block contains only a single BR, ensure a newline is added even if result is empty or ends with a newline
         const children = Array.from(node.childNodes);
         if (children.length === 1 && children[0].tagName === 'BR') {
-          // Inner BR skipped because block newline was already added
+          if (!result.endsWith('\n')) {
+            result += '\n';
+          }
         } else {
           for (const child of children) {
             processNode(child);
