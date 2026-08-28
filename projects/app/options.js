@@ -287,7 +287,7 @@ function renderCategoryEditor() {
       </div>
       <div class="input-field template-content-field">
         <label>テンプレート本文</label>
-        <div class="tpl-content-editor" contenteditable="true" aria-placeholder="本文を入力... チップを配置できます"></div>
+        <div class="tpl-content-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="テンプレート本文" aria-placeholder="本文を入力... チップを配置できます"></div>
       </div>
       <div class="template-preview-field">
         <label class="preview-field-label">リアルタイムプレビュー</label>
