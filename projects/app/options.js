@@ -12,13 +12,13 @@ const VARIABLE_MAP = {
   '{{next_week_with_day}}': { label: '一週間後(曜日有)', icon: 'fast_forward' },
   '{{yesterday}}': { label: '昨日', icon: 'arrow_back' },
   '{{yesterday_with_day}}': { label: '昨日(曜日有)', icon: 'arrow_back' },
-  '{{next_week_monday_with_day}}': { label: '次月(曜日有)', icon: 'event' },
-  '{{next_week_tuesday_with_day}}': { label: '次火(曜日有)', icon: 'event' },
-  '{{next_week_wednesday_with_day}}': { label: '次水(曜日有)', icon: 'event' },
-  '{{next_week_thursday_with_day}}': { label: '次木(曜日有)', icon: 'event' },
-  '{{next_week_friday_with_day}}': { label: '次金(曜日有)', icon: 'event' },
-  '{{next_week_saturday_with_day}}': { label: '次土(曜日有)', icon: 'event' },
-  '{{next_week_sunday_with_day}}': { label: '次日(曜日有)', icon: 'event' },
+  '{{next_week_monday_with_day}}': { label: '次月曜日', icon: 'event' },
+  '{{next_week_tuesday_with_day}}': { label: '次火曜日', icon: 'event' },
+  '{{next_week_wednesday_with_day}}': { label: '次水曜日', icon: 'event' },
+  '{{next_week_thursday_with_day}}': { label: '次木曜日', icon: 'event' },
+  '{{next_week_friday_with_day}}': { label: '次金曜日', icon: 'event' },
+  '{{next_week_saturday_with_day}}': { label: '次土曜日', icon: 'event' },
+  '{{next_week_sunday_with_day}}': { label: '次日曜日', icon: 'event' },
   '{{month_end}}': { label: '月末', icon: 'calendar_month' },
   '{{month_last_workday}}': { label: '月末最終稼働日', icon: 'domain' },
   '{{selection}}': { label: '選択テキスト', icon: 'content_cut' },
@@ -307,12 +307,36 @@ function renderCategoryEditor() {
         <div class="tpl-content-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="テンプレート本文" aria-placeholder="本文を入力... チップを配置できます"></div>
       </div>
       <div class="template-preview-field">
-        <label class="preview-field-label">リアルタイムプレビュー</label>
-        <div class="preview-box">
+        <button type="button" class="preview-toggle-btn" aria-expanded="false" title="リアルタイムプレビューを切り替え">
+          <span class="material-symbols-outlined toggle-icon">chevron_right</span>
+          <span class="preview-field-label">リアルタイムプレビュー</span>
+          <span class="toggle-status">(クリックして開く)</span>
+        </button>
+        <div class="preview-box hidden">
           <div class="preview-content">${escapeHtml(previewResolved)}</div>
         </div>
       </div>
     `;
+
+    const previewToggleBtn = card.querySelector('.preview-toggle-btn');
+    const previewBox = card.querySelector('.preview-box');
+    const toggleIcon = card.querySelector('.toggle-icon');
+    const toggleStatus = card.querySelector('.toggle-status');
+
+    previewToggleBtn.addEventListener('click', () => {
+      const isHidden = previewBox.classList.contains('hidden');
+      if (isHidden) {
+        previewBox.classList.remove('hidden');
+        previewToggleBtn.setAttribute('aria-expanded', 'true');
+        toggleIcon.textContent = 'expand_more';
+        toggleStatus.textContent = '(クリックして閉じる)';
+      } else {
+        previewBox.classList.add('hidden');
+        previewToggleBtn.setAttribute('aria-expanded', 'false');
+        toggleIcon.textContent = 'chevron_right';
+        toggleStatus.textContent = '(クリックして開く)';
+      }
+    });
 
     const handleEl = card.querySelector('.tpl-drag-handle');
     const titleEl = card.querySelector('.tpl-title-val');
