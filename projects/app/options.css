@@ -375,6 +375,12 @@ body {
 
 .chips-container {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chips-row {
+  display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
