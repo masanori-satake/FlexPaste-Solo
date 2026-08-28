@@ -710,6 +710,29 @@ function setupEventHandlers() {
     });
   });
 
+  // Variable Toolbar Toggle
+  const btnToggleChips = document.getElementById('btn-toggle-chips');
+  const chipsContainer = document.getElementById('chips-container');
+  if (btnToggleChips && chipsContainer) {
+    btnToggleChips.addEventListener('click', () => {
+      const isHidden = chipsContainer.classList.contains('hidden');
+      const toggleIcon = btnToggleChips.querySelector('.toggle-icon');
+      const toggleStatus = btnToggleChips.querySelector('.toggle-status');
+
+      if (isHidden) {
+        chipsContainer.classList.remove('hidden');
+        btnToggleChips.setAttribute('aria-expanded', 'true');
+        if (toggleIcon) toggleIcon.textContent = 'expand_more';
+        if (toggleStatus) toggleStatus.textContent = '(クリックして閉じる)';
+      } else {
+        chipsContainer.classList.add('hidden');
+        btnToggleChips.setAttribute('aria-expanded', 'false');
+        if (toggleIcon) toggleIcon.textContent = 'chevron_right';
+        if (toggleStatus) toggleStatus.textContent = '(クリックして開く)';
+      }
+    });
+  }
+
   // Variable Chips (Click & Drag)
   document.querySelectorAll('.chip').forEach(chip => {
     const tag = chip.dataset.tag;

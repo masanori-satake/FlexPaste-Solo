@@ -403,16 +403,18 @@ body {
 }
 
 .toolbar-header {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--md-sys-color-on-surface-variant);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .chips-container {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-top: 8px;
+}
+
+.chips-container.hidden {
+  display: none;
 }
 
 .chips-row {
