@@ -8,6 +8,7 @@ export const DEFAULT_DATA = {
     {
       id: "cat_1",
       title: "業務連絡",
+      time_adj_interval: 0,
       templates: [
         {
           id: "tpl_1",
@@ -24,6 +25,7 @@ export const DEFAULT_DATA = {
     {
       id: "cat_2",
       title: "日程調整",
+      time_adj_interval: 0,
       templates: [
         {
           id: "tpl_3",
@@ -66,6 +68,23 @@ export function formatTimeWithSec(date) {
   const m = padZero(date.getMinutes());
   const s = padZero(date.getSeconds());
   return `${h}:${m}:${s}`;
+}
+
+export function adjustTime(date, intervalMinutes = 0, mode = 'prev') {
+  const interval = Number(intervalMinutes) || 0;
+  if (interval === 0) {
+    return formatTime(date);
+  }
+  const totalMinutes = date.getHours() * 60 + date.getMinutes();
+  let adjMinutes;
+  if (mode === 'prev') {
+    adjMinutes = Math.floor(totalMinutes / interval) * interval;
+  } else {
+    adjMinutes = Math.ceil(totalMinutes / interval) * interval;
+  }
+  const h = padZero(Math.floor(adjMinutes / 60) % 24);
+  const m = padZero(adjMinutes % 60);
+  return `${h}:${m}`;
 }
 
 export function calculateNextWorkday(now, workdays) {
@@ -141,11 +160,13 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
   const selection = contextData.selection ?? '';
   const pageTitle = contextData.page_title ?? '';
   const pageUrl = contextData.page_url ?? '';
+  const timeAdjInterval = Number(contextData.time_adj_interval) || 0;
 
   const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, now.getHours(), now.getMinutes(), now.getSeconds());
   const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, now.getHours(), now.getMinutes(), now.getSeconds());
   const nextWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7, now.getHours(), now.getMinutes(), now.getSeconds());
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const inOneHour = new Date(now.getTime() + 60 * 60 * 1000);
 
   const nextWorkdayDate = calculateNextWorkday(now, workdays);
   const nextWeekDays = getNextWeekDays(now);
@@ -155,6 +176,11 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
     'date': formatDate(now),
     'time': formatTime(now),
     'time_with_sec': formatTimeWithSec(now),
+    'time_prev_adj': adjustTime(now, timeAdjInterval, 'prev'),
+    'time_next_adj': adjustTime(now, timeAdjInterval, 'next'),
+    'in_one_hour': formatTime(inOneHour),
+    'in_one_hour_prev_adj': adjustTime(inOneHour, timeAdjInterval, 'prev'),
+    'in_one_hour_next_adj': adjustTime(inOneHour, timeAdjInterval, 'next'),
     'yesterday_with_day': formatDateWithDay(yesterday),
     'yesterday': formatDate(yesterday),
     'tomorrow_with_day': formatDateWithDay(tomorrow),

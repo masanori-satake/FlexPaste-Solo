@@ -24,8 +24,12 @@ const VARIABLE_MAP = {
   '{{selection}}': { label: '選択テキスト', icon: 'content_cut' },
   '{{page_title}}': { label: 'ページタイトル', icon: 'description' },
   '{{page_url}}': { label: 'ページURL', icon: 'link' },
-  '{{time}}': { label: '時刻', icon: 'schedule' },
-  '{{time_with_sec}}': { label: '時刻(秒有)', icon: 'schedule' }
+  '{{time}}': { label: '現在時刻', icon: 'schedule' },
+  '{{time_prev_adj}}': { label: '現在時刻(前補正)', icon: 'schedule' },
+  '{{time_next_adj}}': { label: '現在時刻(後補正)', icon: 'schedule' },
+  '{{in_one_hour}}': { label: '一時間後', icon: 'schedule' },
+  '{{in_one_hour_prev_adj}}': { label: '一時間後(前補正)', icon: 'schedule' },
+  '{{in_one_hour_next_adj}}': { label: '一時間後(後補正)', icon: 'schedule' }
 };
 
 let appState = {
@@ -189,6 +193,7 @@ function updateAllPreviews() {
     if (previewEl) {
       previewEl.textContent = resolveVariables(tpl.content || '', {
         workdays: appState.settings.workdays,
+        time_adj_interval: currentCat.time_adj_interval || 0,
         selection: '（サンプル選択テキスト）',
         page_title: 'サンプルページタイトル',
         page_url: 'https://example.com/sample'
@@ -300,6 +305,12 @@ function renderCategoryEditor() {
   const titleInput = document.getElementById('current-cat-title');
   titleInput.value = currentCat.title || '';
 
+  // Category Time Adjustment Interval
+  const timeAdjSelect = document.getElementById('current-cat-time-adj');
+  if (timeAdjSelect) {
+    timeAdjSelect.value = String(currentCat.time_adj_interval || 0);
+  }
+
   // Render Templates
   const templatesContainer = document.getElementById('templates-container');
   templatesContainer.innerHTML = '';
@@ -317,6 +328,7 @@ function renderCategoryEditor() {
 
     const previewResolved = resolveVariables(tpl.content || '', {
       workdays: appState.settings.workdays,
+      time_adj_interval: currentCat.time_adj_interval || 0,
       selection: '（サンプル選択テキスト）',
       page_title: 'サンプルページタイトル',
       page_url: 'https://example.com/sample'
@@ -388,6 +400,7 @@ function renderCategoryEditor() {
       tpl.content = getEditorContentString(contentEl);
       previewEl.textContent = resolveVariables(tpl.content, {
         workdays: appState.settings.workdays,
+        time_adj_interval: currentCat.time_adj_interval || 0,
         selection: '（サンプル選択テキスト）',
         page_title: 'サンプルページタイトル',
         page_url: 'https://example.com/sample'
@@ -632,6 +645,7 @@ function validateAndNormalizeBackup(data) {
       seenCatIds.add(catId);
 
       const catTitle = typeof cat?.title === 'string' ? cat.title : `カテゴリ ${catIdx + 1}`;
+      const timeAdjInterval = [0, 5, 10, 15, 30].includes(Number(cat?.time_adj_interval)) ? Number(cat.time_adj_interval) : 0;
       const templates = Array.isArray(cat?.templates) ? cat.templates.map((tpl, tplIdx) => ({
         id: typeof tpl?.id === 'string' && tpl.id ? tpl.id : generateId('tpl'),
         title: typeof tpl?.title === 'string' ? tpl.title : `定型文 ${tplIdx + 1}`,
@@ -641,6 +655,7 @@ function validateAndNormalizeBackup(data) {
       return {
         id: catId,
         title: catTitle,
+        time_adj_interval: timeAdjInterval,
         templates
       };
     });
@@ -663,6 +678,16 @@ function setupEventHandlers() {
     }
   });
 
+  // Category Time Adjustment Interval Change
+  document.getElementById('current-cat-time-adj').addEventListener('change', (e) => {
+    const currentCat = appState.categories.find(c => c.id === appState.selectedCategoryId);
+    if (currentCat) {
+      currentCat.time_adj_interval = Number(e.target.value) || 0;
+      saveStorage(true);
+      updateAllPreviews();
+    }
+  });
+
   // Add Category
   document.getElementById('btn-add-category').addEventListener('click', () => {
     if (!Array.isArray(appState.categories)) {
@@ -671,6 +696,7 @@ function setupEventHandlers() {
     const newCat = {
       id: generateId('cat'),
       title: '新しいカテゴリ',
+      time_adj_interval: 0,
       templates: []
     };
     appState.categories.push(newCat);
