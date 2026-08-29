@@ -233,9 +233,9 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       const contextData = {
         workdays: settings.workdays || [1, 2, 3, 4, 5],
         time_adj_interval: foundCategory?.time_adj_interval || 0,
-        selection: info.selectionText || '',
-        page_title: tab?.title || '',
-        page_url: tab?.url || ''
+        def_1: foundCategory?.def_1 || '',
+        def_2: foundCategory?.def_2 || '',
+        def_3: foundCategory?.def_3 || ''
       };
 
       const resolvedText = resolveVariables(foundTemplate.content, contextData);

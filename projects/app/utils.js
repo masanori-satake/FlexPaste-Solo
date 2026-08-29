@@ -32,16 +32,19 @@ const DEFAULT_DATA_JA = {
       id: "cat_1",
       title: "業務連絡",
       time_adj_interval: 0,
+      def_1: "",
+      def_2: "",
+      def_3: "",
       templates: [
         {
           id: "tpl_1",
           title: "日報フォーマット",
-          content: "【日報】{{date_with_day}}\n\n■ 本日の業務内容\n- {{selection}}\n\n■ 明日の予定\n- \n\n退勤時刻: {{time}}"
+          content: "【日報】{{date_with_day}}\n\n■ 本日の業務内容\n- {{def_1}}\n\n■ 明日の予定\n- \n\n退勤時刻: {{time}}"
         },
         {
           id: "tpl_2",
           title: "業務終了報告",
-          content: "本日の業務を終了します。\n稼働時間: 9:00-{{time}}\n対象: {{selection}}"
+          content: "本日の業務を終了します。\n稼働時間: 9:00-{{time}}\n連絡先: {{def_2}}"
         }
       ]
     },
@@ -49,11 +52,14 @@ const DEFAULT_DATA_JA = {
       id: "cat_2",
       title: "日程調整",
       time_adj_interval: 0,
+      def_1: "",
+      def_2: "",
+      def_3: "",
       templates: [
         {
           id: "tpl_3",
           title: "会議開催案内",
-          content: "お世話になっております。\n以下の件について会議を設定させていただきます。\n\n件名: {{page_title}}\n参考URL: {{page_url}}\n候補日時: {{tomorrow_with_day}} 10:00〜\n\nご確認のほどよろしくお願いいたします。"
+          content: "お世話になっております。\n以下の件について会議を設定させていただきます。\n\n件名: {{def_1}}\n参考: {{def_2}}\n候補日時: {{tomorrow_with_day}} 10:00〜\n\nご確認のほどよろしくお願いいたします。"
         }
       ]
     }
@@ -69,16 +75,19 @@ const DEFAULT_DATA_EN = {
       id: "cat_1",
       title: "Work Updates",
       time_adj_interval: 0,
+      def_1: "",
+      def_2: "",
+      def_3: "",
       templates: [
         {
           id: "tpl_1",
           title: "Daily Report Format",
-          content: "[Daily Report] {{date_with_day}}\n\n■ Today's Tasks\n- {{selection}}\n\n■ Tomorrow's Plan\n- \n\nClock-out Time: {{time}}"
+          content: "[Daily Report] {{date_with_day}}\n\n■ Today's Tasks\n- {{def_1}}\n\n■ Tomorrow's Plan\n- \n\nClock-out Time: {{time}}"
         },
         {
           id: "tpl_2",
           title: "End of Day Report",
-          content: "Finished work for today.\nWorking Hours: 9:00-{{time}}\nSubject: {{selection}}"
+          content: "Finished work for today.\nWorking Hours: 9:00-{{time}}\nContact: {{def_2}}"
         }
       ]
     },
@@ -86,11 +95,14 @@ const DEFAULT_DATA_EN = {
       id: "cat_2",
       title: "Scheduling",
       time_adj_interval: 0,
+      def_1: "",
+      def_2: "",
+      def_3: "",
       templates: [
         {
           id: "tpl_3",
           title: "Meeting Invitation",
-          content: "Hello,\nI would like to schedule a meeting regarding the following:\n\nSubject: {{page_title}}\nURL: {{page_url}}\nProposed Time: {{tomorrow_with_day}} 10:00~\n\nPlease let me know if this works for you."
+          content: "Hello,\nI would like to schedule a meeting regarding the following:\n\nSubject: {{def_1}}\nNote: {{def_2}}\nProposed Time: {{tomorrow_with_day}} 10:00~\n\nPlease let me know if this works for you."
         }
       ]
     }
@@ -228,10 +240,10 @@ export function calculateMonthLastWorkday(now, workdays) {
 
 export function resolveVariables(templateContent, contextData = {}, now = new Date()) {
   const workdays = contextData.workdays || [1, 2, 3, 4, 5];
-  const selection = contextData.selection ?? '';
-  const pageTitle = contextData.page_title ?? '';
-  const pageUrl = contextData.page_url ?? '';
   const timeAdjInterval = Number(contextData.time_adj_interval) || 0;
+  const def1 = contextData.def_1 ?? '';
+  const def2 = contextData.def_2 ?? '';
+  const def3 = contextData.def_3 ?? '';
 
   const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, now.getHours(), now.getMinutes(), now.getSeconds());
   const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, now.getHours(), now.getMinutes(), now.getSeconds());
@@ -264,9 +276,9 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
     ...nextWeekDays,
     'month_end': formatDate(monthEnd),
     'month_last_workday': calculateMonthLastWorkday(now, workdays),
-    'selection': selection,
-    'page_title': pageTitle,
-    'page_url': pageUrl
+    'def_1': def1,
+    'def_2': def2,
+    'def_3': def3
   };
 
   return templateContent.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (match, varName) => {
