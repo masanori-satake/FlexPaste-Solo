@@ -342,5 +342,18 @@
   "untitledTemplate": {
     "message": "（無題のテンプレート）",
     "description": "Untitled template fallback for context menu"
+  },
+  "deleteChipAriaLabel": {
+    "message": "$LABEL$チップを削除",
+    "description": "Aria label for inline chip remove button",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      }
+    }
+  },
+  "dragToReorder": {
+    "message": "ドラッグして順序変更",
+    "description": "Tooltip for template handle"
   }
 }

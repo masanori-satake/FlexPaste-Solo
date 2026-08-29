@@ -56,7 +56,7 @@ function createChipNode(tag) {
   span.innerHTML = `
     <span class="material-symbols-outlined tpl-chip-icon">${meta.icon}</span>
     <span class="tpl-chip-label">${escapeHtml(meta.label)}</span>
-    <button type="button" class="tpl-chip-remove" title="×" aria-label="Remove ${escapeHtml(meta.label)}">×</button>
+    <button type="button" class="tpl-chip-remove" title="×" aria-label="${escapeHtml(getMessage('deleteChipAriaLabel', meta.label))}">×</button>
   `;
 
   return span;
@@ -434,7 +434,7 @@ function renderCategoryEditor() {
 
     card.innerHTML = `
       <div class="template-card-header">
-        <span class="material-symbols-outlined tpl-drag-handle" draggable="true" title="Drag to reorder">drag_indicator</span>
+        <span class="material-symbols-outlined tpl-drag-handle" draggable="true" title="${escapeHtml(getMessage('dragToReorder'))}">drag_indicator</span>
         <div class="input-field template-title-input">
           <input type="text" class="tpl-title-val" value="${escapeHtml(tpl.title || '')}" placeholder="${escapeHtml(getMessage('templateTitlePlaceholder'))}">
         </div>

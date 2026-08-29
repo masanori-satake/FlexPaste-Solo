@@ -32,7 +32,9 @@
   --md-sys-color-workday-active-bg: #624B5D;
   --md-sys-color-workday-active-text: #FFFFFF;
   --md-sys-color-workday-sun: #C83737;
+  --md-sys-color-workday-sun-active-text: #FFFFFF;
   --md-sys-color-workday-sat: #1976D2;
+  --md-sys-color-workday-sat-active-text: #FFFFFF;
 
   /* Typography & Geometry */
   --md-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -76,7 +78,9 @@
     --md-sys-color-workday-active-bg: #9C8397;
     --md-sys-color-workday-active-text: #171D1D;
     --md-sys-color-workday-sun: #FFB4AB;
+    --md-sys-color-workday-sun-active-text: #380B0B;
     --md-sys-color-workday-sat: #90CAF9;
+    --md-sys-color-workday-sat-active-text: #0A2D4D;
 
     --md-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.4), 0px 1px 2px 0px rgba(0, 0, 0, 0.6);
     --md-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.4), 0px 1px 2px 0px rgba(0, 0, 0, 0.6);
@@ -391,13 +395,13 @@ body {
 .workday-pill.workday-sun.active {
   background-color: var(--md-sys-color-workday-sun);
   border-color: var(--md-sys-color-workday-sun);
-  color: #FFFFFF;
+  color: var(--md-sys-color-workday-sun-active-text);
 }
 
 .workday-pill.workday-sat.active {
   background-color: var(--md-sys-color-workday-sat);
   border-color: var(--md-sys-color-workday-sat);
-  color: #FFFFFF;
+  color: var(--md-sys-color-workday-sat-active-text);
 }
 
 .setting-desc {

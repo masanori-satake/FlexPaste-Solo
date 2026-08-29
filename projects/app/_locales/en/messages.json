@@ -342,5 +342,18 @@
   "untitledTemplate": {
     "message": "(Untitled Template)",
     "description": "Untitled template fallback for context menu"
+  },
+  "deleteChipAriaLabel": {
+    "message": "Remove $LABEL$ chip",
+    "description": "Aria label for inline chip remove button",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      }
+    }
+  },
+  "dragToReorder": {
+    "message": "Drag to reorder",
+    "description": "Tooltip for template handle"
   }
 }
