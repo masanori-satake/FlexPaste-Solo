@@ -175,6 +175,28 @@ function debouncedSaveStorage(delay = 300) {
   }, delay);
 }
 
+// Helper to update all previews without re-rendering template cards
+function updateAllPreviews() {
+  const currentCat = appState.categories.find(c => c.id === appState.selectedCategoryId);
+  if (!currentCat || !currentCat.templates) return;
+
+  const cards = document.querySelectorAll('#templates-container .template-card');
+  cards.forEach(card => {
+    const tplId = card.dataset.id;
+    const tpl = currentCat.templates.find(t => t.id === tplId);
+    if (!tpl) return;
+    const previewEl = card.querySelector('.preview-content');
+    if (previewEl) {
+      previewEl.textContent = resolveVariables(tpl.content || '', {
+        workdays: appState.settings.workdays,
+        selection: '（サンプル選択テキスト）',
+        page_title: 'サンプルページタイトル',
+        page_url: 'https://example.com/sample'
+      });
+    }
+  });
+}
+
 // Render Functions
 function renderWorkdays() {
   const pills = document.querySelectorAll('.workday-pill');
@@ -720,7 +742,7 @@ function setupEventHandlers() {
       appState.settings.workdays = activeDays;
       saveStorage(true);
       renderWorkdays();
-      renderCategoryEditor();
+      updateAllPreviews();
     });
   });
 
