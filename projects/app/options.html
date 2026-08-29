@@ -12,18 +12,30 @@
     <!-- Top Header -->
     <header class="app-header">
       <div class="header-brand">
-        <span class="material-symbols-outlined brand-icon">content_paste</span>
+        <img src="icons/icon32.png" alt="FlexPaste-Solo" class="brand-icon-img">
         <div>
           <h1>FlexPaste-Solo</h1>
-          <p class="subtitle">カテゴリ別定型文 ＆ 動的変数 マネジメント</p>
+          <p class="subtitle">カテゴリ別定型文 ＆ チップ 設定</p>
         </div>
       </div>
       <div class="header-actions">
-        <button id="btn-export" class="btn btn-outlined">
-          <span class="material-symbols-outlined icon">download</span> エクスポート
+        <div class="header-workdays-container">
+          <span class="workdays-label">稼働曜日</span>
+          <div class="workday-pills">
+            <button type="button" class="workday-pill workday-sun" data-value="7" title="日曜日">日</button>
+            <button type="button" class="workday-pill workday-mon" data-value="1" title="月曜日">月</button>
+            <button type="button" class="workday-pill workday-tue" data-value="2" title="火曜日">火</button>
+            <button type="button" class="workday-pill workday-wed" data-value="3" title="水曜日">水</button>
+            <button type="button" class="workday-pill workday-thu" data-value="4" title="木曜日">木</button>
+            <button type="button" class="workday-pill workday-fri" data-value="5" title="金曜日">金</button>
+            <button type="button" class="workday-pill workday-sat" data-value="6" title="土曜日">土</button>
+          </div>
+        </div>
+        <button id="btn-export" class="btn btn-outlined icon-btn" title="エクスポート" aria-label="エクスポート">
+          <span class="material-symbols-outlined">download</span>
         </button>
-        <button id="btn-import" class="btn btn-outlined">
-          <span class="material-symbols-outlined icon">upload</span> インポート
+        <button id="btn-import" class="btn btn-outlined icon-btn" title="インポート" aria-label="インポート">
+          <span class="material-symbols-outlined">upload</span>
         </button>
         <input type="file" id="file-import" accept=".json" style="display: none;">
         <button id="btn-reset" class="btn btn-text text-danger icon-btn" title="初期化" aria-label="初期化">
@@ -31,25 +43,6 @@
         </button>
       </div>
     </header>
-
-    <!-- Common Settings Section -->
-    <section class="card settings-card">
-      <div class="card-header">
-        <h2><span class="material-symbols-outlined icon-inline">settings</span> 共通設定(稼働曜日)</h2>
-      </div>
-      <div class="card-body">
-        <p class="setting-desc"><code>{{month_last_workday}}</code> (月末最終稼働日) および <code>{{next_workday}}</code> (次稼働日) の計算対象とする曜日を選択してください。</p>
-        <div class="workday-checkboxes">
-          <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="1"> 月</label>
-          <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="2"> 火</label>
-          <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="3"> 水</label>
-          <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="4"> 木</label>
-          <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="5"> 金</label>
-          <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="6"> 土</label>
-          <label class="checkbox-label"><input type="checkbox" class="workday-cb" value="7"> 日</label>
-        </div>
-      </div>
-    </section>
 
     <!-- Main Content Grid -->
     <main class="app-main">
@@ -85,9 +78,9 @@
           <!-- Variable Chips Toolbar -->
           <div class="variable-toolbar-card">
             <div class="toolbar-header">
-              <button type="button" id="btn-toggle-chips" class="preview-toggle-btn" aria-expanded="true" title="変数チップエリアの開閉">
+              <button type="button" id="btn-toggle-chips" class="preview-toggle-btn" aria-expanded="true" title="チップエリアの開閉">
                 <span class="material-symbols-outlined toggle-icon">expand_more</span>
-                <span>変数チップ (キャレット位置にクリックまたはドラッグで挿入)</span>
+                <span>チップ (キャレット位置にクリックまたはドラッグで挿入)</span>
                 <span class="toggle-status">(クリックして閉じる)</span>
               </button>
             </div>
