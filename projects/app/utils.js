@@ -141,13 +141,6 @@ export function formatTime(date) {
   return `${h}:${m}`;
 }
 
-export function formatTimeWithSec(date) {
-  const h = padZero(date.getHours());
-  const m = padZero(date.getMinutes());
-  const s = padZero(date.getSeconds());
-  return `${h}:${m}:${s}`;
-}
-
 export function adjustTime(date, intervalMinutes = 0, mode = 'prev') {
   const interval = Number(intervalMinutes) || 0;
   if (interval === 0) {
@@ -254,7 +247,6 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
     'date': formatDate(now),
     'date_short': formatDateShort(now),
     'time': formatTime(now),
-    'time_with_sec': formatTimeWithSec(now),
     'time_prev_adj': adjustTime(now, timeAdjInterval, 'prev'),
     'time_next_adj': adjustTime(now, timeAdjInterval, 'next'),
     'in_one_hour': formatTime(inOneHour),

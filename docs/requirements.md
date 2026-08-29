@@ -85,8 +85,8 @@ flexpaste-solo/
 1. **基本日時:**
 * `{{date_with_day}}` : 例 `2026年8月27日(木)`
 * `{{date}}` : 例 `2026/08/27`
+* `{{date_short}}` : 例 `8/27`
 * `{{time}}` : 例 `20:41`
-* `{{time_with_sec}}` : 例 `20:41:38`
 
 2. **相対日付:**
 * `{{yesterday_with_day}}` / `{{yesterday}}` : 昨日（1日前）
