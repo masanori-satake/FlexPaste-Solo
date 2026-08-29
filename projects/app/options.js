@@ -181,10 +181,13 @@ function renderWorkdays() {
   const activeDays = appState.settings.workdays || [1, 2, 3, 4, 5];
   pills.forEach(pill => {
     const val = parseInt(pill.dataset.value, 10);
-    if (activeDays.includes(val)) {
+    const isActive = activeDays.includes(val);
+    if (isActive) {
       pill.classList.add('active');
+      pill.setAttribute('aria-pressed', 'true');
     } else {
       pill.classList.remove('active');
+      pill.setAttribute('aria-pressed', 'false');
     }
   });
 }
