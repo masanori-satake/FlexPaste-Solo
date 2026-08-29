@@ -210,6 +210,8 @@ function updateAllPreviews() {
 }
 
 function localizeStaticUI() {
+  document.title = getMessage('optionsTitle');
+
   const elemSubtitle = document.getElementById('i18n-header-subtitle');
   if (elemSubtitle) elemSubtitle.textContent = getMessage('headerSubtitle');
 
@@ -217,14 +219,19 @@ function localizeStaticUI() {
   if (elemWorkdays) elemWorkdays.textContent = getMessage('workdaysLabel');
 
   const daysMap = {
-    'pill-sun': 'sun', 'pill-mon': 'mon', 'pill-tue': 'tue',
-    'pill-wed': 'wed', 'pill-thu': 'thu', 'pill-fri': 'fri', 'pill-sat': 'sat'
+    'pill-sun': { text: 'sun', full: 'sunFull' },
+    'pill-mon': { text: 'mon', full: 'monFull' },
+    'pill-tue': { text: 'tue', full: 'tueFull' },
+    'pill-wed': { text: 'wed', full: 'wedFull' },
+    'pill-thu': { text: 'thu', full: 'thuFull' },
+    'pill-fri': { text: 'fri', full: 'friFull' },
+    'pill-sat': { text: 'sat', full: 'satFull' }
   };
   Object.keys(daysMap).forEach(id => {
     const btn = document.getElementById(id);
     if (btn) {
-      btn.textContent = getMessage(daysMap[id]);
-      btn.title = getMessage(daysMap[id]);
+      btn.textContent = getMessage(daysMap[id].text);
+      btn.title = getMessage(daysMap[id].full);
     }
   });
 

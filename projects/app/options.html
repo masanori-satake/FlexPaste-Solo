@@ -15,20 +15,20 @@
         <img src="icons/icon32.png" alt="FlexPaste-Solo" class="brand-icon-img">
         <div>
           <h1>FlexPaste-Solo</h1>
-          <p class="subtitle">カテゴリ別定型文 ＆ チップ 設定</p>
+          <p class="subtitle" id="i18n-header-subtitle">カテゴリ別定型文 ＆ チップ 設定</p>
         </div>
       </div>
       <div class="header-actions">
         <div class="header-workdays-container">
-          <span class="workdays-label">稼働曜日</span>
+          <span class="workdays-label" id="i18n-workdays-label">稼働曜日</span>
           <div class="workday-pills">
-            <button type="button" class="workday-pill workday-sun" data-value="7" title="日曜日">日</button>
-            <button type="button" class="workday-pill workday-mon" data-value="1" title="月曜日">月</button>
-            <button type="button" class="workday-pill workday-tue" data-value="2" title="火曜日">火</button>
-            <button type="button" class="workday-pill workday-wed" data-value="3" title="水曜日">水</button>
-            <button type="button" class="workday-pill workday-thu" data-value="4" title="木曜日">木</button>
-            <button type="button" class="workday-pill workday-fri" data-value="5" title="金曜日">金</button>
-            <button type="button" class="workday-pill workday-sat" data-value="6" title="土曜日">土</button>
+            <button type="button" id="pill-sun" class="workday-pill workday-sun" data-value="7" title="日曜日">日</button>
+            <button type="button" id="pill-mon" class="workday-pill workday-mon" data-value="1" title="月曜日">月</button>
+            <button type="button" id="pill-tue" class="workday-pill workday-tue" data-value="2" title="火曜日">火</button>
+            <button type="button" id="pill-wed" class="workday-pill workday-wed" data-value="3" title="水曜日">水</button>
+            <button type="button" id="pill-thu" class="workday-pill workday-thu" data-value="4" title="木曜日">木</button>
+            <button type="button" id="pill-fri" class="workday-pill workday-fri" data-value="5" title="金曜日">金</button>
+            <button type="button" id="pill-sat" class="workday-pill workday-sat" data-value="6" title="土曜日">土</button>
           </div>
         </div>
         <button id="btn-export" class="btn btn-outlined icon-btn" title="エクスポート" aria-label="エクスポート">
@@ -49,7 +49,7 @@
       <!-- Sidebar: Categories -->
       <aside class="sidebar-card card">
         <div class="card-header">
-          <h2>カテゴリ一覧</h2>
+          <h2 id="i18n-categories-header">カテゴリ一覧</h2>
           <button id="btn-add-category" class="btn btn-filled-tonal icon-btn" title="カテゴリ追加">
             <span class="material-symbols-outlined">add</span>
           </button>
@@ -65,17 +65,17 @@
         <div id="category-editor" class="card category-editor-card">
           <div class="category-header-bar">
             <div class="input-field cat-title-field">
-              <label for="current-cat-title">カテゴリ名</label>
+              <label for="current-cat-title" id="i18n-cat-name-label">カテゴリ名</label>
               <input type="text" id="current-cat-title" placeholder="カテゴリ名を入力...">
             </div>
             <div class="input-field cat-adj-interval-field">
-              <label for="current-cat-time-adj">時分補正間隔</label>
+              <label for="current-cat-time-adj" id="i18n-time-adj-label">時分補正間隔</label>
               <select id="current-cat-time-adj">
-                <option value="0">補正しない</option>
-                <option value="5">5分間隔</option>
-                <option value="10">10分間隔</option>
-                <option value="15">15分間隔</option>
-                <option value="30">30分間隔</option>
+                <option id="opt-adj-0" value="0">補正しない</option>
+                <option id="opt-adj-5" value="5">5分間隔</option>
+                <option id="opt-adj-10" value="10">10分間隔</option>
+                <option id="opt-adj-15" value="15">15分間隔</option>
+                <option id="opt-adj-30" value="30">30分間隔</option>
               </select>
             </div>
             <div class="cat-header-actions">
@@ -90,8 +90,8 @@
             <div class="toolbar-header">
               <button type="button" id="btn-toggle-chips" class="preview-toggle-btn" aria-expanded="true" title="チップエリアの開閉">
                 <span class="material-symbols-outlined toggle-icon">expand_more</span>
-                <span>チップ (キャレット位置にクリックまたはドラッグで挿入)</span>
-                <span class="toggle-status">(クリックして閉じる)</span>
+                <span id="i18n-chips-title">チップ (キャレット位置にクリックまたはドラッグで挿入)</span>
+                <span id="i18n-chips-toggle-status" class="toggle-status">(クリックして閉じる)</span>
               </button>
             </div>
             <div id="chips-container" class="chips-container">
