@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlexPaste-Solo - Usage Guide</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-link">
+        <img src="assets/icon.svg" alt="FlexPaste-Solo Logo" class="brand-icon">
+        <span class="brand-title">FlexPaste-Solo</span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html" class="nav-link">
+          <span class="lang-en">Home</span>
+          <span class="lang-ja">ホーム</span>
+        </a>
+        <a href="usage.html" class="nav-link active">
+          <span class="lang-en">Usage</span>
+          <span class="lang-ja">使い方</span>
+        </a>
+        <a href="privacy.html" class="nav-link">
+          <span class="lang-en">Privacy</span>
+          <span class="lang-ja">プライバシー</span>
+        </a>
+        <div class="lang-switcher">
+          <button type="button" class="lang-btn btn-lang-en">EN</button>
+          <button type="button" class="lang-btn btn-lang-ja">JA</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-content">
+    <div class="doc-container">
+      <h1>
+        <span class="lang-en">Usage Guide</span>
+        <span class="lang-ja">使い方ガイド</span>
+      </h1>
+
+      <section>
+        <h2>
+          <span class="lang-en">1. Installation</span>
+          <span class="lang-ja">1. インストール方法</span>
+        </h2>
+        <p>
+          <span class="lang-en">You can install FlexPaste-Solo via Chrome Web Store or manually load source code in Developer Mode:</span>
+          <span class="lang-ja">FlexPaste-Solo は Chrome ウェブストアまたはソースコードから直接読み込んでインストールできます。</span>
+        </p>
+        <ol>
+          <li>
+            <span class="lang-en">Download or clone the project repository.</span>
+            <span class="lang-ja">リポジトリをダウンロードまたはクローンします。</span>
+          </li>
+          <li>
+            <span class="lang-en">Open <code>chrome://extensions</code> in your Chrome browser.</span>
+            <span class="lang-ja">Chrome で <code>chrome://extensions</code> を開きます。</span>
+          </li>
+          <li>
+            <span class="lang-en">Enable "Developer mode" in the top-right corner.</span>
+            <span class="lang-ja">右上の「デベロッパー モード」を有効にします。</span>
+          </li>
+          <li>
+            <span class="lang-en">Click "Load unpacked" and select the <code>projects/app</code> folder.</span>
+            <span class="lang-ja">「パッケージ化されていない拡張機能を読み込む」を選択し、<code>projects/app</code> フォルダを指定します。</span>
+          </li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>
+          <span class="lang-en">2. Creating Templates & Categories</span>
+          <span class="lang-ja">2. カテゴリとテンプレートの作成</span>
+        </h2>
+        <p>
+          <span class="lang-en">Open the options screen by clicking the extension icon or selecting "Settings" from the context menu.</span>
+          <span class="lang-ja">拡張機能アイコンまたはコンテキストメニューの「⚙ 設定」から管理画面を開きます。</span>
+        </p>
+        <ul>
+          <li>
+            <span class="lang-en"><strong>Categories:</strong> Organize snippets into logical groups (e.g., Work, Greetings, Support).</span>
+            <span class="lang-ja"><strong>カテゴリ:</strong> 定型文をグループ別に整理できます（例: 業務、挨拶、サポート）。</span>
+          </li>
+          <li>
+            <span class="lang-en"><strong>Dynamic Variables:</strong> Click or drag-and-drop variable chips such as <code>{{date_with_day}}</code>, <code>{{time}}</code>, or <code>{{month_last_workday}}</code> into template text.</span>
+            <span class="lang-ja"><strong>動的変数:</strong> <code>{{date_with_day}}</code>、<code>{{time}}</code>、<code>{{month_last_workday}}</code> などのチップをドラッグ＆ドロップまたはクリックでテンプレートに配置できます。</span>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>
+          <span class="lang-en">3. Pasting Snippets</span>
+          <span class="lang-ja">3. 定型文のペースト挿入</span>
+        </h2>
+        <p>
+          <span class="lang-en">Right-click any editable input field (<code>&lt;input&gt;</code>, <code>&lt;textarea&gt;</code>, or <code>[contenteditable]</code>) on any webpage, hover over <strong>FlexPaste</strong>, and select your desired template. The template with converted dynamic variables will be inserted immediately.</span>
+          <span class="lang-ja">Webページ上の入力欄（<code>&lt;input&gt;</code>、<code>&lt;textarea&gt;</code>、<code>[contenteditable]</code>）で右クリックし、<strong>FlexPaste</strong> のメニューから目的の定型文を選択します。動的変数が即座に展開されて流し込まれます。</span>
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-links">
+        <a href="index.html"><span class="lang-en">Home</span><span class="lang-ja">ホーム</span></a>
+        <a href="usage.html"><span class="lang-en">Usage</span><span class="lang-ja">使い方</span></a>
+        <a href="privacy.html"><span class="lang-en">Privacy</span><span class="lang-ja">プライバシー</span></a>
+        <a href="https://github.com/masanori-satake/FlexPaste-Solo" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <p>© 2025 Masanori SATAKE. FlexPaste-Solo is open-source under the MIT License.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

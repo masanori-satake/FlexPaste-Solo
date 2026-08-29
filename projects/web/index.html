@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlexPaste-Solo - Context Menu Template Insertion Chrome Extension</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-link">
+        <img src="assets/icon.svg" alt="FlexPaste-Solo Logo" class="brand-icon">
+        <span class="brand-title">FlexPaste-Solo</span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html" class="nav-link active">
+          <span class="lang-en">Home</span>
+          <span class="lang-ja">ホーム</span>
+        </a>
+        <a href="usage.html" class="nav-link">
+          <span class="lang-en">Usage</span>
+          <span class="lang-ja">使い方</span>
+        </a>
+        <a href="privacy.html" class="nav-link">
+          <span class="lang-en">Privacy</span>
+          <span class="lang-ja">プライバシー</span>
+        </a>
+        <div class="lang-switcher">
+          <button type="button" class="lang-btn btn-lang-en">EN</button>
+          <button type="button" class="lang-btn btn-lang-ja">JA</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-content">
+    <section class="hero-section">
+      <img src="assets/icon.svg" alt="FlexPaste-Solo" class="hero-logo">
+      <h1 class="hero-title">
+        <span class="lang-en">Instant Contextual Snippet Insertion</span>
+        <span class="lang-ja">右クリックから即座に定型文・変数を挿入</span>
+      </h1>
+      <p class="hero-tagline">
+        <span class="lang-en">A 100% local Chrome extension to insert category-organized templates with dynamic real-time variables directly from your right-click context menu.</span>
+        <span class="lang-ja">右クリックメニューからカテゴリ別定型文とリアルタイム動的変数を組み合わせて即座に挿入できる、100%ローカル完結型Chrome拡張機能。</span>
+      </p>
+      <div class="hero-actions">
+        <a href="https://github.com/masanori-satake/FlexPaste-Solo" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+          <span class="lang-en">View on GitHub</span>
+          <span class="lang-ja">GitHubで見る</span>
+        </a>
+        <a href="usage.html" class="btn btn-secondary">
+          <span class="lang-en">How to Use</span>
+          <span class="lang-ja">使い方を見る</span>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">
+        <span class="lang-en">Key Features</span>
+        <span class="lang-ja">主な特徴</span>
+      </h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>
+            <span class="lang-en">100% Local & Privacy-First</span>
+            <span class="lang-ja">100% ローカル完結</span>
+          </h3>
+          <p>
+            <span class="lang-en">No external server communication, tracking, or analytics. All data is stored locally in your browser.</span>
+            <span class="lang-ja">外部サーバー通信、トラッキング、アナリティクスは一切なし。データはすべてブラウザ内に安全に保存されます。</span>
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📂</div>
+          <h3>
+            <span class="lang-en">2-Level Context Menu</span>
+            <span class="lang-ja">2階層コンテキストメニュー</span>
+          </h3>
+          <p>
+            <span class="lang-en">Organize templates into categories for quick, effortless selection from the right-click menu.</span>
+            <span class="lang-ja">カテゴリごとの階層管理により、膨大な定型文も迷わず右クリックメニューから直感的に選択・挿入可能です。</span>
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>
+            <span class="lang-en">Real-Time Dynamic Variables</span>
+            <span class="lang-ja">リアルタイム動的変数</span>
+          </h3>
+          <p>
+            <span class="lang-en">Automatically converts dynamic variables like date, time, tomorrow, month-end workdays, and custom definitions.</span>
+            <span class="lang-ja">日時、相対日付、月末稼働日、カテゴリ定義文などのタグをペースト時にリアルタイム自動変換します。</span>
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <h3>
+            <span class="lang-en">Material Design 3</span>
+            <span class="lang-ja">Material Design 3 UI</span>
+          </h3>
+          <p>
+            <span class="lang-en">Modern M3 UI with light and dark mode support, drag-and-drop variable chips, and live preview.</span>
+            <span class="lang-ja">ライト/ダークモード対応、変数のドラッグ＆ドロップ、リアルタイムプレビューを備えたモダンなUI。</span>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-links">
+        <a href="index.html"><span class="lang-en">Home</span><span class="lang-ja">ホーム</span></a>
+        <a href="usage.html"><span class="lang-en">Usage</span><span class="lang-ja">使い方</span></a>
+        <a href="privacy.html"><span class="lang-en">Privacy</span><span class="lang-ja">プライバシー</span></a>
+        <a href="https://github.com/masanori-satake/FlexPaste-Solo" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <p>© 2025 Masanori SATAKE. FlexPaste-Solo is open-source under the MIT License.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
