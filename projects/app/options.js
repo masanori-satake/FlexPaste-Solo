@@ -291,6 +291,9 @@ function localizeStaticUI() {
   const elemDefsTitle = document.getElementById('i18n-definitions-title');
   if (elemDefsTitle) elemDefsTitle.textContent = getMessage('definitionsToggleTitle');
 
+  const btnToggleDefs = document.getElementById('btn-toggle-definitions');
+  if (btnToggleDefs) btnToggleDefs.title = getMessage('definitionsToggleTitle');
+
   const elemDefsStatus = document.getElementById('i18n-definitions-toggle-status');
   if (elemDefsStatus) elemDefsStatus.textContent = getMessage('clickToOpen');
 
