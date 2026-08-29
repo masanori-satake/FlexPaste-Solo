@@ -1,6 +1,29 @@
 // utils.js - Shared utilities and Variable Resolution Engine for FlexPaste-Solo
 
-export const DEFAULT_DATA = {
+export function getUILanguage() {
+  if (typeof chrome !== 'undefined' && chrome.i18n && typeof chrome.i18n.getUILanguage === 'function') {
+    return chrome.i18n.getUILanguage();
+  }
+  if (typeof navigator !== 'undefined' && navigator.language) {
+    return navigator.language;
+  }
+  return 'en';
+}
+
+export function isJapaneseLocale() {
+  const lang = getUILanguage().toLowerCase();
+  return lang.startsWith('ja');
+}
+
+export function getMessage(key, substitute = null) {
+  if (typeof chrome !== 'undefined' && chrome.i18n && typeof chrome.i18n.getMessage === 'function') {
+    const msg = substitute !== null ? chrome.i18n.getMessage(key, [substitute]) : chrome.i18n.getMessage(key);
+    if (msg) return msg;
+  }
+  return key;
+}
+
+const DEFAULT_DATA_JA = {
   settings: {
     workdays: [1, 2, 3, 4, 5] // 1: Mon, 5: Fri, 7: Sun
   },
@@ -37,17 +60,66 @@ export const DEFAULT_DATA = {
   ]
 };
 
+const DEFAULT_DATA_EN = {
+  settings: {
+    workdays: [1, 2, 3, 4, 5]
+  },
+  categories: [
+    {
+      id: "cat_1",
+      title: "Work Updates",
+      time_adj_interval: 0,
+      templates: [
+        {
+          id: "tpl_1",
+          title: "Daily Report Format",
+          content: "[Daily Report] {{date_with_day}}\n\n■ Today's Tasks\n- {{selection}}\n\n■ Tomorrow's Plan\n- \n\nClock-out Time: {{time}}"
+        },
+        {
+          id: "tpl_2",
+          title: "End of Day Report",
+          content: "Finished work for today.\nWorking Hours: 9:00-{{time}}\nSubject: {{selection}}"
+        }
+      ]
+    },
+    {
+      id: "cat_2",
+      title: "Scheduling",
+      time_adj_interval: 0,
+      templates: [
+        {
+          id: "tpl_3",
+          title: "Meeting Invitation",
+          content: "Hello,\nI would like to schedule a meeting regarding the following:\n\nSubject: {{page_title}}\nURL: {{page_url}}\nProposed Time: {{tomorrow_with_day}} 10:00~\n\nPlease let me know if this works for you."
+        }
+      ]
+    }
+  ]
+};
+
+export const DEFAULT_DATA = isJapaneseLocale() ? DEFAULT_DATA_JA : DEFAULT_DATA_EN;
+
 export function padZero(num) {
   return String(num).padStart(2, '0');
 }
 
 export function formatDateWithDay(date) {
-  const weekdaysJa = ['日', '月', '火', '水', '木', '金', '土'];
-  const y = date.getFullYear();
-  const m = date.getMonth() + 1;
-  const d = date.getDate();
-  const w = weekdaysJa[date.getDay()];
-  return `${y}年${m}月${d}日(${w})`;
+  if (isJapaneseLocale()) {
+    const weekdaysJa = ['日', '月', '火', '水', '木', '金', '土'];
+    const y = date.getFullYear();
+    const m = date.getMonth() + 1;
+    const d = date.getDate();
+    const w = weekdaysJa[date.getDay()];
+    return `${y}年${m}月${d}日(${w})`;
+  } else {
+    const weekdaysEn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const w = weekdaysEn[date.getDay()];
+    const m = monthsEn[date.getMonth()];
+    const d = date.getDate();
+    const y = date.getFullYear();
+    return `${w}, ${m} ${d}, ${y}`;
+  }
 }
 
 export function formatDate(date) {
@@ -55,6 +127,12 @@ export function formatDate(date) {
   const m = padZero(date.getMonth() + 1);
   const d = padZero(date.getDate());
   return `${y}/${m}/${d}`;
+}
+
+export function formatDateShort(date) {
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  return `${m}/${d}`;
 }
 
 export function formatTime(date) {
@@ -174,6 +252,7 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
   const replacements = {
     'date_with_day': formatDateWithDay(now),
     'date': formatDate(now),
+    'date_short': formatDateShort(now),
     'time': formatTime(now),
     'time_with_sec': formatTimeWithSec(now),
     'time_prev_adj': adjustTime(now, timeAdjInterval, 'prev'),
@@ -185,6 +264,7 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
     'yesterday': formatDate(yesterday),
     'tomorrow_with_day': formatDateWithDay(tomorrow),
     'tomorrow': formatDate(tomorrow),
+    'tomorrow_short': formatDateShort(tomorrow),
     'next_workday_with_day': formatDateWithDay(nextWorkdayDate),
     'next_workday': formatDate(nextWorkdayDate),
     'next_week_with_day': formatDateWithDay(nextWeek),

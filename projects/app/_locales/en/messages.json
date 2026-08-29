@@ -1,0 +1,346 @@
+{
+  "appName": {
+    "message": "FlexPaste-Solo",
+    "description": "App Name"
+  },
+  "appDesc": {
+    "message": "Chrome extension to quickly insert category templates and dynamic variables from context menu.",
+    "description": "App Description"
+  },
+  "headerSubtitle": {
+    "message": "Category Templates & Chips Settings",
+    "description": "Header Subtitle"
+  },
+  "workdaysLabel": {
+    "message": "Workdays",
+    "description": "Workdays Label"
+  },
+  "sun": {
+    "message": "Sun",
+    "description": "Sunday"
+  },
+  "mon": {
+    "message": "Mon",
+    "description": "Monday"
+  },
+  "tue": {
+    "message": "Tue",
+    "description": "Tuesday"
+  },
+  "wed": {
+    "message": "Wed",
+    "description": "Wednesday"
+  },
+  "thu": {
+    "message": "Thu",
+    "description": "Thursday"
+  },
+  "fri": {
+    "message": "Fri",
+    "description": "Friday"
+  },
+  "sat": {
+    "message": "Sat",
+    "description": "Saturday"
+  },
+  "exportBtn": {
+    "message": "Export",
+    "description": "Export button title/aria"
+  },
+  "importBtn": {
+    "message": "Import",
+    "description": "Import button title/aria"
+  },
+  "resetBtn": {
+    "message": "Reset",
+    "description": "Reset button title/aria"
+  },
+  "categoriesHeader": {
+    "message": "Categories",
+    "description": "Categories Section Header"
+  },
+  "addCategoryBtn": {
+    "message": "Add Category",
+    "description": "Add Category button title"
+  },
+  "untitledCategory": {
+    "message": "(Untitled Category)",
+    "description": "Default title for untitled category"
+  },
+  "newCategoryTitle": {
+    "message": "New Category",
+    "description": "Title for newly created category"
+  },
+  "categoryNameLabel": {
+    "message": "Category Name",
+    "description": "Label for category name field"
+  },
+  "categoryNamePlaceholder": {
+    "message": "Enter category name...",
+    "description": "Placeholder for category name"
+  },
+  "timeAdjIntervalLabel": {
+    "message": "Time Adj. Interval",
+    "description": "Label for time adjustment interval"
+  },
+  "adjNone": {
+    "message": "Do not adjust",
+    "description": "Time adjustment option: none"
+  },
+  "adjMin": {
+    "message": "$MIN$ min interval",
+    "description": "Time adjustment option: X min interval",
+    "placeholders": {
+      "min": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteCategoryBtn": {
+    "message": "Delete Category",
+    "description": "Delete Category button title"
+  },
+  "confirmDeleteCategory": {
+    "message": "Are you sure you want to delete category \"$CAT$\" and all its templates?",
+    "description": "Confirm delete category",
+    "placeholders": {
+      "cat": {
+        "content": "$1"
+      }
+    }
+  },
+  "chipsToggleTitle": {
+    "message": "Chips (Click or drag to insert at cursor position)",
+    "description": "Chips section toggle label"
+  },
+  "clickToClose": {
+    "message": "(Click to close)",
+    "description": "Toggle status close"
+  },
+  "clickToOpen": {
+    "message": "(Click to open)",
+    "description": "Toggle status open"
+  },
+  "noTemplatesDesc": {
+    "message": "There are no templates in this category. Click the \"Add Template\" button to create one.",
+    "description": "Empty templates text"
+  },
+  "addTemplateBtn": {
+    "message": "Add Template",
+    "description": "Add template button title"
+  },
+  "newTemplateTitle": {
+    "message": "New Template",
+    "description": "Newly created template title"
+  },
+  "templateTitlePlaceholder": {
+    "message": "Template name...",
+    "description": "Template title input placeholder"
+  },
+  "deleteTemplateBtn": {
+    "message": "Delete Template",
+    "description": "Delete template button"
+  },
+  "confirmDeleteTemplate": {
+    "message": "Are you sure you want to delete template \"$TPL$\"?",
+    "description": "Confirm delete template",
+    "placeholders": {
+      "tpl": {
+        "content": "$1"
+      }
+    }
+  },
+  "templateContentLabel": {
+    "message": "Template Content",
+    "description": "Label for template content"
+  },
+  "templateContentPlaceholder": {
+    "message": "Enter text... Variable chips can be inserted here",
+    "description": "Placeholder for template content editor"
+  },
+  "previewLabel": {
+    "message": "Live Preview",
+    "description": "Label for live preview"
+  },
+  "previewToggleTitle": {
+    "message": "Toggle live preview",
+    "description": "Preview toggle title"
+  },
+  "chipTag_date": {
+    "message": "Today",
+    "description": "Chip label"
+  },
+  "chipTag_date_short": {
+    "message": "Today (Short)",
+    "description": "Chip label"
+  },
+  "chipTag_date_with_day": {
+    "message": "Today (w/ Day)",
+    "description": "Chip label"
+  },
+  "chipTag_tomorrow": {
+    "message": "Tomorrow",
+    "description": "Chip label"
+  },
+  "chipTag_tomorrow_short": {
+    "message": "Tomorrow (Short)",
+    "description": "Chip label"
+  },
+  "chipTag_tomorrow_with_day": {
+    "message": "Tomorrow (w/ Day)",
+    "description": "Chip label"
+  },
+  "chipTag_next_workday": {
+    "message": "Next Workday",
+    "description": "Chip label"
+  },
+  "chipTag_next_workday_with_day": {
+    "message": "Next Workday (w/ Day)",
+    "description": "Chip label"
+  },
+  "chipTag_next_week": {
+    "message": "In 1 Week",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_with_day": {
+    "message": "In 1 Week (w/ Day)",
+    "description": "Chip label"
+  },
+  "chipTag_yesterday": {
+    "message": "Yesterday",
+    "description": "Chip label"
+  },
+  "chipTag_yesterday_with_day": {
+    "message": "Yesterday (w/ Day)",
+    "description": "Chip label"
+  },
+  "chipTag_month_end": {
+    "message": "End of Month",
+    "description": "Chip label"
+  },
+  "chipTag_month_last_workday": {
+    "message": "Month Last Workday",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_monday_with_day": {
+    "message": "Next Mon",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_tuesday_with_day": {
+    "message": "Next Tue",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_wednesday_with_day": {
+    "message": "Next Wed",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_thursday_with_day": {
+    "message": "Next Thu",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_friday_with_day": {
+    "message": "Next Fri",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_saturday_with_day": {
+    "message": "Next Sat",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_sunday_with_day": {
+    "message": "Next Sun",
+    "description": "Chip label"
+  },
+  "chipTag_time": {
+    "message": "Current Time",
+    "description": "Chip label"
+  },
+  "chipTag_time_prev_adj": {
+    "message": "Current Time (Prev Adj)",
+    "description": "Chip label"
+  },
+  "chipTag_time_next_adj": {
+    "message": "Current Time (Next Adj)",
+    "description": "Chip label"
+  },
+  "chipTag_in_one_hour": {
+    "message": "In 1 Hour",
+    "description": "Chip label"
+  },
+  "chipTag_in_one_hour_prev_adj": {
+    "message": "In 1 Hour (Prev Adj)",
+    "description": "Chip label"
+  },
+  "chipTag_in_one_hour_next_adj": {
+    "message": "In 1 Hour (Next Adj)",
+    "description": "Chip label"
+  },
+  "chipTag_selection": {
+    "message": "Selected Text",
+    "description": "Chip label"
+  },
+  "chipTag_page_title": {
+    "message": "Page Title",
+    "description": "Chip label"
+  },
+  "chipTag_page_url": {
+    "message": "Page URL",
+    "description": "Chip label"
+  },
+  "toastSaved": {
+    "message": "Saved",
+    "description": "Toast message when saved"
+  },
+  "toastCursorFocusPrompt": {
+    "message": "Please focus cursor in template body before clicking",
+    "description": "Toast prompt"
+  },
+  "toastExported": {
+    "message": "Exported backup file",
+    "description": "Toast message export"
+  },
+  "toastRestored": {
+    "message": "Restored settings successfully",
+    "description": "Toast message import"
+  },
+  "toastReset": {
+    "message": "Reset to default settings",
+    "description": "Toast message reset"
+  },
+  "alertInvalidImport": {
+    "message": "Invalid backup file format. Please check that categories is an array structure.",
+    "description": "Alert invalid backup"
+  },
+  "alertImportFailed": {
+    "message": "Failed to read JSON file: $ERR$",
+    "description": "Alert import failed",
+    "placeholders": {
+      "err": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmReset": {
+    "message": "Are you sure you want to reset all settings and templates to default? (Current data will be lost)",
+    "description": "Confirm reset"
+  },
+  "sampleSelection": {
+    "message": "(Sample Selected Text)",
+    "description": "Sample selection preview"
+  },
+  "samplePageTitle": {
+    "message": "Sample Page Title",
+    "description": "Sample page title preview"
+  },
+  "samplePageUrl": {
+    "message": "https://example.com/sample",
+    "description": "Sample page url preview"
+  },
+  "settingsMenuItem": {
+    "message": "⚙ Settings",
+    "description": "Context menu options link"
+  },
+  "untitledTemplate": {
+    "message": "(Untitled Template)",
+    "description": "Untitled template fallback for context menu"
+  }
+}

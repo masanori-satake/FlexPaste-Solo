@@ -1,36 +1,40 @@
 // options.js - Options Page Script for FlexPaste-Solo
-import { DEFAULT_DATA, resolveVariables } from './utils.js';
+import { DEFAULT_DATA, getMessage, resolveVariables } from './utils.js';
 
-const VARIABLE_MAP = {
-  '{{date}}': { label: '今日', icon: 'calendar_today' },
-  '{{date_with_day}}': { label: '今日(曜日有)', icon: 'calendar_today' },
-  '{{tomorrow}}': { label: '明日', icon: 'arrow_forward' },
-  '{{tomorrow_with_day}}': { label: '明日(曜日有)', icon: 'arrow_forward' },
-  '{{next_workday}}': { label: '次稼働日', icon: 'work' },
-  '{{next_workday_with_day}}': { label: '次稼働日(曜日有)', icon: 'work' },
-  '{{next_week}}': { label: '一週間後', icon: 'fast_forward' },
-  '{{next_week_with_day}}': { label: '一週間後(曜日有)', icon: 'fast_forward' },
-  '{{yesterday}}': { label: '昨日', icon: 'arrow_back' },
-  '{{yesterday_with_day}}': { label: '昨日(曜日有)', icon: 'arrow_back' },
-  '{{next_week_monday_with_day}}': { label: '次月曜日', icon: 'event' },
-  '{{next_week_tuesday_with_day}}': { label: '次火曜日', icon: 'event' },
-  '{{next_week_wednesday_with_day}}': { label: '次水曜日', icon: 'event' },
-  '{{next_week_thursday_with_day}}': { label: '次木曜日', icon: 'event' },
-  '{{next_week_friday_with_day}}': { label: '次金曜日', icon: 'event' },
-  '{{next_week_saturday_with_day}}': { label: '次土曜日', icon: 'event' },
-  '{{next_week_sunday_with_day}}': { label: '次日曜日', icon: 'event' },
-  '{{month_end}}': { label: '月末', icon: 'calendar_month' },
-  '{{month_last_workday}}': { label: '月末最終稼働日', icon: 'domain' },
-  '{{selection}}': { label: '選択テキスト', icon: 'content_cut' },
-  '{{page_title}}': { label: 'ページタイトル', icon: 'description' },
-  '{{page_url}}': { label: 'ページURL', icon: 'link' },
-  '{{time}}': { label: '現在時刻', icon: 'schedule' },
-  '{{time_prev_adj}}': { label: '現在時刻(前補正)', icon: 'schedule' },
-  '{{time_next_adj}}': { label: '現在時刻(後補正)', icon: 'schedule' },
-  '{{in_one_hour}}': { label: '一時間後', icon: 'schedule' },
-  '{{in_one_hour_prev_adj}}': { label: '一時間後(前補正)', icon: 'schedule' },
-  '{{in_one_hour_next_adj}}': { label: '一時間後(後補正)', icon: 'schedule' }
-};
+function getVariableMap() {
+  return {
+    '{{date}}': { label: getMessage('chipTag_date'), icon: 'calendar_today' },
+    '{{date_short}}': { label: getMessage('chipTag_date_short'), icon: 'calendar_today' },
+    '{{date_with_day}}': { label: getMessage('chipTag_date_with_day'), icon: 'calendar_today' },
+    '{{tomorrow}}': { label: getMessage('chipTag_tomorrow'), icon: 'arrow_forward' },
+    '{{tomorrow_short}}': { label: getMessage('chipTag_tomorrow_short'), icon: 'arrow_forward' },
+    '{{tomorrow_with_day}}': { label: getMessage('chipTag_tomorrow_with_day'), icon: 'arrow_forward' },
+    '{{next_workday}}': { label: getMessage('chipTag_next_workday'), icon: 'work' },
+    '{{next_workday_with_day}}': { label: getMessage('chipTag_next_workday_with_day'), icon: 'work' },
+    '{{next_week}}': { label: getMessage('chipTag_next_week'), icon: 'fast_forward' },
+    '{{next_week_with_day}}': { label: getMessage('chipTag_next_week_with_day'), icon: 'fast_forward' },
+    '{{yesterday}}': { label: getMessage('chipTag_yesterday'), icon: 'arrow_back' },
+    '{{yesterday_with_day}}': { label: getMessage('chipTag_yesterday_with_day'), icon: 'arrow_back' },
+    '{{next_week_monday_with_day}}': { label: getMessage('chipTag_next_week_monday_with_day'), icon: 'event' },
+    '{{next_week_tuesday_with_day}}': { label: getMessage('chipTag_next_week_tuesday_with_day'), icon: 'event' },
+    '{{next_week_wednesday_with_day}}': { label: getMessage('chipTag_next_week_wednesday_with_day'), icon: 'event' },
+    '{{next_week_thursday_with_day}}': { label: getMessage('chipTag_next_week_thursday_with_day'), icon: 'event' },
+    '{{next_week_friday_with_day}}': { label: getMessage('chipTag_next_week_friday_with_day'), icon: 'event' },
+    '{{next_week_saturday_with_day}}': { label: getMessage('chipTag_next_week_saturday_with_day'), icon: 'event' },
+    '{{next_week_sunday_with_day}}': { label: getMessage('chipTag_next_week_sunday_with_day'), icon: 'event' },
+    '{{month_end}}': { label: getMessage('chipTag_month_end'), icon: 'calendar_month' },
+    '{{month_last_workday}}': { label: getMessage('chipTag_month_last_workday'), icon: 'domain' },
+    '{{selection}}': { label: getMessage('chipTag_selection'), icon: 'content_cut' },
+    '{{page_title}}': { label: getMessage('chipTag_page_title'), icon: 'description' },
+    '{{page_url}}': { label: getMessage('chipTag_page_url'), icon: 'link' },
+    '{{time}}': { label: getMessage('chipTag_time'), icon: 'schedule' },
+    '{{time_prev_adj}}': { label: getMessage('chipTag_time_prev_adj'), icon: 'schedule' },
+    '{{time_next_adj}}': { label: getMessage('chipTag_time_next_adj'), icon: 'schedule' },
+    '{{in_one_hour}}': { label: getMessage('chipTag_in_one_hour'), icon: 'schedule' },
+    '{{in_one_hour_prev_adj}}': { label: getMessage('chipTag_in_one_hour_prev_adj'), icon: 'schedule' },
+    '{{in_one_hour_next_adj}}': { label: getMessage('chipTag_in_one_hour_next_adj'), icon: 'schedule' }
+  };
+}
 
 let appState = {
   settings: { workdays: [1, 2, 3, 4, 5] },
@@ -38,9 +42,12 @@ let appState = {
   selectedCategoryId: null
 };
 
+let lastFocusedEditor = null;
+
 // Helper: Create inline variable chip element
 function createChipNode(tag) {
-  const meta = VARIABLE_MAP[tag] || { label: tag.replace(/[\{\}]/g, ''), icon: 'code' };
+  const varMap = getVariableMap();
+  const meta = varMap[tag] || { label: tag.replace(/[\{\}]/g, ''), icon: 'code' };
   const span = document.createElement('span');
   span.className = 'tpl-chip';
   span.contentEditable = 'false';
@@ -49,7 +56,7 @@ function createChipNode(tag) {
   span.innerHTML = `
     <span class="material-symbols-outlined tpl-chip-icon">${meta.icon}</span>
     <span class="tpl-chip-label">${escapeHtml(meta.label)}</span>
-    <button type="button" class="tpl-chip-remove" title="削除" aria-label="${escapeHtml(meta.label)}チップを削除">×</button>
+    <button type="button" class="tpl-chip-remove" title="×" aria-label="Remove ${escapeHtml(meta.label)}">×</button>
   `;
 
   return span;
@@ -163,10 +170,10 @@ function saveStorage(showNotification = true) {
       settings: appState.settings,
       categories: appState.categories
     }, () => {
-      if (showNotification) showToast('保存しました');
+      if (showNotification) showToast(getMessage('toastSaved'));
     });
   } else if (showNotification) {
-    showToast('保存しました');
+    showToast(getMessage('toastSaved'));
   }
 }
 
@@ -194,10 +201,101 @@ function updateAllPreviews() {
       previewEl.textContent = resolveVariables(tpl.content || '', {
         workdays: appState.settings.workdays,
         time_adj_interval: currentCat.time_adj_interval || 0,
-        selection: '（サンプル選択テキスト）',
-        page_title: 'サンプルページタイトル',
-        page_url: 'https://example.com/sample'
+        selection: getMessage('sampleSelection'),
+        page_title: getMessage('samplePageTitle'),
+        page_url: getMessage('samplePageUrl')
       });
+    }
+  });
+}
+
+function localizeStaticUI() {
+  const elemSubtitle = document.getElementById('i18n-header-subtitle');
+  if (elemSubtitle) elemSubtitle.textContent = getMessage('headerSubtitle');
+
+  const elemWorkdays = document.getElementById('i18n-workdays-label');
+  if (elemWorkdays) elemWorkdays.textContent = getMessage('workdaysLabel');
+
+  const daysMap = {
+    'pill-sun': 'sun', 'pill-mon': 'mon', 'pill-tue': 'tue',
+    'pill-wed': 'wed', 'pill-thu': 'thu', 'pill-fri': 'fri', 'pill-sat': 'sat'
+  };
+  Object.keys(daysMap).forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.textContent = getMessage(daysMap[id]);
+      btn.title = getMessage(daysMap[id]);
+    }
+  });
+
+  const btnExport = document.getElementById('btn-export');
+  if (btnExport) {
+    btnExport.title = getMessage('exportBtn');
+    btnExport.setAttribute('aria-label', getMessage('exportBtn'));
+  }
+
+  const btnImport = document.getElementById('btn-import');
+  if (btnImport) {
+    btnImport.title = getMessage('importBtn');
+    btnImport.setAttribute('aria-label', getMessage('importBtn'));
+  }
+
+  const btnReset = document.getElementById('btn-reset');
+  if (btnReset) {
+    btnReset.title = getMessage('resetBtn');
+    btnReset.setAttribute('aria-label', getMessage('resetBtn'));
+  }
+
+  const elemCatHeader = document.getElementById('i18n-categories-header');
+  if (elemCatHeader) elemCatHeader.textContent = getMessage('categoriesHeader');
+
+  const btnAddCat = document.getElementById('btn-add-category');
+  if (btnAddCat) btnAddCat.title = getMessage('addCategoryBtn');
+
+  const elemCatNameLabel = document.getElementById('i18n-cat-name-label');
+  if (elemCatNameLabel) elemCatNameLabel.textContent = getMessage('categoryNameLabel');
+
+  const inputCatTitle = document.getElementById('current-cat-title');
+  if (inputCatTitle) inputCatTitle.placeholder = getMessage('categoryNamePlaceholder');
+
+  const elemTimeAdjLabel = document.getElementById('i18n-time-adj-label');
+  if (elemTimeAdjLabel) elemTimeAdjLabel.textContent = getMessage('timeAdjIntervalLabel');
+
+  const opt0 = document.getElementById('opt-adj-0');
+  if (opt0) opt0.textContent = getMessage('adjNone');
+
+  [5, 10, 15, 30].forEach(m => {
+    const opt = document.getElementById(`opt-adj-${m}`);
+    if (opt) opt.textContent = getMessage('adjMin', String(m));
+  });
+
+  const btnDelCat = document.getElementById('btn-delete-category');
+  if (btnDelCat) {
+    btnDelCat.title = getMessage('deleteCategoryBtn');
+    btnDelCat.setAttribute('aria-label', getMessage('deleteCategoryBtn'));
+  }
+
+  const elemChipsTitle = document.getElementById('i18n-chips-title');
+  if (elemChipsTitle) elemChipsTitle.textContent = getMessage('chipsToggleTitle');
+
+  const elemChipsStatus = document.getElementById('i18n-chips-toggle-status');
+  if (elemChipsStatus) elemChipsStatus.textContent = getMessage('clickToClose');
+
+  const btnAddTpl = document.getElementById('btn-add-template');
+  if (btnAddTpl) {
+    btnAddTpl.title = getMessage('addTemplateBtn');
+    btnAddTpl.setAttribute('aria-label', getMessage('addTemplateBtn'));
+  }
+
+  // Localize chips text
+  const varMap = getVariableMap();
+  document.querySelectorAll('.chips-container .chip').forEach(chip => {
+    const tag = chip.dataset.tag;
+    if (tag && varMap[tag]) {
+      const iconEl = chip.querySelector('.chip-icon');
+      chip.innerHTML = '';
+      if (iconEl) chip.appendChild(iconEl);
+      chip.appendChild(document.createTextNode(varMap[tag].label));
     }
   });
 }
@@ -237,7 +335,7 @@ function renderCategoryList() {
     item.innerHTML = `
       <div class="category-item-content">
         <span class="material-symbols-outlined drag-handle">drag_indicator</span>
-        <span class="category-title">${escapeHtml(cat.title || '（無題のカテゴリ）')}</span>
+        <span class="category-title">${escapeHtml(cat.title || getMessage('untitledCategory'))}</span>
       </div>
     `;
 
@@ -316,7 +414,7 @@ function renderCategoryEditor() {
   templatesContainer.innerHTML = '';
 
   if (!currentCat.templates || currentCat.templates.length === 0) {
-    templatesContainer.innerHTML = '<p class="setting-desc">このカテゴリにはテンプレートがありません。「テンプレート追加」ボタンをクリックして作成してください。</p>';
+    templatesContainer.innerHTML = `<p class="setting-desc">${escapeHtml(getMessage('noTemplatesDesc'))}</p>`;
     return;
   }
 
@@ -329,30 +427,30 @@ function renderCategoryEditor() {
     const previewResolved = resolveVariables(tpl.content || '', {
       workdays: appState.settings.workdays,
       time_adj_interval: currentCat.time_adj_interval || 0,
-      selection: '（サンプル選択テキスト）',
-      page_title: 'サンプルページタイトル',
-      page_url: 'https://example.com/sample'
+      selection: getMessage('sampleSelection'),
+      page_title: getMessage('samplePageTitle'),
+      page_url: getMessage('samplePageUrl')
     });
 
     card.innerHTML = `
       <div class="template-card-header">
-        <span class="material-symbols-outlined tpl-drag-handle" draggable="true" title="ドラッグして順序変更">drag_indicator</span>
+        <span class="material-symbols-outlined tpl-drag-handle" draggable="true" title="Drag to reorder">drag_indicator</span>
         <div class="input-field template-title-input">
-          <input type="text" class="tpl-title-val" value="${escapeHtml(tpl.title || '')}" placeholder="テンプレート名...">
+          <input type="text" class="tpl-title-val" value="${escapeHtml(tpl.title || '')}" placeholder="${escapeHtml(getMessage('templateTitlePlaceholder'))}">
         </div>
-        <button class="btn btn-outlined text-danger icon-btn btn-delete-tpl" title="テンプレート削除" aria-label="テンプレート削除">
+        <button class="btn btn-outlined text-danger icon-btn btn-delete-tpl" title="${escapeHtml(getMessage('deleteTemplateBtn'))}" aria-label="${escapeHtml(getMessage('deleteTemplateBtn'))}">
           <span class="material-symbols-outlined">delete</span>
         </button>
       </div>
       <div class="input-field template-content-field">
-        <label>テンプレート本文</label>
-        <div class="tpl-content-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="テンプレート本文" aria-placeholder="本文を入力... チップを配置できます"></div>
+        <label>${escapeHtml(getMessage('templateContentLabel'))}</label>
+        <div class="tpl-content-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="${escapeHtml(getMessage('templateContentLabel'))}" aria-placeholder="${escapeHtml(getMessage('templateContentPlaceholder'))}"></div>
       </div>
       <div class="template-preview-field">
-        <button type="button" class="preview-toggle-btn" aria-expanded="false" title="リアルタイムプレビューを切り替え">
+        <button type="button" class="preview-toggle-btn" aria-expanded="false" title="${escapeHtml(getMessage('previewToggleTitle'))}">
           <span class="material-symbols-outlined toggle-icon">chevron_right</span>
-          <span class="preview-field-label">リアルタイムプレビュー</span>
-          <span class="toggle-status">(クリックして開く)</span>
+          <span class="preview-field-label">${escapeHtml(getMessage('previewLabel'))}</span>
+          <span class="toggle-status">${escapeHtml(getMessage('clickToOpen'))}</span>
         </button>
         <div class="preview-box hidden">
           <div class="preview-content">${escapeHtml(previewResolved)}</div>
@@ -371,12 +469,12 @@ function renderCategoryEditor() {
         previewBox.classList.remove('hidden');
         previewToggleBtn.setAttribute('aria-expanded', 'true');
         toggleIcon.textContent = 'expand_more';
-        toggleStatus.textContent = '(クリックして閉じる)';
+        toggleStatus.textContent = getMessage('clickToClose');
       } else {
         previewBox.classList.add('hidden');
         previewToggleBtn.setAttribute('aria-expanded', 'false');
         toggleIcon.textContent = 'chevron_right';
-        toggleStatus.textContent = '(クリックして開く)';
+        toggleStatus.textContent = getMessage('clickToOpen');
       }
     });
 
@@ -395,15 +493,23 @@ function renderCategoryEditor() {
       debouncedSaveStorage();
     });
 
+    // Track focused content editor
+    const trackFocus = () => {
+      lastFocusedEditor = contentEl;
+    };
+    contentEl.addEventListener('focus', trackFocus);
+    contentEl.addEventListener('click', trackFocus);
+    contentEl.addEventListener('keyup', trackFocus);
+
     // Update model and preview from contenteditable editor
     const updateContent = () => {
       tpl.content = getEditorContentString(contentEl);
       previewEl.textContent = resolveVariables(tpl.content, {
         workdays: appState.settings.workdays,
         time_adj_interval: currentCat.time_adj_interval || 0,
-        selection: '（サンプル選択テキスト）',
-        page_title: 'サンプルページタイトル',
-        page_url: 'https://example.com/sample'
+        selection: getMessage('sampleSelection'),
+        page_title: getMessage('samplePageTitle'),
+        page_url: getMessage('samplePageUrl')
       });
       debouncedSaveStorage();
     };
@@ -527,7 +633,8 @@ function renderCategoryEditor() {
 
     // Delete Template
     deleteBtn.addEventListener('click', () => {
-      if (confirm(`テンプレート「${tpl.title || '無題'}」を削除してもよろしいですか？`)) {
+      const prompt = getMessage('confirmDeleteTemplate', tpl.title || getMessage('untitledTemplate'));
+      if (confirm(prompt)) {
         currentCat.templates.splice(tplIndex, 1);
         saveStorage(true);
         renderCategoryEditor();
@@ -644,11 +751,11 @@ function validateAndNormalizeBackup(data) {
       }
       seenCatIds.add(catId);
 
-      const catTitle = typeof cat?.title === 'string' ? cat.title : `カテゴリ ${catIdx + 1}`;
+      const catTitle = typeof cat?.title === 'string' ? cat.title : `Category ${catIdx + 1}`;
       const timeAdjInterval = [0, 5, 10, 15, 30].includes(Number(cat?.time_adj_interval)) ? Number(cat.time_adj_interval) : 0;
       const templates = Array.isArray(cat?.templates) ? cat.templates.map((tpl, tplIdx) => ({
         id: typeof tpl?.id === 'string' && tpl.id ? tpl.id : generateId('tpl'),
-        title: typeof tpl?.title === 'string' ? tpl.title : `定型文 ${tplIdx + 1}`,
+        title: typeof tpl?.title === 'string' ? tpl.title : `Template ${tplIdx + 1}`,
         content: typeof tpl?.content === 'string' ? tpl.content : ''
       })) : [];
 
@@ -695,7 +802,7 @@ function setupEventHandlers() {
     }
     const newCat = {
       id: generateId('cat'),
-      title: '新しいカテゴリ',
+      title: getMessage('newCategoryTitle'),
       time_adj_interval: 0,
       templates: []
     };
@@ -711,7 +818,8 @@ function setupEventHandlers() {
     const currentCat = appState.categories.find(c => c.id === appState.selectedCategoryId);
     if (!currentCat) return;
 
-    if (confirm(`カテゴリ「${currentCat.title}」と配下のテンプレートをすべて削除してもよろしいですか？`)) {
+    const prompt = getMessage('confirmDeleteCategory', currentCat.title || getMessage('untitledCategory'));
+    if (confirm(prompt)) {
       appState.categories = appState.categories.filter(c => c.id !== appState.selectedCategoryId);
       appState.selectedCategoryId = appState.categories.length > 0 ? appState.categories[0].id : null;
       saveStorage(true);
@@ -731,7 +839,7 @@ function setupEventHandlers() {
 
     const newTpl = {
       id: generateId('tpl'),
-      title: '新しい定型文',
+      title: getMessage('newTemplateTitle'),
       content: ''
     };
     currentCat.templates.push(newTpl);
@@ -785,12 +893,12 @@ function setupEventHandlers() {
         chipsContainer.classList.remove('hidden');
         btnToggleChips.setAttribute('aria-expanded', 'true');
         if (toggleIcon) toggleIcon.textContent = 'expand_more';
-        if (toggleStatus) toggleStatus.textContent = '(クリックして閉じる)';
+        if (toggleStatus) toggleStatus.textContent = getMessage('clickToClose');
       } else {
         chipsContainer.classList.add('hidden');
         btnToggleChips.setAttribute('aria-expanded', 'false');
         if (toggleIcon) toggleIcon.textContent = 'chevron_right';
-        if (toggleStatus) toggleStatus.textContent = '(クリックして開く)';
+        if (toggleStatus) toggleStatus.textContent = getMessage('clickToOpen');
       }
     });
   }
@@ -805,6 +913,8 @@ function setupEventHandlers() {
 
       if (activeEl && activeEl.classList && activeEl.classList.contains('tpl-content-editor')) {
         targetEditor = activeEl;
+      } else if (lastFocusedEditor && document.body.contains(lastFocusedEditor)) {
+        targetEditor = lastFocusedEditor;
       } else {
         targetEditor = document.querySelector('.tpl-content-editor');
       }
@@ -812,7 +922,7 @@ function setupEventHandlers() {
       if (targetEditor) {
         insertTagAtCursor(targetEditor, tag);
       } else {
-        showToast('テンプレート本文に入力カーソルを合わせてからクリックしてください');
+        showToast(getMessage('toastCursorFocusPrompt'));
       }
     });
 
@@ -834,7 +944,7 @@ function setupEventHandlers() {
     a.download = `FlexPaste_Backup_${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast('バックアップをエクスポートしました');
+    showToast(getMessage('toastExported'));
   });
 
   // Backup Import
@@ -861,12 +971,12 @@ function setupEventHandlers() {
           renderWorkdays();
           renderCategoryList();
           renderCategoryEditor();
-          showToast('設定を復元しました');
+          showToast(getMessage('toastRestored'));
         } else {
-          alert('無効なバックアップファイルフォーマットです。カテゴリが配列構造になっていることを確認してください。');
+          alert(getMessage('alertInvalidImport'));
         }
       } catch (err) {
-        alert('JSONファイルの読み込みに失敗しました: ' + err.message);
+        alert(getMessage('alertImportFailed', err.message));
       }
     };
     reader.readAsText(file);
@@ -875,7 +985,7 @@ function setupEventHandlers() {
 
   // Reset to Defaults
   document.getElementById('btn-reset').addEventListener('click', () => {
-    if (confirm('すべての設定と定型文を初期状態に戻しますか？（現在のデータは消去されます）')) {
+    if (confirm(getMessage('confirmReset'))) {
       appState.settings = JSON.parse(JSON.stringify(DEFAULT_DATA.settings));
       appState.categories = JSON.parse(JSON.stringify(DEFAULT_DATA.categories));
       appState.selectedCategoryId = appState.categories[0].id;
@@ -883,13 +993,14 @@ function setupEventHandlers() {
       renderWorkdays();
       renderCategoryList();
       renderCategoryEditor();
-      showToast('初期状態にリセットしました');
+      showToast(getMessage('toastReset'));
     }
   });
 }
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
+  localizeStaticUI();
   loadStorage(() => {
     renderWorkdays();
     renderCategoryList();

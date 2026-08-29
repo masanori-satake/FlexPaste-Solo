@@ -1,5 +1,5 @@
 // background.js - FlexPaste-Solo Service Worker
-import { DEFAULT_DATA, resolveVariables } from './utils.js';
+import { DEFAULT_DATA, getMessage, resolveVariables } from './utils.js';
 
 let isRebuilding = false;
 let pendingRebuild = false;
@@ -52,7 +52,7 @@ function rebuildContextMenus() {
           itemsToCreate.push({
             id: catMenuId,
             parentId: 'flexpaste_root',
-            title: cat.title || '（無題のカテゴリ）',
+            title: cat.title || getMessage('untitledCategory'),
             contexts: ['all']
           });
 
@@ -64,7 +64,7 @@ function rebuildContextMenus() {
                 itemsToCreate.push({
                   id: tplMenuId,
                   parentId: catMenuId,
-                  title: tpl.title || '（無題のテンプレート）',
+                  title: tpl.title || getMessage('untitledTemplate'),
                   contexts: ['all']
                 });
               }
@@ -83,7 +83,7 @@ function rebuildContextMenus() {
       itemsToCreate.push({
         id: 'flexpaste_options',
         parentId: 'flexpaste_root',
-        title: '⚙ 設定',
+        title: getMessage('settingsMenuItem'),
         contexts: ['all']
       });
 

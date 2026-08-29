@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "FlexPaste-Solo",
-  "version": "0.1.11",
-  "description": "右クリックからカテゴリ別定型文と動的変数を組み合わせて即座にペースト挿入するChrome拡張機能",
+  "name": "__MSG_appName__",
+  "version": "0.1.12",
+  "description": "__MSG_appDesc__",
+  "default_locale": "en",
   "permissions": [
     "contextMenus",
     "storage",

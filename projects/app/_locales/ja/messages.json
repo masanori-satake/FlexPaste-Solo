@@ -1,0 +1,346 @@
+{
+  "appName": {
+    "message": "FlexPaste-Solo",
+    "description": "App Name"
+  },
+  "appDesc": {
+    "message": "右クリックからカテゴリ別定型文と動的変数を組み合わせて即座にペースト挿入するChrome拡張機能",
+    "description": "App Description"
+  },
+  "headerSubtitle": {
+    "message": "カテゴリ別定型文 ＆ チップ 設定",
+    "description": "Header Subtitle"
+  },
+  "workdaysLabel": {
+    "message": "稼働曜日",
+    "description": "Workdays Label"
+  },
+  "sun": {
+    "message": "日",
+    "description": "Sunday"
+  },
+  "mon": {
+    "message": "月",
+    "description": "Monday"
+  },
+  "tue": {
+    "message": "火",
+    "description": "Tuesday"
+  },
+  "wed": {
+    "message": "水",
+    "description": "Wednesday"
+  },
+  "thu": {
+    "message": "木",
+    "description": "Thursday"
+  },
+  "fri": {
+    "message": "金",
+    "description": "Friday"
+  },
+  "sat": {
+    "message": "土",
+    "description": "Saturday"
+  },
+  "exportBtn": {
+    "message": "エクスポート",
+    "description": "Export button title/aria"
+  },
+  "importBtn": {
+    "message": "インポート",
+    "description": "Import button title/aria"
+  },
+  "resetBtn": {
+    "message": "初期化",
+    "description": "Reset button title/aria"
+  },
+  "categoriesHeader": {
+    "message": "カテゴリ一覧",
+    "description": "Categories Section Header"
+  },
+  "addCategoryBtn": {
+    "message": "カテゴリ追加",
+    "description": "Add Category button title"
+  },
+  "untitledCategory": {
+    "message": "（無題のカテゴリ）",
+    "description": "Default title for untitled category"
+  },
+  "newCategoryTitle": {
+    "message": "新しいカテゴリ",
+    "description": "Title for newly created category"
+  },
+  "categoryNameLabel": {
+    "message": "カテゴリ名",
+    "description": "Label for category name field"
+  },
+  "categoryNamePlaceholder": {
+    "message": "カテゴリ名を入力...",
+    "description": "Placeholder for category name"
+  },
+  "timeAdjIntervalLabel": {
+    "message": "時分補正間隔",
+    "description": "Label for time adjustment interval"
+  },
+  "adjNone": {
+    "message": "補正しない",
+    "description": "Time adjustment option: none"
+  },
+  "adjMin": {
+    "message": "$MIN$分間隔",
+    "description": "Time adjustment option: X min interval",
+    "placeholders": {
+      "min": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteCategoryBtn": {
+    "message": "カテゴリ削除",
+    "description": "Delete Category button title"
+  },
+  "confirmDeleteCategory": {
+    "message": "カテゴリ「$CAT$」と配下のテンプレートをすべて削除してもよろしいですか？",
+    "description": "Confirm delete category",
+    "placeholders": {
+      "cat": {
+        "content": "$1"
+      }
+    }
+  },
+  "chipsToggleTitle": {
+    "message": "チップ (キャレット位置にクリックまたはドラッグで挿入)",
+    "description": "Chips section toggle label"
+  },
+  "clickToClose": {
+    "message": "(クリックして閉じる)",
+    "description": "Toggle status close"
+  },
+  "clickToOpen": {
+    "message": "(クリックして開く)",
+    "description": "Toggle status open"
+  },
+  "noTemplatesDesc": {
+    "message": "このカテゴリにはテンプレートがありません。「テンプレート追加」ボタンをクリックして作成してください。",
+    "description": "Empty templates text"
+  },
+  "addTemplateBtn": {
+    "message": "テンプレート追加",
+    "description": "Add template button title"
+  },
+  "newTemplateTitle": {
+    "message": "新しい定型文",
+    "description": "Newly created template title"
+  },
+  "templateTitlePlaceholder": {
+    "message": "テンプレート名...",
+    "description": "Template title input placeholder"
+  },
+  "deleteTemplateBtn": {
+    "message": "テンプレート削除",
+    "description": "Delete template button"
+  },
+  "confirmDeleteTemplate": {
+    "message": "テンプレート「$TPL$」を削除してもよろしいですか？",
+    "description": "Confirm delete template",
+    "placeholders": {
+      "tpl": {
+        "content": "$1"
+      }
+    }
+  },
+  "templateContentLabel": {
+    "message": "テンプレート本文",
+    "description": "Label for template content"
+  },
+  "templateContentPlaceholder": {
+    "message": "本文を入力... チップを配置できます",
+    "description": "Placeholder for template content editor"
+  },
+  "previewLabel": {
+    "message": "リアルタイムプレビュー",
+    "description": "Label for live preview"
+  },
+  "previewToggleTitle": {
+    "message": "リアルタイムプレビューを切り替え",
+    "description": "Preview toggle title"
+  },
+  "chipTag_date": {
+    "message": "今日",
+    "description": "Chip label"
+  },
+  "chipTag_date_short": {
+    "message": "今日(短縮)",
+    "description": "Chip label"
+  },
+  "chipTag_date_with_day": {
+    "message": "今日(曜日有)",
+    "description": "Chip label"
+  },
+  "chipTag_tomorrow": {
+    "message": "明日",
+    "description": "Chip label"
+  },
+  "chipTag_tomorrow_short": {
+    "message": "明日(短縮)",
+    "description": "Chip label"
+  },
+  "chipTag_tomorrow_with_day": {
+    "message": "明日(曜日有)",
+    "description": "Chip label"
+  },
+  "chipTag_next_workday": {
+    "message": "次稼働日",
+    "description": "Chip label"
+  },
+  "chipTag_next_workday_with_day": {
+    "message": "次稼働日(曜日有)",
+    "description": "Chip label"
+  },
+  "chipTag_next_week": {
+    "message": "一週間後",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_with_day": {
+    "message": "一週間後(曜日有)",
+    "description": "Chip label"
+  },
+  "chipTag_yesterday": {
+    "message": "昨日",
+    "description": "Chip label"
+  },
+  "chipTag_yesterday_with_day": {
+    "message": "昨日(曜日有)",
+    "description": "Chip label"
+  },
+  "chipTag_month_end": {
+    "message": "月末",
+    "description": "Chip label"
+  },
+  "chipTag_month_last_workday": {
+    "message": "月末最終稼働日",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_monday_with_day": {
+    "message": "次月曜日",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_tuesday_with_day": {
+    "message": "次火曜日",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_wednesday_with_day": {
+    "message": "次水曜日",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_thursday_with_day": {
+    "message": "次木曜日",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_friday_with_day": {
+    "message": "次金曜日",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_saturday_with_day": {
+    "message": "次土曜日",
+    "description": "Chip label"
+  },
+  "chipTag_next_week_sunday_with_day": {
+    "message": "次日曜日",
+    "description": "Chip label"
+  },
+  "chipTag_time": {
+    "message": "現在時刻",
+    "description": "Chip label"
+  },
+  "chipTag_time_prev_adj": {
+    "message": "現在時刻(前補正)",
+    "description": "Chip label"
+  },
+  "chipTag_time_next_adj": {
+    "message": "現在時刻(後補正)",
+    "description": "Chip label"
+  },
+  "chipTag_in_one_hour": {
+    "message": "一時間後",
+    "description": "Chip label"
+  },
+  "chipTag_in_one_hour_prev_adj": {
+    "message": "一時間後(前補正)",
+    "description": "Chip label"
+  },
+  "chipTag_in_one_hour_next_adj": {
+    "message": "一時間後(後補正)",
+    "description": "Chip label"
+  },
+  "chipTag_selection": {
+    "message": "選択テキスト",
+    "description": "Chip label"
+  },
+  "chipTag_page_title": {
+    "message": "ページタイトル",
+    "description": "Chip label"
+  },
+  "chipTag_page_url": {
+    "message": "ページURL",
+    "description": "Chip label"
+  },
+  "toastSaved": {
+    "message": "保存しました",
+    "description": "Toast message when saved"
+  },
+  "toastCursorFocusPrompt": {
+    "message": "テンプレート本文に入力カーソルを合わせてからクリックしてください",
+    "description": "Toast prompt"
+  },
+  "toastExported": {
+    "message": "バックアップをエクスポートしました",
+    "description": "Toast message export"
+  },
+  "toastRestored": {
+    "message": "設定を復元しました",
+    "description": "Toast message import"
+  },
+  "toastReset": {
+    "message": "初期状態にリセットしました",
+    "description": "Toast message reset"
+  },
+  "alertInvalidImport": {
+    "message": "無効なバックアップファイルフォーマットです。カテゴリが配列構造になっていることを確認してください。",
+    "description": "Alert invalid backup"
+  },
+  "alertImportFailed": {
+    "message": "JSONファイルの読み込みに失敗しました: $ERR$",
+    "description": "Alert import failed",
+    "placeholders": {
+      "err": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmReset": {
+    "message": "すべての設定と定型文を初期状態に戻しますか？（現在のデータは消去されます）",
+    "description": "Confirm reset"
+  },
+  "sampleSelection": {
+    "message": "（サンプル選択テキスト）",
+    "description": "Sample selection preview"
+  },
+  "samplePageTitle": {
+    "message": "サンプルページタイトル",
+    "description": "Sample page title preview"
+  },
+  "samplePageUrl": {
+    "message": "https://example.com/sample",
+    "description": "Sample page url preview"
+  },
+  "settingsMenuItem": {
+    "message": "⚙ 設定",
+    "description": "Context menu options link"
+  },
+  "untitledTemplate": {
+    "message": "（無題のテンプレート）",
+    "description": "Untitled template fallback for context menu"
+  }
+}
