@@ -386,10 +386,28 @@ body {
   flex: 1;
 }
 
+.cat-adj-interval-field select {
+  padding: 10px 14px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--md-shape-corner-small);
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.cat-adj-interval-field select:focus {
+  border-color: var(--md-sys-color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 106, 106, 0.2);
+}
+
 .cat-header-actions {
   display: flex;
   gap: 12px;
-  align-items: center;
+  align-items: flex-end;
 }
 
 /* Input Fields */

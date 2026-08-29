@@ -214,11 +214,13 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
       // Find template by menu item ID matching tpl_{catId}_{tplId}
       let foundTemplate = null;
+      let foundCategory = null;
       for (const cat of categories) {
         if (Array.isArray(cat.templates)) {
           for (const tpl of cat.templates) {
             if (`tpl_${cat.id}_${tpl.id}` === info.menuItemId) {
               foundTemplate = tpl;
+              foundCategory = cat;
               break;
             }
           }
@@ -230,6 +232,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
       const contextData = {
         workdays: settings.workdays || [1, 2, 3, 4, 5],
+        time_adj_interval: foundCategory?.time_adj_interval || 0,
         selection: info.selectionText || '',
         page_title: tab?.title || '',
         page_url: tab?.url || ''
