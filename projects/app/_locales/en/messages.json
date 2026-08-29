@@ -306,17 +306,37 @@
     "message": "In 1 Hour (Next Adj)",
     "description": "Chip label"
   },
-  "chipTag_selection": {
-    "message": "Selected Text",
+  "chipTag_def_1": {
+    "message": "Definition 1",
     "description": "Chip label"
   },
-  "chipTag_page_title": {
-    "message": "Page Title",
+  "chipTag_def_2": {
+    "message": "Definition 2",
     "description": "Chip label"
   },
-  "chipTag_page_url": {
-    "message": "Page URL",
+  "chipTag_def_3": {
+    "message": "Definition 3",
     "description": "Chip label"
+  },
+  "definitionsToggleTitle": {
+    "message": "Definitions",
+    "description": "Definitions section title"
+  },
+  "def1Label": {
+    "message": "Definition 1",
+    "description": "Definition 1 label"
+  },
+  "def2Label": {
+    "message": "Definition 2",
+    "description": "Definition 2 label"
+  },
+  "def3Label": {
+    "message": "Definition 3",
+    "description": "Definition 3 label"
+  },
+  "defPlaceholder": {
+    "message": "Enter definition text...",
+    "description": "Definition input placeholder"
   },
   "toastSaved": {
     "message": "Saved",
@@ -354,18 +374,6 @@
   "confirmReset": {
     "message": "Are you sure you want to reset all settings and templates to default? (Current data will be lost)",
     "description": "Confirm reset"
-  },
-  "sampleSelection": {
-    "message": "(Sample Selected Text)",
-    "description": "Sample selection preview"
-  },
-  "samplePageTitle": {
-    "message": "Sample Page Title",
-    "description": "Sample page title preview"
-  },
-  "samplePageUrl": {
-    "message": "https://example.com/sample",
-    "description": "Sample page url preview"
   },
   "settingsMenuItem": {
     "message": "⚙ Settings",

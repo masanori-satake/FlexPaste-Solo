@@ -306,17 +306,37 @@
     "message": "一時間後(後補正)",
     "description": "Chip label"
   },
-  "chipTag_selection": {
-    "message": "選択テキスト",
+  "chipTag_def_1": {
+    "message": "定義文1",
     "description": "Chip label"
   },
-  "chipTag_page_title": {
-    "message": "ページタイトル",
+  "chipTag_def_2": {
+    "message": "定義文2",
     "description": "Chip label"
   },
-  "chipTag_page_url": {
-    "message": "ページURL",
+  "chipTag_def_3": {
+    "message": "定義文3",
     "description": "Chip label"
+  },
+  "definitionsToggleTitle": {
+    "message": "定義文",
+    "description": "Definitions section title"
+  },
+  "def1Label": {
+    "message": "定義文1",
+    "description": "Definition 1 label"
+  },
+  "def2Label": {
+    "message": "定義文2",
+    "description": "Definition 2 label"
+  },
+  "def3Label": {
+    "message": "定義文3",
+    "description": "Definition 3 label"
+  },
+  "defPlaceholder": {
+    "message": "定義文を入力...",
+    "description": "Definition input placeholder"
   },
   "toastSaved": {
     "message": "保存しました",
@@ -354,18 +374,6 @@
   "confirmReset": {
     "message": "すべての設定と定型文を初期状態に戻しますか？（現在のデータは消去されます）",
     "description": "Confirm reset"
-  },
-  "sampleSelection": {
-    "message": "（サンプル選択テキスト）",
-    "description": "Sample selection preview"
-  },
-  "samplePageTitle": {
-    "message": "サンプルページタイトル",
-    "description": "Sample page title preview"
-  },
-  "samplePageUrl": {
-    "message": "https://example.com/sample",
-    "description": "Sample page url preview"
   },
   "settingsMenuItem": {
     "message": "⚙ 設定",

@@ -24,9 +24,9 @@ function getVariableMap() {
     '{{next_week_sunday_with_day}}': { label: getMessage('chipTag_next_week_sunday_with_day'), icon: 'event' },
     '{{month_end}}': { label: getMessage('chipTag_month_end'), icon: 'calendar_month' },
     '{{month_last_workday}}': { label: getMessage('chipTag_month_last_workday'), icon: 'domain' },
-    '{{selection}}': { label: getMessage('chipTag_selection'), icon: 'content_cut' },
-    '{{page_title}}': { label: getMessage('chipTag_page_title'), icon: 'description' },
-    '{{page_url}}': { label: getMessage('chipTag_page_url'), icon: 'link' },
+    '{{def_1}}': { label: getMessage('chipTag_def_1'), icon: 'edit_note' },
+    '{{def_2}}': { label: getMessage('chipTag_def_2'), icon: 'edit_note' },
+    '{{def_3}}': { label: getMessage('chipTag_def_3'), icon: 'edit_note' },
     '{{time}}': { label: getMessage('chipTag_time'), icon: 'schedule' },
     '{{time_prev_adj}}': { label: getMessage('chipTag_time_prev_adj'), icon: 'schedule' },
     '{{time_next_adj}}': { label: getMessage('chipTag_time_next_adj'), icon: 'schedule' },
@@ -201,9 +201,9 @@ function updateAllPreviews() {
       previewEl.textContent = resolveVariables(tpl.content || '', {
         workdays: appState.settings.workdays,
         time_adj_interval: currentCat.time_adj_interval || 0,
-        selection: getMessage('sampleSelection'),
-        page_title: getMessage('samplePageTitle'),
-        page_url: getMessage('samplePageUrl')
+        def_1: currentCat.def_1 || '',
+        def_2: currentCat.def_2 || '',
+        def_3: currentCat.def_3 || ''
       });
     }
   });
@@ -287,6 +287,19 @@ function localizeStaticUI() {
 
   const elemChipsStatus = document.getElementById('i18n-chips-toggle-status');
   if (elemChipsStatus) elemChipsStatus.textContent = getMessage('clickToClose');
+
+  const elemDefsTitle = document.getElementById('i18n-definitions-title');
+  if (elemDefsTitle) elemDefsTitle.textContent = getMessage('definitionsToggleTitle');
+
+  const elemDefsStatus = document.getElementById('i18n-definitions-toggle-status');
+  if (elemDefsStatus) elemDefsStatus.textContent = getMessage('clickToOpen');
+
+  [1, 2, 3].forEach(n => {
+    const lbl = document.getElementById(`i18n-def${n}-label`);
+    if (lbl) lbl.textContent = getMessage(`def${n}Label`);
+    const input = document.getElementById(`current-cat-def-${n}`);
+    if (input) input.placeholder = getMessage('defPlaceholder');
+  });
 
   const btnAddTpl = document.getElementById('btn-add-template');
   if (btnAddTpl) {
@@ -416,6 +429,14 @@ function renderCategoryEditor() {
     timeAdjSelect.value = String(currentCat.time_adj_interval || 0);
   }
 
+  // Category Definitions
+  [1, 2, 3].forEach(n => {
+    const input = document.getElementById(`current-cat-def-${n}`);
+    if (input) {
+      input.value = currentCat[`def_${n}`] || '';
+    }
+  });
+
   // Render Templates
   const templatesContainer = document.getElementById('templates-container');
   templatesContainer.innerHTML = '';
@@ -434,9 +455,9 @@ function renderCategoryEditor() {
     const previewResolved = resolveVariables(tpl.content || '', {
       workdays: appState.settings.workdays,
       time_adj_interval: currentCat.time_adj_interval || 0,
-      selection: getMessage('sampleSelection'),
-      page_title: getMessage('samplePageTitle'),
-      page_url: getMessage('samplePageUrl')
+      def_1: currentCat.def_1 || '',
+      def_2: currentCat.def_2 || '',
+      def_3: currentCat.def_3 || ''
     });
 
     card.innerHTML = `
@@ -514,9 +535,9 @@ function renderCategoryEditor() {
       previewEl.textContent = resolveVariables(tpl.content, {
         workdays: appState.settings.workdays,
         time_adj_interval: currentCat.time_adj_interval || 0,
-        selection: getMessage('sampleSelection'),
-        page_title: getMessage('samplePageTitle'),
-        page_url: getMessage('samplePageUrl')
+        def_1: currentCat.def_1 || '',
+        def_2: currentCat.def_2 || '',
+        def_3: currentCat.def_3 || ''
       });
       debouncedSaveStorage();
     };
@@ -760,6 +781,9 @@ function validateAndNormalizeBackup(data) {
 
       const catTitle = typeof cat?.title === 'string' ? cat.title : `Category ${catIdx + 1}`;
       const timeAdjInterval = [0, 5, 10, 15, 30].includes(Number(cat?.time_adj_interval)) ? Number(cat.time_adj_interval) : 0;
+      const def1 = typeof cat?.def_1 === 'string' ? cat.def_1 : '';
+      const def2 = typeof cat?.def_2 === 'string' ? cat.def_2 : '';
+      const def3 = typeof cat?.def_3 === 'string' ? cat.def_3 : '';
       const templates = Array.isArray(cat?.templates) ? cat.templates.map((tpl, tplIdx) => ({
         id: typeof tpl?.id === 'string' && tpl.id ? tpl.id : generateId('tpl'),
         title: typeof tpl?.title === 'string' ? tpl.title : `Template ${tplIdx + 1}`,
@@ -770,6 +794,9 @@ function validateAndNormalizeBackup(data) {
         id: catId,
         title: catTitle,
         time_adj_interval: timeAdjInterval,
+        def_1: def1,
+        def_2: def2,
+        def_3: def3,
         templates
       };
     });
@@ -802,6 +829,21 @@ function setupEventHandlers() {
     }
   });
 
+  // Category Definitions Changes
+  [1, 2, 3].forEach(n => {
+    const input = document.getElementById(`current-cat-def-${n}`);
+    if (input) {
+      input.addEventListener('input', (e) => {
+        const currentCat = appState.categories.find(c => c.id === appState.selectedCategoryId);
+        if (currentCat) {
+          currentCat[`def_${n}`] = e.target.value;
+          debouncedSaveStorage();
+          updateAllPreviews();
+        }
+      });
+    }
+  });
+
   // Add Category
   document.getElementById('btn-add-category').addEventListener('click', () => {
     if (!Array.isArray(appState.categories)) {
@@ -811,6 +853,9 @@ function setupEventHandlers() {
       id: generateId('cat'),
       title: getMessage('newCategoryTitle'),
       time_adj_interval: 0,
+      def_1: '',
+      def_2: '',
+      def_3: '',
       templates: []
     };
     appState.categories.push(newCat);
@@ -904,6 +949,29 @@ function setupEventHandlers() {
       } else {
         chipsContainer.classList.add('hidden');
         btnToggleChips.setAttribute('aria-expanded', 'false');
+        if (toggleIcon) toggleIcon.textContent = 'chevron_right';
+        if (toggleStatus) toggleStatus.textContent = getMessage('clickToOpen');
+      }
+    });
+  }
+
+  // Definitions Toolbar Toggle
+  const btnToggleDefs = document.getElementById('btn-toggle-definitions');
+  const defsContainer = document.getElementById('definitions-container');
+  if (btnToggleDefs && defsContainer) {
+    btnToggleDefs.addEventListener('click', () => {
+      const isHidden = defsContainer.classList.contains('hidden');
+      const toggleIcon = btnToggleDefs.querySelector('.toggle-icon');
+      const toggleStatus = btnToggleDefs.querySelector('.toggle-status');
+
+      if (isHidden) {
+        defsContainer.classList.remove('hidden');
+        btnToggleDefs.setAttribute('aria-expanded', 'true');
+        if (toggleIcon) toggleIcon.textContent = 'expand_more';
+        if (toggleStatus) toggleStatus.textContent = getMessage('clickToClose');
+      } else {
+        defsContainer.classList.add('hidden');
+        btnToggleDefs.setAttribute('aria-expanded', 'false');
         if (toggleIcon) toggleIcon.textContent = 'chevron_right';
         if (toggleStatus) toggleStatus.textContent = getMessage('clickToOpen');
       }

@@ -134,12 +134,41 @@
                 <div class="chip" draggable="true" data-tag="{{in_one_hour_prev_adj}}"><span class="material-symbols-outlined chip-icon">schedule</span>一時間後(前補正)</div>
                 <div class="chip" draggable="true" data-tag="{{in_one_hour_next_adj}}"><span class="material-symbols-outlined chip-icon">schedule</span>一時間後(後補正)</div>
               </div>
-              <!-- Row 5: selection, title, url -->
+              <!-- Row 5: def_1, def_2, def_3 -->
               <div class="chips-row">
-                <div class="chip" draggable="true" data-tag="{{selection}}"><span class="material-symbols-outlined chip-icon">content_cut</span>選択テキスト</div>
-                <div class="chip" draggable="true" data-tag="{{page_title}}"><span class="material-symbols-outlined chip-icon">description</span>ページタイトル</div>
-                <div class="chip" draggable="true" data-tag="{{page_url}}"><span class="material-symbols-outlined chip-icon">link</span>ページURL</div>
+                <div class="chip" draggable="true" data-tag="{{def_1}}"><span class="material-symbols-outlined chip-icon">edit_note</span>定義文1</div>
+                <div class="chip" draggable="true" data-tag="{{def_2}}"><span class="material-symbols-outlined chip-icon">edit_note</span>定義文2</div>
+                <div class="chip" draggable="true" data-tag="{{def_3}}"><span class="material-symbols-outlined chip-icon">edit_note</span>定義文3</div>
               </div>
+            </div>
+          </div>
+
+          <!-- Definitions Collapsible Section -->
+          <div class="definitions-toolbar-card">
+            <div class="toolbar-header">
+              <button type="button" id="btn-toggle-definitions" class="preview-toggle-btn" aria-expanded="false" title="定義文エリアの開閉">
+                <span class="material-symbols-outlined toggle-icon">chevron_right</span>
+                <span id="i18n-definitions-title">定義文</span>
+                <span id="i18n-definitions-toggle-status" class="toggle-status">(クリックして開く)</span>
+              </button>
+            </div>
+            <div id="definitions-container" class="definitions-container hidden">
+              <table class="definitions-table">
+                <tbody>
+                  <tr>
+                    <th><label for="current-cat-def-1" id="i18n-def1-label">定義文1</label></th>
+                    <td><input type="text" id="current-cat-def-1" class="def-input" placeholder="定義文を入力..."></td>
+                  </tr>
+                  <tr>
+                    <th><label for="current-cat-def-2" id="i18n-def2-label">定義文2</label></th>
+                    <td><input type="text" id="current-cat-def-2" class="def-input" placeholder="定義文を入力..."></td>
+                  </tr>
+                  <tr>
+                    <th><label for="current-cat-def-3" id="i18n-def3-label">定義文3</label></th>
+                    <td><input type="text" id="current-cat-def-3" class="def-input" placeholder="定義文を入力..."></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
