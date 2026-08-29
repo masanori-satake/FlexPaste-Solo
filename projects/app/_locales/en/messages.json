@@ -11,37 +11,69 @@
     "message": "Category Templates & Chips Settings",
     "description": "Header Subtitle"
   },
+  "optionsTitle": {
+    "message": "FlexPaste-Solo Settings",
+    "description": "Options page tab title"
+  },
   "workdaysLabel": {
     "message": "Workdays",
     "description": "Workdays Label"
   },
   "sun": {
-    "message": "Sun",
+    "message": "S",
     "description": "Sunday"
   },
   "mon": {
-    "message": "Mon",
+    "message": "M",
     "description": "Monday"
   },
   "tue": {
-    "message": "Tue",
+    "message": "T",
     "description": "Tuesday"
   },
   "wed": {
-    "message": "Wed",
+    "message": "W",
     "description": "Wednesday"
   },
   "thu": {
-    "message": "Thu",
+    "message": "T",
     "description": "Thursday"
   },
   "fri": {
-    "message": "Fri",
+    "message": "F",
     "description": "Friday"
   },
   "sat": {
-    "message": "Sat",
+    "message": "S",
     "description": "Saturday"
+  },
+  "sunFull": {
+    "message": "Sunday",
+    "description": "Sunday full name"
+  },
+  "monFull": {
+    "message": "Monday",
+    "description": "Monday full name"
+  },
+  "tueFull": {
+    "message": "Tuesday",
+    "description": "Tuesday full name"
+  },
+  "wedFull": {
+    "message": "Wednesday",
+    "description": "Wednesday full name"
+  },
+  "thuFull": {
+    "message": "Thursday",
+    "description": "Thursday full name"
+  },
+  "friFull": {
+    "message": "Friday",
+    "description": "Friday full name"
+  },
+  "satFull": {
+    "message": "Saturday",
+    "description": "Saturday full name"
   },
   "exportBtn": {
     "message": "Export",

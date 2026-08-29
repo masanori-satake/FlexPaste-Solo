@@ -11,6 +11,10 @@
     "message": "カテゴリ別定型文 ＆ チップ 設定",
     "description": "Header Subtitle"
   },
+  "optionsTitle": {
+    "message": "FlexPaste-Solo 設定",
+    "description": "Options page tab title"
+  },
   "workdaysLabel": {
     "message": "稼働曜日",
     "description": "Workdays Label"
@@ -42,6 +46,34 @@
   "sat": {
     "message": "土",
     "description": "Saturday"
+  },
+  "sunFull": {
+    "message": "日曜日",
+    "description": "Sunday full name"
+  },
+  "monFull": {
+    "message": "月曜日",
+    "description": "Monday full name"
+  },
+  "tueFull": {
+    "message": "火曜日",
+    "description": "Tuesday full name"
+  },
+  "wedFull": {
+    "message": "水曜日",
+    "description": "Wednesday full name"
+  },
+  "thuFull": {
+    "message": "木曜日",
+    "description": "Thursday full name"
+  },
+  "friFull": {
+    "message": "金曜日",
+    "description": "Friday full name"
+  },
+  "satFull": {
+    "message": "土曜日",
+    "description": "Saturday full name"
   },
   "exportBtn": {
     "message": "エクスポート",
