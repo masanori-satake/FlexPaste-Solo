@@ -177,10 +177,18 @@ function debouncedSaveStorage(delay = 300) {
 
 // Render Functions
 function renderWorkdays() {
-  const checkboxes = document.querySelectorAll('.workday-cb');
+  const pills = document.querySelectorAll('.workday-pill');
   const activeDays = appState.settings.workdays || [1, 2, 3, 4, 5];
-  checkboxes.forEach(cb => {
-    cb.checked = activeDays.includes(parseInt(cb.value, 10));
+  pills.forEach(pill => {
+    const val = parseInt(pill.dataset.value, 10);
+    const isActive = activeDays.includes(val);
+    if (isActive) {
+      pill.classList.add('active');
+      pill.setAttribute('aria-pressed', 'true');
+    } else {
+      pill.classList.remove('active');
+      pill.setAttribute('aria-pressed', 'false');
+    }
   });
 }
 
@@ -699,13 +707,19 @@ function setupEventHandlers() {
     }, 0);
   });
 
-  // Workday Checkboxes
-  document.querySelectorAll('.workday-cb').forEach(cb => {
-    cb.addEventListener('change', () => {
-      const selected = Array.from(document.querySelectorAll('.workday-cb:checked'))
-        .map(el => parseInt(el.value, 10));
-      appState.settings.workdays = selected;
+  // Workday Pills
+  document.querySelectorAll('.workday-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const val = parseInt(pill.dataset.value, 10);
+      let activeDays = [...(appState.settings.workdays || [1, 2, 3, 4, 5])];
+      if (activeDays.includes(val)) {
+        activeDays = activeDays.filter(d => d !== val);
+      } else {
+        activeDays.push(val);
+      }
+      appState.settings.workdays = activeDays;
       saveStorage(true);
+      renderWorkdays();
       renderCategoryEditor();
     });
   });
