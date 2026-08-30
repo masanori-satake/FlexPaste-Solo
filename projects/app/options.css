@@ -43,6 +43,7 @@
   --md-shape-corner-large: 16px;
   --md-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.30);
   --md-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.30);
+  --md-scroll-shadow-color: rgba(0, 0, 0, 0.15);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -84,6 +85,7 @@
 
     --md-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.4), 0px 1px 2px 0px rgba(0, 0, 0, 0.6);
     --md-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.4), 0px 1px 2px 0px rgba(0, 0, 0, 0.6);
+    --md-scroll-shadow-color: rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -236,7 +238,7 @@ body {
 /* Main Grid Layout */
 .app-main {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 2fr 3fr;
   grid-template-rows: 1fr;
   gap: 24px;
   flex: 1;
@@ -261,9 +263,10 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--md-sys-color-on-surface);
+  line-height: 1.3;
 }
 
 .icon-inline {
@@ -273,11 +276,22 @@ body {
   align-items: center;
 }
 
-/* Sidebar Category List */
-.sidebar-card {
+/* Sidebar Category List & Chips Cards */
+.sidebar-container {
   display: flex;
   flex-direction: column;
+  gap: 20px;
   min-height: 0;
+  height: 100%;
+}
+
+.sidebar-card,
+.chips-card {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .category-list {
@@ -502,16 +516,55 @@ body {
   min-height: 0;
 }
 
+.templates-scroll-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-radius: var(--md-shape-corner-medium);
+  overflow: hidden;
+}
+
+.templates-scroll-wrapper::before,
+.templates-scroll-wrapper::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 20px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.templates-scroll-wrapper::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--md-scroll-shadow-color), transparent);
+}
+
+.templates-scroll-wrapper::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--md-scroll-shadow-color), transparent);
+}
+
+.templates-scroll-wrapper.has-top-shadow::before {
+  opacity: 1;
+}
+
+.templates-scroll-wrapper.has-bottom-shadow::after {
+  opacity: 1;
+}
+
 .templates-scroll-area {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
-  padding-right: 4px;
-  margin-right: -4px;
+  padding: 4px 4px 4px 0;
 }
 
 /* Variable Chips & Definitions Toolbar */
-.variable-toolbar-card,
 .definitions-toolbar-card {
   background-color: var(--md-sys-color-surface-container);
   border-radius: var(--md-shape-corner-medium);
@@ -575,11 +628,10 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 8px;
-}
-
-.chips-container.hidden {
-  display: none;
+  margin-top: 4px;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .chips-row {

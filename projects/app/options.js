@@ -144,7 +144,7 @@ function showToast(message) {
 
 // Storage helpers
 function loadStorage(callback) {
-  if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+  if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local && typeof chrome.storage.local.get === 'function') {
     chrome.storage.local.get(['categories', 'settings'], (result) => {
       appState.settings = result.settings || JSON.parse(JSON.stringify(DEFAULT_DATA.settings));
       appState.categories = Array.isArray(result.categories)
@@ -165,7 +165,7 @@ function loadStorage(callback) {
 }
 
 function saveStorage(showNotification = true) {
-  if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+  if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local && typeof chrome.storage.local.set === 'function') {
     chrome.storage.local.set({
       settings: appState.settings,
       categories: appState.categories
@@ -184,6 +184,20 @@ function debouncedSaveStorage(delay = 300) {
   saveDebounceTimer = setTimeout(() => {
     saveStorage(false);
   }, delay);
+}
+
+// Helper: Update scroll shadows on templates scroll area boundaries
+function updateTemplateScrollShadows() {
+  const scrollArea = document.querySelector('.templates-scroll-area');
+  const scrollWrapper = document.querySelector('.templates-scroll-wrapper');
+  if (!scrollArea || !scrollWrapper) return;
+
+  const isScrollable = scrollArea.scrollHeight > scrollArea.clientHeight + 1;
+  const canScrollUp = scrollArea.scrollTop > 2;
+  const canScrollDown = scrollArea.scrollTop + scrollArea.clientHeight < scrollArea.scrollHeight - 2;
+
+  scrollWrapper.classList.toggle('has-top-shadow', isScrollable && canScrollUp);
+  scrollWrapper.classList.toggle('has-bottom-shadow', isScrollable && canScrollDown);
 }
 
 // Helper to update all previews without re-rendering template cards
@@ -282,11 +296,8 @@ function localizeStaticUI() {
     btnDelCat.setAttribute('aria-label', getMessage('deleteCategoryBtn'));
   }
 
-  const elemChipsTitle = document.getElementById('i18n-chips-title');
-  if (elemChipsTitle) elemChipsTitle.textContent = getMessage('chipsToggleTitle');
-
-  const elemChipsStatus = document.getElementById('i18n-chips-toggle-status');
-  if (elemChipsStatus) elemChipsStatus.textContent = getMessage('clickToClose');
+  const elemChipsHeader = document.getElementById('i18n-chips-header');
+  if (elemChipsHeader) elemChipsHeader.textContent = getMessage('chipsToggleTitle');
 
   const elemDefsTitle = document.getElementById('i18n-definitions-title');
   if (elemDefsTitle) elemDefsTitle.textContent = getMessage('definitionsToggleTitle');
@@ -709,6 +720,8 @@ function renderCategoryEditor() {
 
     templatesContainer.appendChild(card);
   });
+
+  requestAnimationFrame(updateTemplateScrollShadows);
 }
 
 // Cursor Insertion Helper for contenteditable editor
@@ -935,28 +948,6 @@ function setupEventHandlers() {
     });
   });
 
-  // Variable Toolbar Toggle
-  const btnToggleChips = document.getElementById('btn-toggle-chips');
-  const chipsContainer = document.getElementById('chips-container');
-  if (btnToggleChips && chipsContainer) {
-    btnToggleChips.addEventListener('click', () => {
-      const isHidden = chipsContainer.classList.contains('hidden');
-      const toggleIcon = btnToggleChips.querySelector('.toggle-icon');
-      const toggleStatus = btnToggleChips.querySelector('.toggle-status');
-
-      if (isHidden) {
-        chipsContainer.classList.remove('hidden');
-        btnToggleChips.setAttribute('aria-expanded', 'true');
-        if (toggleIcon) toggleIcon.textContent = 'expand_more';
-        if (toggleStatus) toggleStatus.textContent = getMessage('clickToClose');
-      } else {
-        chipsContainer.classList.add('hidden');
-        btnToggleChips.setAttribute('aria-expanded', 'false');
-        if (toggleIcon) toggleIcon.textContent = 'chevron_right';
-        if (toggleStatus) toggleStatus.textContent = getMessage('clickToOpen');
-      }
-    });
-  }
 
   // Definitions Toolbar Toggle
   const btnToggleDefs = document.getElementById('btn-toggle-definitions');
@@ -1060,6 +1051,13 @@ function setupEventHandlers() {
     reader.readAsText(file);
     fileInput.value = '';
   });
+
+  // Templates Scroll Area Shadow Updates
+  const scrollArea = document.querySelector('.templates-scroll-area');
+  if (scrollArea) {
+    scrollArea.addEventListener('scroll', updateTemplateScrollShadows, { passive: true });
+  }
+  window.addEventListener('resize', updateTemplateScrollShadows);
 
   // Reset to Defaults
   document.getElementById('btn-reset').addEventListener('click', () => {
