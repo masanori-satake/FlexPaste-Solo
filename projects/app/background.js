@@ -142,13 +142,73 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 });
 
 // Injection script function executed in target page context
-function injectTextToElement(textToInject) {
+function injectTextToElement(textToInject, usePaste) {
   const activeEl = document.activeElement;
   if (!activeEl) return;
 
   function triggerEvents(el) {
     el.dispatchEvent(new Event('input', { bubbles: true }));
     el.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  if (usePaste) {
+    activeEl.focus();
+
+    const fallbackCopy = (text) => {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch (e) {
+        ok = false;
+      }
+      document.body.removeChild(textarea);
+      return ok;
+    };
+
+    const doPaste = () => {
+      activeEl.focus();
+      let success = false;
+      try {
+        success = document.execCommand('paste');
+      } catch (e) {
+        success = false;
+      }
+
+      if (!success) {
+        try {
+          const dataTransfer = new DataTransfer();
+          dataTransfer.setData('text/plain', textToInject);
+          const pasteEvent = new ClipboardEvent('paste', {
+            bubbles: true,
+            cancelable: true,
+            clipboardData: dataTransfer
+          });
+          activeEl.dispatchEvent(pasteEvent);
+        } catch (e) {
+          // ignore fallback error
+        }
+      }
+      triggerEvents(activeEl);
+    };
+
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      navigator.clipboard.writeText(textToInject)
+        .then(doPaste)
+        .catch(() => {
+          fallbackCopy(textToInject);
+          doPaste();
+        });
+    } else {
+      fallbackCopy(textToInject);
+      doPaste();
+    }
+    return;
   }
 
   if (activeEl.isContentEditable) {
@@ -239,6 +299,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       };
 
       const resolvedText = resolveVariables(foundTemplate.content, contextData);
+      const usePaste = Boolean(foundCategory?.use_paste);
 
       if (tab?.id) {
         const targetConfig = { tabId: tab.id };
@@ -249,7 +310,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         chrome.scripting.executeScript({
           target: targetConfig,
           func: injectTextToElement,
-          args: [resolvedText]
+          args: [resolvedText, usePaste]
         }).catch((err) => {
           console.error('Failed to inject text:', err);
         });

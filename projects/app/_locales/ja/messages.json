@@ -115,6 +115,10 @@
     "message": "時分補正間隔",
     "description": "Label for time adjustment interval"
   },
+  "pasteInputLabel": {
+    "message": "ペースト入力",
+    "description": "Label for paste input toggle option"
+  },
   "adjNone": {
     "message": "補正しない",
     "description": "Time adjustment option: none"

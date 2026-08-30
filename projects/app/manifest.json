@@ -1,14 +1,16 @@
 {
   "manifest_version": 3,
   "name": "__MSG_appName__",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "__MSG_appDesc__",
   "default_locale": "en",
   "permissions": [
     "contextMenus",
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "clipboardWrite",
+    "clipboardRead"
   ],
   "action": {
     "default_icon": {
