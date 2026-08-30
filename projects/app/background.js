@@ -151,6 +151,54 @@ function injectTextToElement(textToInject, usePaste) {
     el.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
+  function insertDirectly(el, text) {
+    if (el.isContentEditable) {
+      el.focus();
+      let success = false;
+      try {
+        success = document.execCommand('insertText', false, text);
+      } catch (e) {
+        success = false;
+      }
+      if (!success) {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+          const range = sel.getRangeAt(0);
+          range.deleteContents();
+          const textNode = document.createTextNode(text);
+          range.insertNode(textNode);
+          range.setStartAfter(textNode);
+          range.setEndAfter(textNode);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        } else {
+          el.textContent += text;
+        }
+      }
+    } else if (
+      el.tagName === 'INPUT' ||
+      el.tagName === 'TEXTAREA'
+    ) {
+      el.focus();
+      const start = el.selectionStart ?? el.value.length;
+      const end = el.selectionEnd ?? el.value.length;
+
+      let success = false;
+      try {
+        success = document.execCommand('insertText', false, text);
+      } catch (e) {
+        success = false;
+      }
+
+      if (!success) {
+        const val = el.value;
+        el.value = val.substring(0, start) + text + val.substring(end);
+        const newCursorPos = start + text.length;
+        el.setSelectionRange(newCursorPos, newCursorPos);
+      }
+    }
+  }
+
   if (usePaste) {
     activeEl.focus();
 
@@ -181,6 +229,7 @@ function injectTextToElement(textToInject, usePaste) {
       }
 
       if (!success) {
+        let defaultPrevented = false;
         try {
           const dataTransfer = new DataTransfer();
           dataTransfer.setData('text/plain', textToInject);
@@ -190,8 +239,13 @@ function injectTextToElement(textToInject, usePaste) {
             clipboardData: dataTransfer
           });
           activeEl.dispatchEvent(pasteEvent);
+          defaultPrevented = pasteEvent.defaultPrevented;
         } catch (e) {
           // ignore fallback error
+        }
+
+        if (!defaultPrevented) {
+          insertDirectly(activeEl, textToInject);
         }
       }
       triggerEvents(activeEl);
@@ -211,53 +265,8 @@ function injectTextToElement(textToInject, usePaste) {
     return;
   }
 
-  if (activeEl.isContentEditable) {
-    activeEl.focus();
-    let success = false;
-    try {
-      success = document.execCommand('insertText', false, textToInject);
-    } catch (e) {
-      success = false;
-    }
-    if (!success) {
-      const sel = window.getSelection();
-      if (sel && sel.rangeCount > 0) {
-        const range = sel.getRangeAt(0);
-        range.deleteContents();
-        const textNode = document.createTextNode(textToInject);
-        range.insertNode(textNode);
-        range.setStartAfter(textNode);
-        range.setEndAfter(textNode);
-        sel.removeAllRanges();
-        sel.addRange(range);
-      } else {
-        activeEl.textContent += textToInject;
-      }
-    }
-    triggerEvents(activeEl);
-  } else if (
-    activeEl.tagName === 'INPUT' ||
-    activeEl.tagName === 'TEXTAREA'
-  ) {
-    activeEl.focus();
-    const start = activeEl.selectionStart ?? activeEl.value.length;
-    const end = activeEl.selectionEnd ?? activeEl.value.length;
-
-    let success = false;
-    try {
-      success = document.execCommand('insertText', false, textToInject);
-    } catch (e) {
-      success = false;
-    }
-
-    if (!success) {
-      const val = activeEl.value;
-      activeEl.value = val.substring(0, start) + textToInject + val.substring(end);
-      const newCursorPos = start + textToInject.length;
-      activeEl.setSelectionRange(newCursorPos, newCursorPos);
-    }
-    triggerEvents(activeEl);
-  }
+  insertDirectly(activeEl, textToInject);
+  triggerEvents(activeEl);
 }
 
 // Handle context menu item clicks
