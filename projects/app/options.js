@@ -807,7 +807,7 @@ function validateAndNormalizeBackup(data) {
 
       const catTitle = typeof cat?.title === 'string' ? cat.title : `Category ${catIdx + 1}`;
       const timeAdjInterval = [0, 5, 10, 15, 30].includes(Number(cat?.time_adj_interval)) ? Number(cat.time_adj_interval) : 0;
-      const usePaste = Boolean(cat?.use_paste);
+      const usePaste = typeof cat?.use_paste === 'boolean' ? cat.use_paste : cat?.use_paste === 'true';
       const def1 = typeof cat?.def_1 === 'string' ? cat.def_1 : '';
       const def2 = typeof cat?.def_2 === 'string' ? cat.def_2 : '';
       const def3 = typeof cat?.def_3 === 'string' ? cat.def_3 : '';
