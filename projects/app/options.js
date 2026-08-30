@@ -457,6 +457,7 @@ function renderCategoryEditor() {
 
   if (!currentCat.templates || currentCat.templates.length === 0) {
     templatesContainer.innerHTML = `<p class="setting-desc">${escapeHtml(getMessage('noTemplatesDesc'))}</p>`;
+    requestAnimationFrame(updateTemplateScrollShadows);
     return;
   }
 
