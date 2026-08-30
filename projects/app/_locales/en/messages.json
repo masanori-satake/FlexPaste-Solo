@@ -115,6 +115,10 @@
     "message": "Time Adj. Interval",
     "description": "Label for time adjustment interval"
   },
+  "pasteInputLabel": {
+    "message": "Paste Input",
+    "description": "Label for paste input toggle option"
+  },
   "adjNone": {
     "message": "Do not adjust",
     "description": "Time adjustment option: none"

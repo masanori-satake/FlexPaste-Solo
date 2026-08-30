@@ -282,6 +282,9 @@ function localizeStaticUI() {
   const elemTimeAdjLabel = document.getElementById('i18n-time-adj-label');
   if (elemTimeAdjLabel) elemTimeAdjLabel.textContent = getMessage('timeAdjIntervalLabel');
 
+  const elemPasteInputLabel = document.getElementById('i18n-paste-input-label');
+  if (elemPasteInputLabel) elemPasteInputLabel.textContent = getMessage('pasteInputLabel');
+
   const opt0 = document.getElementById('opt-adj-0');
   if (opt0) opt0.textContent = getMessage('adjNone');
 
@@ -441,6 +444,12 @@ function renderCategoryEditor() {
   const timeAdjSelect = document.getElementById('current-cat-time-adj');
   if (timeAdjSelect) {
     timeAdjSelect.value = String(currentCat.time_adj_interval || 0);
+  }
+
+  // Category Paste Input Toggle
+  const usePasteCheckbox = document.getElementById('current-cat-use-paste');
+  if (usePasteCheckbox) {
+    usePasteCheckbox.checked = Boolean(currentCat.use_paste);
   }
 
   // Category Definitions
@@ -798,6 +807,7 @@ function validateAndNormalizeBackup(data) {
 
       const catTitle = typeof cat?.title === 'string' ? cat.title : `Category ${catIdx + 1}`;
       const timeAdjInterval = [0, 5, 10, 15, 30].includes(Number(cat?.time_adj_interval)) ? Number(cat.time_adj_interval) : 0;
+      const usePaste = typeof cat?.use_paste === 'boolean' ? cat.use_paste : cat?.use_paste === 'true';
       const def1 = typeof cat?.def_1 === 'string' ? cat.def_1 : '';
       const def2 = typeof cat?.def_2 === 'string' ? cat.def_2 : '';
       const def3 = typeof cat?.def_3 === 'string' ? cat.def_3 : '';
@@ -811,6 +821,7 @@ function validateAndNormalizeBackup(data) {
         id: catId,
         title: catTitle,
         time_adj_interval: timeAdjInterval,
+        use_paste: usePaste,
         def_1: def1,
         def_2: def2,
         def_3: def3,
@@ -846,6 +857,15 @@ function setupEventHandlers() {
     }
   });
 
+  // Category Paste Input Change
+  document.getElementById('current-cat-use-paste').addEventListener('change', (e) => {
+    const currentCat = appState.categories.find(c => c.id === appState.selectedCategoryId);
+    if (currentCat) {
+      currentCat.use_paste = e.target.checked;
+      saveStorage(true);
+    }
+  });
+
   // Category Definitions Changes
   [1, 2, 3].forEach(n => {
     const input = document.getElementById(`current-cat-def-${n}`);
@@ -870,6 +890,7 @@ function setupEventHandlers() {
       id: generateId('cat'),
       title: getMessage('newCategoryTitle'),
       time_adj_interval: 0,
+      use_paste: false,
       def_1: '',
       def_2: '',
       def_3: '',

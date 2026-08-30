@@ -142,7 +142,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 });
 
 // Injection script function executed in target page context
-function injectTextToElement(textToInject) {
+function injectTextToElement(textToInject, usePaste) {
   const activeEl = document.activeElement;
   if (!activeEl) return;
 
@@ -151,53 +151,122 @@ function injectTextToElement(textToInject) {
     el.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
-  if (activeEl.isContentEditable) {
-    activeEl.focus();
-    let success = false;
-    try {
-      success = document.execCommand('insertText', false, textToInject);
-    } catch (e) {
-      success = false;
-    }
-    if (!success) {
-      const sel = window.getSelection();
-      if (sel && sel.rangeCount > 0) {
-        const range = sel.getRangeAt(0);
-        range.deleteContents();
-        const textNode = document.createTextNode(textToInject);
-        range.insertNode(textNode);
-        range.setStartAfter(textNode);
-        range.setEndAfter(textNode);
-        sel.removeAllRanges();
-        sel.addRange(range);
-      } else {
-        activeEl.textContent += textToInject;
+  function insertDirectly(el, text) {
+    if (el.isContentEditable) {
+      el.focus();
+      let success = false;
+      try {
+        success = document.execCommand('insertText', false, text);
+      } catch (e) {
+        success = false;
+      }
+      if (!success) {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+          const range = sel.getRangeAt(0);
+          range.deleteContents();
+          const textNode = document.createTextNode(text);
+          range.insertNode(textNode);
+          range.setStartAfter(textNode);
+          range.setEndAfter(textNode);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        } else {
+          el.textContent += text;
+        }
+      }
+    } else if (
+      el.tagName === 'INPUT' ||
+      el.tagName === 'TEXTAREA'
+    ) {
+      el.focus();
+      const start = el.selectionStart ?? el.value.length;
+      const end = el.selectionEnd ?? el.value.length;
+
+      let success = false;
+      try {
+        success = document.execCommand('insertText', false, text);
+      } catch (e) {
+        success = false;
+      }
+
+      if (!success) {
+        const val = el.value;
+        el.value = val.substring(0, start) + text + val.substring(end);
+        const newCursorPos = start + text.length;
+        el.setSelectionRange(newCursorPos, newCursorPos);
       }
     }
-    triggerEvents(activeEl);
-  } else if (
-    activeEl.tagName === 'INPUT' ||
-    activeEl.tagName === 'TEXTAREA'
-  ) {
-    activeEl.focus();
-    const start = activeEl.selectionStart ?? activeEl.value.length;
-    const end = activeEl.selectionEnd ?? activeEl.value.length;
-
-    let success = false;
-    try {
-      success = document.execCommand('insertText', false, textToInject);
-    } catch (e) {
-      success = false;
-    }
-
-    if (!success) {
-      const val = activeEl.value;
-      activeEl.value = val.substring(0, start) + textToInject + val.substring(end);
-      const newCursorPos = start + textToInject.length;
-      activeEl.setSelectionRange(newCursorPos, newCursorPos);
-    }
-    triggerEvents(activeEl);
   }
+
+  if (usePaste) {
+    activeEl.focus();
+
+    const fallbackCopy = (text) => {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch (e) {
+        ok = false;
+      }
+      document.body.removeChild(textarea);
+      return ok;
+    };
+
+    const doPaste = () => {
+      activeEl.focus();
+      let success = false;
+      try {
+        success = document.execCommand('paste');
+      } catch (e) {
+        success = false;
+      }
+
+      if (!success) {
+        let defaultPrevented = false;
+        try {
+          const dataTransfer = new DataTransfer();
+          dataTransfer.setData('text/plain', textToInject);
+          const pasteEvent = new ClipboardEvent('paste', {
+            bubbles: true,
+            cancelable: true,
+            clipboardData: dataTransfer
+          });
+          activeEl.dispatchEvent(pasteEvent);
+          defaultPrevented = pasteEvent.defaultPrevented;
+        } catch (e) {
+          // ignore fallback error
+        }
+
+        if (!defaultPrevented) {
+          insertDirectly(activeEl, textToInject);
+        }
+      }
+      triggerEvents(activeEl);
+    };
+
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      navigator.clipboard.writeText(textToInject)
+        .then(doPaste)
+        .catch(() => {
+          fallbackCopy(textToInject);
+          doPaste();
+        });
+    } else {
+      fallbackCopy(textToInject);
+      doPaste();
+    }
+    return;
+  }
+
+  insertDirectly(activeEl, textToInject);
+  triggerEvents(activeEl);
 }
 
 // Handle context menu item clicks
@@ -239,6 +308,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       };
 
       const resolvedText = resolveVariables(foundTemplate.content, contextData);
+      const usePaste = Boolean(foundCategory?.use_paste);
 
       if (tab?.id) {
         const targetConfig = { tabId: tab.id };
@@ -249,7 +319,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         chrome.scripting.executeScript({
           target: targetConfig,
           func: injectTextToElement,
-          args: [resolvedText]
+          args: [resolvedText, usePaste]
         }).catch((err) => {
           console.error('Failed to inject text:', err);
         });
