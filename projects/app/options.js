@@ -859,10 +859,43 @@ function setupEventHandlers() {
 
   // Category Paste Input Change
   document.getElementById('current-cat-use-paste').addEventListener('change', (e) => {
+    const checkbox = e.target;
+    const isChecked = checkbox.checked;
     const currentCat = appState.categories.find(c => c.id === appState.selectedCategoryId);
-    if (currentCat) {
-      currentCat.use_paste = e.target.checked;
+
+    if (!currentCat) return;
+
+    if (isChecked) {
+      if (typeof chrome !== 'undefined' && chrome.permissions && typeof chrome.permissions.request === 'function') {
+        chrome.permissions.request({
+          permissions: ['clipboardWrite', 'clipboardRead']
+        }, (granted) => {
+          if (chrome.runtime.lastError || !granted) {
+            checkbox.checked = false;
+            currentCat.use_paste = false;
+            showToast(getMessage('toastPermissionDenied'));
+          } else {
+            currentCat.use_paste = true;
+            saveStorage(true);
+          }
+        });
+      } else {
+        currentCat.use_paste = true;
+        saveStorage(true);
+      }
+    } else {
+      currentCat.use_paste = false;
       saveStorage(true);
+
+      // Check if any other category still uses paste
+      const anyOtherUsesPaste = appState.categories.some(c => c.use_paste);
+      if (!anyOtherUsesPaste && typeof chrome !== 'undefined' && chrome.permissions && typeof chrome.permissions.remove === 'function') {
+        chrome.permissions.remove({
+          permissions: ['clipboardWrite', 'clipboardRead']
+        }, () => {
+          // Permission revocation completed (ignore error if already removed)
+        });
+      }
     }
   });
 

@@ -362,6 +362,10 @@
     "message": "Reset to default settings",
     "description": "Toast message reset"
   },
+  "toastPermissionDenied": {
+    "message": "Clipboard permission was denied. Paste input cannot be enabled.",
+    "description": "Toast message when clipboard permission is denied"
+  },
   "alertInvalidImport": {
     "message": "Invalid backup file format. Please check that categories is an array structure.",
     "description": "Alert invalid backup"
