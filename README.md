@@ -1,6 +1,6 @@
 # FlexPaste-Solo
 
-[![version](https://img.shields.io/badge/version-1.0.0-blue)](projects/app/manifest.json)
+[![version](https://img.shields.io/badge/version-1.0.1-blue)](projects/app/manifest.json)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Privacy-Local Only](https://img.shields.io/badge/Privacy-Local%20Only-brightgreen)](PRIVACY.md)
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-orange)](projects/app/manifest.json)

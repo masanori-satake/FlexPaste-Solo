@@ -362,6 +362,10 @@
     "message": "初期状態にリセットしました",
     "description": "Toast message reset"
   },
+  "toastPermissionDenied": {
+    "message": "クリップボードの権限が拒否されたため、ペースト利用を有効にできませんでした",
+    "description": "Toast message when clipboard permission is denied"
+  },
   "alertInvalidImport": {
     "message": "無効なバックアップファイルフォーマットです。カテゴリが配列構造になっていることを確認してください。",
     "description": "Alert invalid backup"
