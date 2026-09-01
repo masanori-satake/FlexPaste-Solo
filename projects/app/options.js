@@ -858,12 +858,63 @@ function setupEventHandlers() {
   });
 
   // Category Paste Input Change
+  let permissionQueue = Promise.resolve();
+
   document.getElementById('current-cat-use-paste').addEventListener('change', (e) => {
-    const currentCat = appState.categories.find(c => c.id === appState.selectedCategoryId);
-    if (currentCat) {
-      currentCat.use_paste = e.target.checked;
-      saveStorage(true);
-    }
+    const checkbox = e.target;
+    const catId = appState.selectedCategoryId;
+    const isChecked = checkbox.checked;
+
+    permissionQueue = permissionQueue.then(() => new Promise((resolve) => {
+      const currentCat = appState.categories.find(c => c.id === catId);
+      if (!currentCat) {
+        resolve();
+        return;
+      }
+
+      if (isChecked) {
+        if (typeof chrome !== 'undefined' && chrome.permissions && typeof chrome.permissions.request === 'function') {
+          chrome.permissions.request({
+            permissions: ['clipboardWrite', 'clipboardRead']
+          }, (granted) => {
+            const liveCat = appState.categories.find(c => c.id === catId);
+            const isStillChecked = (appState.selectedCategoryId === catId) ? checkbox.checked : isChecked;
+
+            if (chrome.runtime.lastError || !granted) {
+              if (liveCat) liveCat.use_paste = false;
+              if (appState.selectedCategoryId === catId) checkbox.checked = false;
+              showToast(getMessage('toastPermissionDenied'));
+              saveStorage(false);
+            } else if (isStillChecked) {
+              if (liveCat) liveCat.use_paste = true;
+              saveStorage(true);
+            }
+            resolve();
+          });
+        } else {
+          currentCat.use_paste = true;
+          saveStorage(true);
+          resolve();
+        }
+      } else {
+        currentCat.use_paste = false;
+        saveStorage(true);
+
+        // Check if any other category still uses paste
+        const anyOtherUsesPaste = appState.categories.some(c => c.use_paste);
+        if (!anyOtherUsesPaste && typeof chrome !== 'undefined' && chrome.permissions && typeof chrome.permissions.remove === 'function') {
+          chrome.permissions.remove({
+            permissions: ['clipboardWrite', 'clipboardRead']
+          }, () => {
+            resolve();
+          });
+        } else {
+          resolve();
+        }
+      }
+    })).catch((err) => {
+      console.error('Permission operation failed:', err);
+    });
   });
 
   // Category Definitions Changes
