@@ -290,6 +290,10 @@
     "message": "Current Time",
     "description": "Chip label"
   },
+  "chipTag_time_adj": {
+    "message": "Current Time (Adj)",
+    "description": "Chip label"
+  },
   "chipTag_time_prev_adj": {
     "message": "Current Time (Prev Adj)",
     "description": "Chip label"
@@ -300,6 +304,10 @@
   },
   "chipTag_in_one_hour": {
     "message": "In 1 Hour",
+    "description": "Chip label"
+  },
+  "chipTag_in_one_hour_adj": {
+    "message": "In 1 Hour (Adj)",
     "description": "Chip label"
   },
   "chipTag_in_one_hour_prev_adj": {

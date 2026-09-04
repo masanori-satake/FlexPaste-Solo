@@ -166,8 +166,10 @@ export function adjustTime(date, intervalMinutes = 0, mode = 'prev') {
   let adjMinutes;
   if (mode === 'prev') {
     adjMinutes = Math.floor(totalMinutes / interval) * interval;
-  } else {
+  } else if (mode === 'next') {
     adjMinutes = Math.ceil(totalMinutes / interval) * interval;
+  } else {
+    adjMinutes = Math.round(totalMinutes / interval) * interval;
   }
   const h = padZero(Math.floor(adjMinutes / 60) % 24);
   const m = padZero(adjMinutes % 60);
@@ -263,9 +265,11 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
     'date': formatDate(now),
     'date_short': formatDateShort(now),
     'time': formatTime(now),
+    'time_adj': adjustTime(now, timeAdjInterval, 'round'),
     'time_prev_adj': adjustTime(now, timeAdjInterval, 'prev'),
     'time_next_adj': adjustTime(now, timeAdjInterval, 'next'),
     'in_one_hour': formatTime(inOneHour),
+    'in_one_hour_adj': adjustTime(inOneHour, timeAdjInterval, 'round'),
     'in_one_hour_prev_adj': adjustTime(inOneHour, timeAdjInterval, 'prev'),
     'in_one_hour_next_adj': adjustTime(inOneHour, timeAdjInterval, 'next'),
     'yesterday_with_day': formatDateWithDay(yesterday),

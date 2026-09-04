@@ -28,9 +28,11 @@ function getVariableMap() {
     '{{def_2}}': { label: getMessage('chipTag_def_2'), icon: 'edit_note' },
     '{{def_3}}': { label: getMessage('chipTag_def_3'), icon: 'edit_note' },
     '{{time}}': { label: getMessage('chipTag_time'), icon: 'schedule' },
+    '{{time_adj}}': { label: getMessage('chipTag_time_adj'), icon: 'schedule' },
     '{{time_prev_adj}}': { label: getMessage('chipTag_time_prev_adj'), icon: 'schedule' },
     '{{time_next_adj}}': { label: getMessage('chipTag_time_next_adj'), icon: 'schedule' },
     '{{in_one_hour}}': { label: getMessage('chipTag_in_one_hour'), icon: 'schedule' },
+    '{{in_one_hour_adj}}': { label: getMessage('chipTag_in_one_hour_adj'), icon: 'schedule' },
     '{{in_one_hour_prev_adj}}': { label: getMessage('chipTag_in_one_hour_prev_adj'), icon: 'schedule' },
     '{{in_one_hour_next_adj}}': { label: getMessage('chipTag_in_one_hour_next_adj'), icon: 'schedule' }
   };
