@@ -290,6 +290,10 @@
     "message": "現在時刻",
     "description": "Chip label"
   },
+  "chipTag_time_adj": {
+    "message": "現在時刻(補正)",
+    "description": "Chip label"
+  },
   "chipTag_time_prev_adj": {
     "message": "現在時刻(前補正)",
     "description": "Chip label"
@@ -300,6 +304,10 @@
   },
   "chipTag_in_one_hour": {
     "message": "一時間後",
+    "description": "Chip label"
+  },
+  "chipTag_in_one_hour_adj": {
+    "message": "一時間後(補正)",
     "description": "Chip label"
   },
   "chipTag_in_one_hour_prev_adj": {
