@@ -953,9 +953,14 @@ function generateId(prefix) {
   return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
 }
 
-// Normalize and validate imported data
+// Normalize and validate imported data with strict upper bounds to prevent DoS / storage overflow
 function validateAndNormalizeBackup(data) {
   if (!data || typeof data !== 'object') return null;
+
+  const MAX_CATEGORIES = 100;
+  const MAX_TEMPLATES = 100;
+  const MAX_TITLE_LEN = 200;
+  const MAX_CONTENT_LEN = 10000;
 
   const validData = {
     settings: { workdays: [1, 2, 3, 4, 5] },
@@ -972,27 +977,38 @@ function validateAndNormalizeBackup(data) {
     validData.settings.workdays = [...appState.settings.workdays];
   }
 
-  // Validate categories
+  // Validate categories with limits and unique ID enforcement
   if (Array.isArray(data.categories)) {
     const seenCatIds = new Set();
-    validData.categories = data.categories.map((cat, catIdx) => {
-      let catId = typeof cat?.id === 'string' && cat.id ? cat.id : generateId('cat');
+    const seenTplIds = new Set();
+
+    validData.categories = data.categories.slice(0, MAX_CATEGORIES).map((cat, catIdx) => {
+      let catId = typeof cat?.id === 'string' && cat.id ? cat.id.slice(0, 100) : generateId('cat');
       if (seenCatIds.has(catId)) {
         catId = generateId('cat');
       }
       seenCatIds.add(catId);
 
-      const catTitle = typeof cat?.title === 'string' ? cat.title : `Category ${catIdx + 1}`;
+      const catTitle = typeof cat?.title === 'string' ? cat.title.slice(0, MAX_TITLE_LEN) : `Category ${catIdx + 1}`;
       const timeAdjInterval = [0, 5, 10, 15, 30].includes(Number(cat?.time_adj_interval)) ? Number(cat.time_adj_interval) : 0;
       const usePaste = typeof cat?.use_paste === 'boolean' ? cat.use_paste : cat?.use_paste === 'true';
-      const def1 = typeof cat?.def_1 === 'string' ? cat.def_1 : '';
-      const def2 = typeof cat?.def_2 === 'string' ? cat.def_2 : '';
-      const def3 = typeof cat?.def_3 === 'string' ? cat.def_3 : '';
-      const templates = Array.isArray(cat?.templates) ? cat.templates.map((tpl, tplIdx) => ({
-        id: typeof tpl?.id === 'string' && tpl.id ? tpl.id : generateId('tpl'),
-        title: typeof tpl?.title === 'string' ? tpl.title : `Template ${tplIdx + 1}`,
-        content: typeof tpl?.content === 'string' ? tpl.content : ''
-      })) : [];
+      const def1 = typeof cat?.def_1 === 'string' ? cat.def_1.slice(0, MAX_TITLE_LEN) : '';
+      const def2 = typeof cat?.def_2 === 'string' ? cat.def_2.slice(0, MAX_TITLE_LEN) : '';
+      const def3 = typeof cat?.def_3 === 'string' ? cat.def_3.slice(0, MAX_TITLE_LEN) : '';
+
+      const templates = Array.isArray(cat?.templates) ? cat.templates.slice(0, MAX_TEMPLATES).map((tpl, tplIdx) => {
+        let tplId = typeof tpl?.id === 'string' && tpl.id ? tpl.id.slice(0, 100) : generateId('tpl');
+        if (seenTplIds.has(tplId)) {
+          tplId = generateId('tpl');
+        }
+        seenTplIds.add(tplId);
+
+        return {
+          id: tplId,
+          title: typeof tpl?.title === 'string' ? tpl.title.slice(0, MAX_TITLE_LEN) : `Template ${tplIdx + 1}`,
+          content: typeof tpl?.content === 'string' ? tpl.content.slice(0, MAX_CONTENT_LEN) : ''
+        };
+      }) : [];
 
       return {
         id: catId,
@@ -1232,6 +1248,13 @@ function setupEventHandlers() {
   fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit to prevent DoS
+    if (file.size > MAX_FILE_SIZE) {
+      alert(getMessage('alertImportFailed', 'File too large (max 5MB)'));
+      fileInput.value = '';
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (event) => {

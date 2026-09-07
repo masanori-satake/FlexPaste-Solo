@@ -29,6 +29,12 @@ console.log('Running unit tests for utils.js...');
 
   // 0 min interval (no adjustment)
   assert.strictEqual(adjustTime(d910, 0, 'round'), '09:10', '9:10 with 0 min interval should be 09:10');
+
+  // Negative, NaN, or non-finite intervals (defensive check)
+  assert.strictEqual(adjustTime(d910, -15, 'round'), '09:10', '9:10 with -15 min interval should return unadjusted time');
+  assert.strictEqual(adjustTime(d910, NaN, 'round'), '09:10', '9:10 with NaN interval should return unadjusted time');
+  assert.strictEqual(adjustTime(d910, Infinity, 'round'), '09:10', '9:10 with Infinity interval should return unadjusted time');
+  assert.strictEqual(adjustTime(d910, 'invalid', 'round'), '09:10', '9:10 with invalid string interval should return unadjusted time');
 }
 
 // 2. Test resolveVariables with {{time_adj}} and {{in_one_hour_adj}}
