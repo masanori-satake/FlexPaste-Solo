@@ -367,7 +367,7 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
         break;
       }
       default: {
-        if (varName.startsWith('next_week_') && varName.endsWith('_with_day')) {
+        if (varName.startsWith('next_week_')) {
           const nextWeekDays = getNextWeekDays(now);
           val = nextWeekDays[varName];
         } else {
