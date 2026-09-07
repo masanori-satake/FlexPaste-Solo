@@ -159,7 +159,7 @@ export function formatTime(date) {
 
 export function adjustTime(date, intervalMinutes = 0, mode = 'prev') {
   const interval = Number(intervalMinutes) || 0;
-  if (interval === 0) {
+  if (interval <= 0 || !Number.isFinite(interval)) {
     return formatTime(date);
   }
   const totalMinutes = date.getHours() * 60 + date.getMinutes();
