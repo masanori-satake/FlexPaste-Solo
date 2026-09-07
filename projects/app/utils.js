@@ -249,7 +249,7 @@ export function calculateMonthLastWorkday(now, workdays) {
 // causes ~10x performance overhead. Early return skips parsing entirely when no Mustache tags exist,
 // and lazy evaluation computes variables on demand and caches results per call.
 export function resolveVariables(templateContent, contextData = {}, now = new Date()) {
-  if (!templateContent) return '';
+  if (!templateContent || typeof templateContent !== 'string') return '';
   if (!templateContent.includes('{{')) return templateContent;
 
   const workdays = contextData.workdays || [1, 2, 3, 4, 5];

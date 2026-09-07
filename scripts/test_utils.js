@@ -61,4 +61,12 @@ console.log('Running unit tests for utils.js...');
   assert.strictEqual(resolved, expected, `Resolved template mismatch.\nGot:      ${resolved}\nExpected: ${expected}`);
 }
 
+// 3. Test resolveVariables defensive handling for non-string input
+{
+  assert.strictEqual(resolveVariables(null), '', 'resolveVariables(null) should return empty string');
+  assert.strictEqual(resolveVariables(undefined), '', 'resolveVariables(undefined) should return empty string');
+  assert.strictEqual(resolveVariables(12345), '', 'resolveVariables(number) should return empty string');
+  assert.strictEqual(resolveVariables({ key: 'value' }), '', 'resolveVariables(object) should return empty string');
+}
+
 console.log('All unit tests passed successfully!');

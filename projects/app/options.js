@@ -48,12 +48,13 @@ let lastFocusedEditor = null;
 
 // Helper: Create inline variable chip element
 function createChipNode(tag) {
+  const safeTag = typeof tag === 'string' ? tag : String(tag || '');
   const varMap = getVariableMap();
-  const meta = varMap[tag] || { label: tag.replace(/[\{\}]/g, ''), icon: 'code' };
+  const meta = varMap[safeTag] || { label: safeTag.replace(/[\{\}]/g, ''), icon: 'code' };
   const span = document.createElement('span');
   span.className = 'tpl-chip';
   span.contentEditable = 'false';
-  span.dataset.tag = tag;
+  span.dataset.tag = safeTag;
 
   span.innerHTML = `
     <span class="material-symbols-outlined tpl-chip-icon">${meta.icon}</span>
@@ -583,7 +584,13 @@ function renderCategoryList() {
       item.classList.remove('drag-over');
       try {
         const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-        if (data.type === 'category' && data.index !== index) {
+        if (
+          data.type === 'category' &&
+          Number.isInteger(data.index) &&
+          data.index >= 0 &&
+          data.index < appState.categories.length &&
+          data.index !== index
+        ) {
           const movedCat = appState.categories.splice(data.index, 1)[0];
           appState.categories.splice(index, 0, movedCat);
           saveStorage(false);
@@ -851,7 +858,7 @@ function renderCategoryEditor() {
       contentEl.classList.remove('drag-over');
       try {
         const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-        if (data.type === 'chip' && data.tag) {
+        if (data.type === 'chip' && typeof data.tag === 'string' && data.tag) {
           insertTagAtCursor(contentEl, data.tag);
           updateContent();
         }
@@ -894,7 +901,13 @@ function renderCategoryEditor() {
       card.classList.remove('drag-over');
       try {
         const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-        if (data.type === 'template' && data.index !== tplIndex) {
+        if (
+          data.type === 'template' &&
+          Number.isInteger(data.index) &&
+          data.index >= 0 &&
+          data.index < currentCat.templates.length &&
+          data.index !== tplIndex
+        ) {
           const movedTpl = currentCat.templates.splice(data.index, 1)[0];
           currentCat.templates.splice(tplIndex, 0, movedTpl);
           saveStorage(false);
