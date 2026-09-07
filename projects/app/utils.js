@@ -257,6 +257,34 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
 
   const cache = new Map();
 
+  // Lazy base date and object helpers to avoid redundant Date instantiations across variables
+  let inOneHour, yesterday, tomorrow, nextWeek, nextWorkdayDate, nextWeekDays;
+
+  function getInOneHour() {
+    if (!inOneHour) inOneHour = new Date(now.getTime() + 60 * 60 * 1000);
+    return inOneHour;
+  }
+  function getYesterday() {
+    if (!yesterday) yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, now.getHours(), now.getMinutes(), now.getSeconds());
+    return yesterday;
+  }
+  function getTomorrow() {
+    if (!tomorrow) tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, now.getHours(), now.getMinutes(), now.getSeconds());
+    return tomorrow;
+  }
+  function getNextWeek() {
+    if (!nextWeek) nextWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7, now.getHours(), now.getMinutes(), now.getSeconds());
+    return nextWeek;
+  }
+  function getNextWorkdayDate() {
+    if (!nextWorkdayDate) nextWorkdayDate = calculateNextWorkday(now, workdays);
+    return nextWorkdayDate;
+  }
+  function getNextWeekDaysObj() {
+    if (!nextWeekDays) nextWeekDays = getNextWeekDays(now);
+    return nextWeekDays;
+  }
+
   function getValue(varName) {
     if (cache.has(varName)) return cache.get(varName);
 
@@ -292,84 +320,56 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
       case 'time_next_adj':
         val = adjustTime(now, timeAdjInterval, 'next');
         break;
-      case 'in_one_hour': {
-        const inOneHour = new Date(now.getTime() + 60 * 60 * 1000);
-        val = formatTime(inOneHour);
+      case 'in_one_hour':
+        val = formatTime(getInOneHour());
         break;
-      }
-      case 'in_one_hour_adj': {
-        const inOneHour = new Date(now.getTime() + 60 * 60 * 1000);
-        val = adjustTime(inOneHour, timeAdjInterval, 'round');
+      case 'in_one_hour_adj':
+        val = adjustTime(getInOneHour(), timeAdjInterval, 'round');
         break;
-      }
-      case 'in_one_hour_prev_adj': {
-        const inOneHour = new Date(now.getTime() + 60 * 60 * 1000);
-        val = adjustTime(inOneHour, timeAdjInterval, 'prev');
+      case 'in_one_hour_prev_adj':
+        val = adjustTime(getInOneHour(), timeAdjInterval, 'prev');
         break;
-      }
-      case 'in_one_hour_next_adj': {
-        const inOneHour = new Date(now.getTime() + 60 * 60 * 1000);
-        val = adjustTime(inOneHour, timeAdjInterval, 'next');
+      case 'in_one_hour_next_adj':
+        val = adjustTime(getInOneHour(), timeAdjInterval, 'next');
         break;
-      }
-      case 'yesterday_with_day': {
-        const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, now.getHours(), now.getMinutes(), now.getSeconds());
-        val = formatDateWithDay(yesterday);
+      case 'yesterday_with_day':
+        val = formatDateWithDay(getYesterday());
         break;
-      }
-      case 'yesterday': {
-        const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, now.getHours(), now.getMinutes(), now.getSeconds());
-        val = formatDate(yesterday);
+      case 'yesterday':
+        val = formatDate(getYesterday());
         break;
-      }
-      case 'tomorrow_with_day': {
-        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, now.getHours(), now.getMinutes(), now.getSeconds());
-        val = formatDateWithDay(tomorrow);
+      case 'tomorrow_with_day':
+        val = formatDateWithDay(getTomorrow());
         break;
-      }
-      case 'tomorrow': {
-        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, now.getHours(), now.getMinutes(), now.getSeconds());
-        val = formatDate(tomorrow);
+      case 'tomorrow':
+        val = formatDate(getTomorrow());
         break;
-      }
-      case 'tomorrow_short': {
-        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, now.getHours(), now.getMinutes(), now.getSeconds());
-        val = formatDateShort(tomorrow);
+      case 'tomorrow_short':
+        val = formatDateShort(getTomorrow());
         break;
-      }
-      case 'next_workday_with_day': {
-        const nextWorkdayDate = calculateNextWorkday(now, workdays);
-        val = formatDateWithDay(nextWorkdayDate);
+      case 'next_workday_with_day':
+        val = formatDateWithDay(getNextWorkdayDate());
         break;
-      }
-      case 'next_workday': {
-        const nextWorkdayDate = calculateNextWorkday(now, workdays);
-        val = formatDate(nextWorkdayDate);
+      case 'next_workday':
+        val = formatDate(getNextWorkdayDate());
         break;
-      }
-      case 'next_week_with_day': {
-        const nextWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7, now.getHours(), now.getMinutes(), now.getSeconds());
-        val = formatDateWithDay(nextWeek);
+      case 'next_week_with_day':
+        val = formatDateWithDay(getNextWeek());
         break;
-      }
-      case 'next_week': {
-        const nextWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7, now.getHours(), now.getMinutes(), now.getSeconds());
-        val = formatDate(nextWeek);
+      case 'next_week':
+        val = formatDate(getNextWeek());
         break;
-      }
       case 'month_end': {
         const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         val = formatDate(monthEnd);
         break;
       }
-      case 'month_last_workday': {
+      case 'month_last_workday':
         val = calculateMonthLastWorkday(now, workdays);
         break;
-      }
       default: {
         if (varName.startsWith('next_week_')) {
-          const nextWeekDays = getNextWeekDays(now);
-          val = nextWeekDays[varName];
+          val = getNextWeekDaysObj()[varName];
         } else {
           val = undefined;
         }
@@ -377,9 +377,7 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
       }
     }
 
-    if (val !== undefined) {
-      cache.set(varName, val);
-    }
+    cache.set(varName, val);
     return val;
   }
 
