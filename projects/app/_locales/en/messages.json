@@ -119,6 +119,10 @@
     "message": "Paste Input",
     "description": "Label for paste input toggle option"
   },
+  "pasteInputTooltip": {
+    "message": "Turn ON for apps where templates cannot be inserted directly.",
+    "description": "Tooltip for paste input option"
+  },
   "adjNone": {
     "message": "Do not adjust",
     "description": "Time adjustment option: none"

@@ -463,6 +463,9 @@ function localizeStaticUI() {
   const elemPasteInputLabel = document.getElementById('i18n-paste-input-label');
   if (elemPasteInputLabel) elemPasteInputLabel.textContent = getMessage('pasteInputLabel');
 
+  const pasteInputContainer = document.getElementById('container-paste-input');
+  if (pasteInputContainer) pasteInputContainer.title = getMessage('pasteInputTooltip');
+
   const opt0 = document.getElementById('opt-adj-0');
   if (opt0) opt0.textContent = getMessage('adjNone');
 
