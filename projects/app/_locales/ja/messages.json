@@ -119,6 +119,10 @@
     "message": "ペースト入力",
     "description": "Label for paste input toggle option"
   },
+  "pasteInputTooltip": {
+    "message": "テンプレートが入力できないアプリではONにしてください。",
+    "description": "Tooltip for paste input option"
+  },
   "adjNone": {
     "message": "補正しない",
     "description": "Time adjustment option: none"
