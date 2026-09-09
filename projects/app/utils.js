@@ -369,7 +369,9 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
         break;
       default: {
         if (varName.startsWith('next_week_')) {
-          val = getNextWeekDaysObj()[varName];
+          const daysObj = getNextWeekDaysObj();
+          // Security: Use hasOwnProperty to prevent prototype property resolution (e.g. constructor)
+          val = Object.prototype.hasOwnProperty.call(daysObj, varName) ? daysObj[varName] : undefined;
         } else {
           val = undefined;
         }
