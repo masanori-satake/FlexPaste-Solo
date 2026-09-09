@@ -73,8 +73,20 @@ console.log('Running unit tests for utils.js...');
 {
   const now = new Date(2025, 0, 1, 9, 0, 0);
   const protoTemplate = '{{next_week_constructor}} {{next_week_toString}} {{next_week_valueOf}}';
-  const resolved = resolveVariables(protoTemplate, {}, now);
-  assert.strictEqual(resolved, protoTemplate, 'Inherited Object prototype properties should not be resolved');
+  Object.assign(Object.prototype, {
+    next_week_constructor: 'polluted constructor',
+    next_week_toString: 'polluted toString',
+    next_week_valueOf: 'polluted valueOf'
+  });
+
+  try {
+    const resolved = resolveVariables(protoTemplate, {}, now);
+    assert.strictEqual(resolved, protoTemplate, 'Inherited Object prototype properties should not be resolved');
+  } finally {
+    delete Object.prototype.next_week_constructor;
+    delete Object.prototype.next_week_toString;
+    delete Object.prototype.next_week_valueOf;
+  }
 }
 
 console.log('All unit tests passed successfully!');
