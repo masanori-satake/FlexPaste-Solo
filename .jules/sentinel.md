@@ -12,5 +12,5 @@
 
 ## 2026-04-18 - Sanitization of ASCII Control Characters in Local Data Import
 **Vulnerability:** User-supplied backup JSON files containing non-printable ASCII control characters (such as NULL bytes `\x00` or bell `\x07`) can lead to string corruption, unexpected UI behavior, or breakdown when injected into extension storage and DOM nodes.
-**Learning:** Standard JSON parsing accepts control characters within strings, but raw control characters in Chrome Extensions storage or DOM contenteditable elements can create subtle rendering/parsing issues.
+**Learning:** Raw unescaped ASCII control characters (U+0000–U+001F) cause `JSON.parse` to throw a `SyntaxError`, whereas escaped unicode forms (such as `\u0000`) pass `JSON.parse` successfully and are decoded into JavaScript string control characters. These decoded control characters in extension storage or DOM elements can create subtle rendering or execution issues.
 **Prevention:** Strip ASCII control characters `[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]` during import normalization while explicitly preserving valid multi-line formatting whitespace (`\t`, `\n`, `\r`).
