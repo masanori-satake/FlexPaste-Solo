@@ -970,13 +970,19 @@ function generateId(prefix) {
 }
 
 // Normalize and validate imported data with strict upper bounds to prevent DoS / storage overflow
-function validateAndNormalizeBackup(data) {
+export function validateAndNormalizeBackup(data) {
   if (!data || typeof data !== 'object') return null;
 
   const MAX_CATEGORIES = 100;
   const MAX_TEMPLATES = 100;
   const MAX_TITLE_LEN = 200;
   const MAX_CONTENT_LEN = 10000;
+
+  // Security: Sanitize strings by stripping harmful ASCII control characters (preserving tab, LF, CR)
+  const sanitizeStr = (str, maxLen) => {
+    if (typeof str !== 'string') return '';
+    return str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').slice(0, maxLen);
+  };
 
   const validData = {
     settings: { workdays: [1, 2, 3, 4, 5] },
@@ -989,7 +995,7 @@ function validateAndNormalizeBackup(data) {
       .map(d => Number(d))
       .filter(d => Number.isInteger(d) && d >= 1 && d <= 7);
     validData.settings.workdays = workdays.length > 0 ? Array.from(new Set(workdays)) : [1, 2, 3, 4, 5];
-  } else if (appState.settings && Array.isArray(appState.settings.workdays)) {
+  } else if (typeof appState !== 'undefined' && appState.settings && Array.isArray(appState.settings.workdays)) {
     validData.settings.workdays = [...appState.settings.workdays];
   }
 
@@ -999,30 +1005,30 @@ function validateAndNormalizeBackup(data) {
     const seenTplIds = new Set();
 
     validData.categories = data.categories.slice(0, MAX_CATEGORIES).map((cat, catIdx) => {
-      let catId = typeof cat?.id === 'string' && cat.id ? cat.id.slice(0, 100) : generateId('cat');
-      if (seenCatIds.has(catId)) {
+      let catId = typeof cat?.id === 'string' && cat.id ? sanitizeStr(cat.id, 100) : generateId('cat');
+      if (!catId || seenCatIds.has(catId)) {
         catId = generateId('cat');
       }
       seenCatIds.add(catId);
 
-      const catTitle = typeof cat?.title === 'string' ? cat.title.slice(0, MAX_TITLE_LEN) : `Category ${catIdx + 1}`;
+      const catTitle = typeof cat?.title === 'string' ? sanitizeStr(cat.title, MAX_TITLE_LEN) : `Category ${catIdx + 1}`;
       const timeAdjInterval = [0, 5, 10, 15, 30].includes(Number(cat?.time_adj_interval)) ? Number(cat.time_adj_interval) : 0;
       const usePaste = typeof cat?.use_paste === 'boolean' ? cat.use_paste : cat?.use_paste === 'true';
-      const def1 = typeof cat?.def_1 === 'string' ? cat.def_1.slice(0, MAX_TITLE_LEN) : '';
-      const def2 = typeof cat?.def_2 === 'string' ? cat.def_2.slice(0, MAX_TITLE_LEN) : '';
-      const def3 = typeof cat?.def_3 === 'string' ? cat.def_3.slice(0, MAX_TITLE_LEN) : '';
+      const def1 = typeof cat?.def_1 === 'string' ? sanitizeStr(cat.def_1, MAX_TITLE_LEN) : '';
+      const def2 = typeof cat?.def_2 === 'string' ? sanitizeStr(cat.def_2, MAX_TITLE_LEN) : '';
+      const def3 = typeof cat?.def_3 === 'string' ? sanitizeStr(cat.def_3, MAX_TITLE_LEN) : '';
 
       const templates = Array.isArray(cat?.templates) ? cat.templates.slice(0, MAX_TEMPLATES).map((tpl, tplIdx) => {
-        let tplId = typeof tpl?.id === 'string' && tpl.id ? tpl.id.slice(0, 100) : generateId('tpl');
-        if (seenTplIds.has(tplId)) {
+        let tplId = typeof tpl?.id === 'string' && tpl.id ? sanitizeStr(tpl.id, 100) : generateId('tpl');
+        if (!tplId || seenTplIds.has(tplId)) {
           tplId = generateId('tpl');
         }
         seenTplIds.add(tplId);
 
         return {
           id: tplId,
-          title: typeof tpl?.title === 'string' ? tpl.title.slice(0, MAX_TITLE_LEN) : `Template ${tplIdx + 1}`,
-          content: typeof tpl?.content === 'string' ? tpl.content.slice(0, MAX_CONTENT_LEN) : ''
+          title: typeof tpl?.title === 'string' ? sanitizeStr(tpl.title, MAX_TITLE_LEN) : `Template ${tplIdx + 1}`,
+          content: typeof tpl?.content === 'string' ? sanitizeStr(tpl.content, MAX_CONTENT_LEN) : ''
         };
       }) : [];
 
@@ -1325,13 +1331,15 @@ function setupEventHandlers() {
 }
 
 // Initialization
-document.addEventListener('DOMContentLoaded', () => {
-  localizeStaticUI();
-  loadStorage(() => {
-    renderWorkdays();
-    renderCategoryList();
-    renderCategoryEditor();
-    setupEventHandlers();
-    syncClipboardPermissions();
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    localizeStaticUI();
+    loadStorage(() => {
+      renderWorkdays();
+      renderCategoryList();
+      renderCategoryEditor();
+      setupEventHandlers();
+      syncClipboardPermissions();
+    });
   });
-});
+}

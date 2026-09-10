@@ -1,8 +1,9 @@
 // scripts/test_utils.js - Unit tests for FlexPaste-Solo utils.js
 import assert from 'node:assert';
 import { adjustTime, resolveVariables } from '../projects/app/utils.js';
+import { validateAndNormalizeBackup } from '../projects/app/options.js';
 
-console.log('Running unit tests for utils.js...');
+console.log('Running unit tests for utils.js & options.js...');
 
 // 1. Test adjustTime - round mode
 {
@@ -87,6 +88,35 @@ console.log('Running unit tests for utils.js...');
     delete Object.prototype.next_week_toString;
     delete Object.prototype.next_week_valueOf;
   }
+}
+
+// 5. Test validateAndNormalizeBackup control character stripping and input sanitization
+{
+  const maliciousInput = {
+    settings: { workdays: [1, 2, 3] },
+    categories: [
+      {
+        id: 'cat_\x01_test\x00',
+        title: 'Title\x07With\x1FControl\x7FChars',
+        time_adj_interval: 15,
+        def_1: 'Def1\x00Value',
+        templates: [
+          {
+            id: 'tpl_\x001',
+            title: 'Tpl\x02Title',
+            content: 'Hello\x00World\nLine2'
+          }
+        ]
+      }
+    ]
+  };
+
+  const normalized = validateAndNormalizeBackup(maliciousInput);
+  assert.notStrictEqual(normalized, null, 'Normalized result should not be null');
+  assert.strictEqual(normalized.categories[0].title, 'TitleWithControlChars', 'Control characters should be stripped from title');
+  assert.strictEqual(normalized.categories[0].def_1, 'Def1Value', 'Control characters should be stripped from def_1');
+  assert.strictEqual(normalized.categories[0].templates[0].title, 'TplTitle', 'Control characters should be stripped from template title');
+  assert.strictEqual(normalized.categories[0].templates[0].content, 'HelloWorld\nLine2', 'Control characters should be stripped from content while preserving newlines');
 }
 
 console.log('All unit tests passed successfully!');
