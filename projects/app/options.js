@@ -1,5 +1,5 @@
 // options.js - Options Page Script for FlexPaste-Solo
-import { DEFAULT_DATA, getMessage, resolveVariables } from './utils.js';
+import { DEFAULT_DATA, DEFAULT_SETTINGS, getMessage, resolveVariables, syncFromCloudIfNeeded } from './utils.js';
 
 function getVariableMap() {
   return {
@@ -39,7 +39,7 @@ function getVariableMap() {
 }
 
 let appState = {
-  settings: { workdays: [1, 2, 3, 4, 5] },
+  settings: { workdays: [1, 2, 3, 4, 5], syncEnabled: false },
   categories: [],
   selectedCategoryId: null
 };
@@ -157,25 +157,75 @@ function showToast(message) {
   }, 2500);
 }
 
-// Storage helpers
+// Sync modal state and helpers
+function openSyncModal() {
+  const syncModalScrim = document.getElementById('sync-modal-scrim');
+  const confirmBtn = document.getElementById('confirm-sync-btn');
+
+  document.querySelectorAll('input[name="sync-settings-option"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="sync-categories-option"]').forEach(r => r.checked = false);
+
+  if (confirmBtn) confirmBtn.classList.add('disabled');
+  if (syncModalScrim) syncModalScrim.style.display = 'flex';
+}
+
+function closeSyncModal() {
+  const syncModalScrim = document.getElementById('sync-modal-scrim');
+  if (syncModalScrim) syncModalScrim.style.display = 'none';
+}
+
+function checkSyncFormValidation() {
+  const settingsOpt = document.querySelector('input[name="sync-settings-option"]:checked');
+  const categoriesOpt = document.querySelector('input[name="sync-categories-option"]:checked');
+  const confirmBtn = document.getElementById('confirm-sync-btn');
+
+  if (confirmBtn) {
+    if (settingsOpt && categoriesOpt) {
+      confirmBtn.classList.remove('disabled');
+    } else {
+      confirmBtn.classList.add('disabled');
+    }
+  }
+}
+
+// Storage helpers with sync
 function loadStorage(callback) {
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local && typeof chrome.storage.local.get === 'function') {
-    chrome.storage.local.get(['categories', 'settings'], (result) => {
-      appState.settings = result.settings || JSON.parse(JSON.stringify(DEFAULT_DATA.settings));
-      appState.categories = Array.isArray(result.categories)
-        ? result.categories
-        : JSON.parse(JSON.stringify(DEFAULT_DATA.categories));
-      if (!appState.selectedCategoryId && appState.categories.length > 0) {
-        appState.selectedCategoryId = appState.categories[0].id;
-      }
-      if (callback) callback();
+    syncFromCloudIfNeeded().then(() => {
+      chrome.storage.local.get(['categories', 'settings'], (result) => {
+        appState.settings = { ...DEFAULT_SETTINGS, ...(result.settings || DEFAULT_DATA.settings) };
+        appState.categories = Array.isArray(result.categories)
+          ? result.categories
+          : JSON.parse(JSON.stringify(DEFAULT_DATA.categories));
+        if (!appState.selectedCategoryId && appState.categories.length > 0) {
+          appState.selectedCategoryId = appState.categories[0].id;
+        }
+        if (callback) callback();
+      });
     });
   } else {
     // Fallback for standalone/local testing
-    appState.settings = JSON.parse(JSON.stringify(DEFAULT_DATA.settings));
+    appState.settings = { ...DEFAULT_SETTINGS, ...JSON.parse(JSON.stringify(DEFAULT_DATA.settings)) };
     appState.categories = JSON.parse(JSON.stringify(DEFAULT_DATA.categories));
     appState.selectedCategoryId = appState.categories[0].id;
     if (callback) callback();
+  }
+}
+
+function saveCategories(categories) {
+  if (appState.settings.syncEnabled && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+    chrome.storage.sync.set({ categories: appState.categories }).catch(e => {
+      console.warn('Failed to sync categories to chrome.storage.sync:', e);
+    });
+  }
+}
+
+function saveSettings(settings) {
+  if (appState.settings.syncEnabled && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+    const { syncEnabled, ...syncableSettings } = appState.settings;
+    chrome.storage.sync.set({ settings: syncableSettings }).catch(e => {
+      console.warn('Failed to sync settings to chrome.storage.sync:', e);
+    });
   }
 }
 
@@ -185,6 +235,8 @@ function saveStorage(showNotification = true) {
       settings: appState.settings,
       categories: appState.categories
     }, () => {
+      saveSettings(appState.settings);
+      saveCategories(appState.categories);
       if (showNotification) showToast(getMessage('toastSaved'));
     });
   } else if (showNotification) {
@@ -220,6 +272,18 @@ function refreshPendingUsePasteStates() {
       pendingUsePasteStates.set(categoryId, checkbox.checked);
     }
   });
+}
+
+function renderSyncControls() {
+  const syncEnabledSwitch = document.getElementById('sync-enabled-switch');
+  const syncIndicator = document.getElementById('sync-indicator');
+
+  if (syncEnabledSwitch) {
+    syncEnabledSwitch.checked = Boolean(appState.settings.syncEnabled);
+  }
+  if (syncIndicator) {
+    syncIndicator.classList.toggle('hidden', !appState.settings.syncEnabled);
+  }
 }
 
 function updateSelectedUsePasteCheckbox() {
@@ -409,6 +473,45 @@ function localizeStaticUI() {
 
   const elemWorkdays = document.getElementById('i18n-workdays-label');
   if (elemWorkdays) elemWorkdays.textContent = getMessage('workdaysLabel');
+
+  const elemDeviceSyncLabel = document.getElementById('i18n-device-sync-label');
+  if (elemDeviceSyncLabel) elemDeviceSyncLabel.textContent = getMessage('deviceSyncLabel');
+
+  const containerDeviceSync = document.getElementById('container-device-sync');
+  if (containerDeviceSync) containerDeviceSync.title = getMessage('deviceSyncTooltip');
+
+  const syncIndicator = document.getElementById('sync-indicator');
+  if (syncIndicator) syncIndicator.title = getMessage('syncActiveTooltip');
+
+  const elemSyncModalTitle = document.getElementById('i18n-sync-modal-title');
+  if (elemSyncModalTitle) elemSyncModalTitle.textContent = getMessage('syncModalTitle');
+
+  const elemSyncModalNote = document.getElementById('i18n-sync-modal-note');
+  if (elemSyncModalNote) elemSyncModalNote.textContent = getMessage('syncModalNote');
+
+  const elemSyncModalSettingsTitle = document.getElementById('i18n-sync-modal-settings-title');
+  if (elemSyncModalSettingsTitle) elemSyncModalSettingsTitle.textContent = getMessage('syncModalSettingsTitle');
+
+  const elemSyncOptSettingsFromSync = document.getElementById('i18n-sync-option-settings-from-sync');
+  if (elemSyncOptSettingsFromSync) elemSyncOptSettingsFromSync.textContent = getMessage('syncOptionSettingsFromSync');
+
+  const elemSyncOptSettingsToSync = document.getElementById('i18n-sync-option-settings-to-sync');
+  if (elemSyncOptSettingsToSync) elemSyncOptSettingsToSync.textContent = getMessage('syncOptionSettingsToSync');
+
+  const elemSyncModalCategoriesTitle = document.getElementById('i18n-sync-modal-categories-title');
+  if (elemSyncModalCategoriesTitle) elemSyncModalCategoriesTitle.textContent = getMessage('syncModalCategoriesTitle');
+
+  const elemSyncOptCategoriesFromSync = document.getElementById('i18n-sync-option-categories-from-sync');
+  if (elemSyncOptCategoriesFromSync) elemSyncOptCategoriesFromSync.textContent = getMessage('syncOptionCategoriesFromSync');
+
+  const elemSyncOptCategoriesToSync = document.getElementById('i18n-sync-option-categories-to-sync');
+  if (elemSyncOptCategoriesToSync) elemSyncOptCategoriesToSync.textContent = getMessage('syncOptionCategoriesToSync');
+
+  const btnCancelSync = document.getElementById('cancel-sync-btn');
+  if (btnCancelSync) btnCancelSync.textContent = getMessage('cancel');
+
+  const btnConfirmSync = document.getElementById('confirm-sync-btn');
+  if (btnConfirmSync) btnConfirmSync.textContent = getMessage('confirm');
 
   const daysMap = {
     'pill-sun': { text: 'sun', full: 'sunFull' },
@@ -1052,6 +1155,83 @@ export function validateAndNormalizeBackup(data) {
 
 // Setup Event Handlers
 function setupEventHandlers() {
+  // Device Sync Switch Handler
+  const syncEnabledSwitch = document.getElementById('sync-enabled-switch');
+  if (syncEnabledSwitch) {
+    syncEnabledSwitch.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!appState.settings.syncEnabled) {
+        openSyncModal();
+      } else {
+        appState.settings.syncEnabled = false;
+        saveStorage(true);
+        renderSyncControls();
+      }
+    });
+  }
+
+  // Sync Modal Options Change
+  document.querySelectorAll('input[name="sync-settings-option"], input[name="sync-categories-option"]').forEach(r => {
+    r.addEventListener('change', checkSyncFormValidation);
+  });
+
+  // Cancel Sync Modal
+  const cancelSyncBtn = document.getElementById('cancel-sync-btn');
+  if (cancelSyncBtn) {
+    cancelSyncBtn.addEventListener('click', closeSyncModal);
+  }
+
+  // Confirm Sync Modal
+  const confirmSyncBtn = document.getElementById('confirm-sync-btn');
+  if (confirmSyncBtn) {
+    confirmSyncBtn.addEventListener('click', async () => {
+      const settingsOpt = document.querySelector('input[name="sync-settings-option"]:checked')?.value;
+      const categoriesOpt = document.querySelector('input[name="sync-categories-option"]:checked')?.value;
+
+      if (!settingsOpt || !categoriesOpt) return;
+
+      appState.settings.syncEnabled = true;
+
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+        try {
+          const syncData = await chrome.storage.sync.get(['settings', 'categories']);
+
+          // Handle Settings Sync
+          if (settingsOpt === 'from_sync' && syncData.settings) {
+            const { syncEnabled, ...cloudSettings } = syncData.settings;
+            appState.settings = {
+              ...DEFAULT_SETTINGS,
+              ...cloudSettings,
+              syncEnabled: true
+            };
+          } else {
+            const { syncEnabled, ...syncableSettings } = appState.settings;
+            await chrome.storage.sync.set({ settings: syncableSettings });
+          }
+
+          // Handle Categories Sync
+          if (categoriesOpt === 'from_sync' && Array.isArray(syncData.categories)) {
+            appState.categories = syncData.categories;
+            if (appState.categories.length > 0) {
+              appState.selectedCategoryId = appState.categories[0].id;
+            }
+          } else {
+            await chrome.storage.sync.set({ categories: appState.categories });
+          }
+        } catch (e) {
+          console.warn('Sync conflict resolution error:', e);
+        }
+      }
+
+      saveStorage(true);
+      closeSyncModal();
+      renderWorkdays();
+      renderSyncControls();
+      renderCategoryList();
+      renderCategoryEditor();
+    });
+  }
+
   // Category Title Change
   document.getElementById('current-cat-title').addEventListener('input', (e) => {
     const currentCat = appState.categories.find(c => c.id === appState.selectedCategoryId);
@@ -1336,6 +1516,7 @@ if (typeof document !== 'undefined') {
     localizeStaticUI();
     loadStorage(() => {
       renderWorkdays();
+      renderSyncControls();
       renderCategoryList();
       renderCategoryEditor();
       setupEventHandlers();

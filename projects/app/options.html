@@ -17,6 +17,9 @@
           <h1>FlexPaste-Solo</h1>
           <p class="subtitle" id="i18n-header-subtitle">カテゴリ別定型文 ＆ チップ 設定</p>
         </div>
+        <div id="sync-indicator" class="sync-indicator hidden" title="端末間同期(Sync)が有効です">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor"><path fill-rule="evenodd" d="M150-760h220q20 0 35 15t15 35v210H100v-210q0-20 15-35t35-15Zm-10 40v130h240v-130H140ZM80-460h360q17 0 28.5 11.5T460-420v10q0 17-11.5 28.5T420-370H80q-17 0-28.5-11.5T40-400v-10q0-17 11.5-28.5T80-460Zm560-300h140q25 0 42.5 17.5T840-700v440q0 25-17.5 42.5T780-200H640q-25 0-42.5-17.5T580-260v-440q0-25 17.5-42.5T640-760Zm-20 80v380h180v-380H620Zm-190 50h75v-30l50 45-50 45v-30h-75v-30Zm125 150h-75v-30l-50 45 50 45v-30h75v-30Z"/></svg>
+        </div>
       </div>
       <div class="header-actions">
         <div class="header-workdays-container">
@@ -30,6 +33,13 @@
             <button type="button" id="pill-fri" class="workday-pill workday-fri" data-value="5" title="金曜日">金</button>
             <button type="button" id="pill-sat" class="workday-pill workday-sat" data-value="6" title="土曜日">土</button>
           </div>
+        </div>
+        <div class="input-field header-sync-container" id="container-device-sync">
+          <label for="sync-enabled-switch" id="i18n-device-sync-label">端末間同期(β)</label>
+          <label class="switch">
+            <input type="checkbox" id="sync-enabled-switch">
+            <span class="slider round"></span>
+          </label>
         </div>
         <button id="btn-export" class="btn btn-outlined icon-btn" title="エクスポート" aria-label="エクスポート">
           <span class="material-symbols-outlined">download</span>
@@ -203,6 +213,48 @@
 
   <!-- Toast Notification -->
   <div id="toast" class="toast hidden"></div>
+
+  <!-- Sync Settings Modal -->
+  <div id="sync-modal-scrim" class="scrim" style="display: none;">
+    <div class="modal">
+      <div class="modal-title" id="i18n-sync-modal-title">端末間同期の詳細設定</div>
+      <div class="modal-content">
+        <div class="sync-modal-note" id="i18n-sync-modal-note">*同じアカウントでログインした同一ブラウザ間でのみ同期されます（ChromeとEdgeの直接同期等には対応していません）。</div>
+
+        <div style="margin-top: 8px;">
+          <div class="sync-modal-section-title" id="i18n-sync-modal-settings-title">設定項目（稼働曜日等）の同期:</div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="sync-settings-option" value="from_sync">
+              <span id="i18n-sync-option-settings-from-sync">同期領域のデータをこの端末に適用する</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="sync-settings-option" value="to_sync">
+              <span id="i18n-sync-option-settings-to-sync">この端末のデータを同期領域に上書きする</span>
+            </label>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+          <div class="sync-modal-section-title" id="i18n-sync-modal-categories-title">カテゴリ・テンプレートデータの同期:</div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="sync-categories-option" value="from_sync">
+              <span id="i18n-sync-option-categories-from-sync">同期領域のデータをこの端末に適用する</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="sync-categories-option" value="to_sync">
+              <span id="i18n-sync-option-categories-to-sync">この端末のデータを同期領域に上書きする</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="cancel-sync-btn" class="btn btn-text">キャンセル</button>
+        <button id="confirm-sync-btn" class="btn btn-filled disabled">確定</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="options.js"></script>
 </body>

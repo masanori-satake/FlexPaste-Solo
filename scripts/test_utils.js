@@ -1,6 +1,6 @@
 // scripts/test_utils.js - Unit tests for FlexPaste-Solo utils.js
 import assert from 'node:assert';
-import { adjustTime, resolveVariables } from '../projects/app/utils.js';
+import { adjustTime, resolveVariables, validateImportData } from '../projects/app/utils.js';
 import { validateAndNormalizeBackup } from '../projects/app/options.js';
 
 console.log('Running unit tests for utils.js & options.js...');
@@ -117,6 +117,39 @@ console.log('Running unit tests for utils.js & options.js...');
   assert.strictEqual(normalized.categories[0].def_1, 'Def1Value', 'Control characters should be stripped from def_1');
   assert.strictEqual(normalized.categories[0].templates[0].title, 'TplTitle', 'Control characters should be stripped from template title');
   assert.strictEqual(normalized.categories[0].templates[0].content, 'HelloWorld\nLine2', 'Control characters should be stripped from content while preserving newlines');
+}
+
+// 6. Test validateImportData for device sync data
+{
+  const testData = {
+    settings: {
+      workdays: [1, 2, '3', 8, 0],
+      syncEnabled: true
+    },
+    categories: [
+      {
+        id: 'cat_sync_1',
+        title: 'Sync Category',
+        time_adj_interval: 15,
+        use_paste: true,
+        def_1: 'Def 1',
+        templates: [
+          {
+            id: 'tpl_sync_1',
+            title: 'Sync Template',
+            content: 'Hello {{date}}'
+          }
+        ]
+      }
+    ]
+  };
+
+  validateImportData(testData);
+  assert.deepStrictEqual(testData.settings.workdays, [1, 2, 3], 'Workdays should be normalized and filtered to 1-7');
+  assert.strictEqual(testData.settings.syncEnabled, true, 'syncEnabled should be boolean true');
+  assert.strictEqual(testData.categories.length, 1, 'Categories length should be 1');
+  assert.strictEqual(testData.categories[0].id, 'cat_sync_1', 'Category ID should be preserved');
+  assert.strictEqual(testData.categories[0].templates[0].id, 'tpl_sync_1', 'Template ID should be preserved');
 }
 
 console.log('All unit tests passed successfully!');

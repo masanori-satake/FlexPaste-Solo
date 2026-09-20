@@ -922,6 +922,118 @@ input:checked + .slider:before {
   border: 2px dashed var(--md-sys-color-primary);
 }
 
+/* Sync Indicator Icon in Header Brand */
+.sync-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--md-sys-color-primary);
+  margin-left: 8px;
+}
+
+.sync-indicator.hidden {
+  display: none !important;
+}
+
+/* Header Sync Container */
+.header-sync-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-sync-container label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+/* Modal and Scrim */
+.scrim {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal {
+  background-color: var(--md-sys-color-card-bg);
+  border-radius: var(--md-shape-corner-large);
+  padding: 24px;
+  width: 440px;
+  max-width: 90vw;
+  box-shadow: var(--md-elevation-2);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface);
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--md-sys-color-on-surface);
+}
+
+.sync-modal-note {
+  font-size: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.sync-modal-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--md-sys-color-primary);
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--md-sys-color-on-surface);
+}
+
+.radio-option input[type="radio"] {
+  cursor: pointer;
+  accent-color: var(--md-sys-color-primary);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* Toast */
 .toast {
   position: fixed;

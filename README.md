@@ -1,6 +1,6 @@
 # FlexPaste-Solo
 
-[![version](https://img.shields.io/badge/version-1.0.9-blue)](projects/app/manifest.json)
+[![version](https://img.shields.io/badge/version-1.0.10-blue)](projects/app/manifest.json)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Privacy-Local Only](https://img.shields.io/badge/Privacy-Local%20Only-brightgreen)](PRIVACY.md)
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-orange)](projects/app/manifest.json)
@@ -16,7 +16,7 @@
 
 ## 特徴
 
-- **100% ローカル完結 (プライバシー最優先):** 外部サーバー通信、トラッキング、アナリティクス、リモートAPI呼び出しは一切行いません。すべての処理をユーザーのブラウザ内で完結させます。
+- **完全ローカル実行 & 端末間同期(β):** デフォルトではすべてのデータがブラウザ内の `chrome.storage.local` に保存されます（外部サーバーへの送信は一切行われません）。設定画面で「端末間同期(β)」を有効にした場合のみ、ブラウザのアカウント同期機能（`chrome.storage.sync`）を経由して同一アカウント・同一ブラウザ間で設定およびテンプレートデータが自動同期されます。
 - **2階層コンテキストメニュー:** カテゴリ別のグループ化により、膨大な定型文も迷わずスムーズに選択・挿入可能です。
 - **リアルタイム動的変数エンジン:** 日時 (`{{date_with_day}}`, `{{time}}`)、相対日付 (`{{tomorrow}}`)、月末・稼働日 (`{{month_last_workday}}`)、カテゴリ定義文 (`{{def_1}}`, `{{def_2}}`, `{{def_3}}`) をリアルタイム変換。
 - **ノーコード変数挿入 & リアルタイムプレビュー UI:** 設定画面でチップをドラッグ＆ドロップ（またはクリック）するだけでマスタッシュタグを挿入でき、プレビューで最終出力を事前に確認できます。
