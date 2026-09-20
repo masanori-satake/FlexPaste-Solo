@@ -305,6 +305,28 @@ console.log('Running unit tests for utils.js & options.js...');
     'Missing chunks should fall back to legacy categories'
   );
 
+  // Test invalid / malicious categories_chunk_count bounds
+  assert.strictEqual(
+    restoreCategoriesFromSync({ categories: legacyCategories, categories_chunk_count: 1.5 }),
+    legacyCategories,
+    'Non-integer categories_chunk_count should fall back to legacy categories'
+  );
+  assert.strictEqual(
+    restoreCategoriesFromSync({ categories: legacyCategories, categories_chunk_count: -1 }),
+    legacyCategories,
+    'Negative categories_chunk_count should fall back to legacy categories'
+  );
+  assert.strictEqual(
+    restoreCategoriesFromSync({ categories: legacyCategories, categories_chunk_count: 1000 }),
+    legacyCategories,
+    'Excessive categories_chunk_count (>100) should fall back to legacy categories'
+  );
+  assert.strictEqual(
+    restoreCategoriesFromSync({ categories: legacyCategories, categories_chunk_count: Infinity }),
+    legacyCategories,
+    'Infinity categories_chunk_count should fall back to legacy categories'
+  );
+
   const originalWarn = console.warn;
   console.warn = () => {};
   try {
