@@ -1,6 +1,6 @@
 // scripts/test_utils.js - Unit tests for FlexPaste-Solo utils.js
 import assert from 'node:assert';
-import { adjustTime, resolveVariables, validateImportData } from '../projects/app/utils.js';
+import { adjustTime, resolveVariables, restoreCategoriesFromSync, syncFromCloudIfNeeded, validateImportData } from '../projects/app/utils.js';
 import { validateAndNormalizeBackup } from '../projects/app/options.js';
 
 console.log('Running unit tests for utils.js & options.js...');
@@ -216,6 +216,109 @@ console.log('Running unit tests for utils.js & options.js...');
     assert.strictEqual(generatedIdCollisionData.categories[1].templates[1].id, 'tpl_template-unique', 'Duplicate template IDs must retry generated collisions');
   } finally {
     crypto.randomUUID = originalRandomUUID;
+  }
+}
+
+// 9. Test syncFromCloudIfNeeded with mock chrome.storage
+{
+  const mockLocalStorage = {
+    settings: { workdays: [1, 2, 3, 4, 5], syncEnabled: true },
+    categories: []
+  };
+
+  const sampleCategories = [
+    {
+      id: 'cat_cloud_1',
+      title: 'Cloud Category',
+      time_adj_interval: 10,
+      use_paste: false,
+      def_1: '',
+      def_2: '',
+      def_3: '',
+      templates: [{ id: 'tpl_cloud_1', title: 'Cloud Tpl', content: 'Sync Content' }]
+    }
+  ];
+
+  const serializedCats = JSON.stringify(sampleCategories);
+  const legacyCategories = [{ id: 'cat_legacy', title: 'Legacy Category', templates: [] }];
+  const mockSyncStorage = {
+    settings: { workdays: [1, 2, 3, 4, 5, 6] },
+    categories: legacyCategories,
+    categories_chunk_count: 1,
+    categories_chunk_0: serializedCats
+  };
+
+  let localSavedData = null;
+
+  globalThis.chrome = {
+    storage: {
+      local: {
+        get: async (keys) => {
+          const res = {};
+          if (Array.isArray(keys)) {
+            keys.forEach(k => { res[k] = mockLocalStorage[k]; });
+          }
+          return res;
+        },
+        set: async (updates) => {
+          localSavedData = updates;
+        }
+      },
+      sync: {
+        get: async (keys) => {
+          if (keys === null) {
+            return { ...mockSyncStorage };
+          }
+          const res = {};
+          if (Array.isArray(keys)) {
+            keys.forEach(k => { res[k] = mockSyncStorage[k]; });
+          }
+          return res;
+        }
+      }
+    }
+  };
+
+  await syncFromCloudIfNeeded();
+
+  assert.notStrictEqual(localSavedData, null, 'Local storage should be updated by syncFromCloudIfNeeded');
+  assert.deepStrictEqual(localSavedData.settings.workdays, [1, 2, 3, 4, 5, 6], 'Cloud settings workdays should be applied');
+  assert.strictEqual(localSavedData.settings.syncEnabled, true, 'syncEnabled should remain true in local settings');
+  assert.strictEqual(localSavedData.categories.length, 1, 'Chunked categories from cloud should be reconstructed and saved');
+  assert.strictEqual(localSavedData.categories[0].id, 'cat_cloud_1', 'Valid chunked categories should take precedence over legacy categories');
+
+  delete globalThis.chrome;
+}
+
+// 10. Test chunk restoration falls back to legacy categories only when chunks fail
+{
+  const legacyCategories = [{ id: 'cat_legacy', title: 'Legacy Category', templates: [] }];
+  const incompleteChunks = {
+    categories: legacyCategories,
+    categories_chunk_count: 2,
+    categories_chunk_0: '[{"id":"cat_chunked"}]'
+  };
+
+  assert.strictEqual(
+    restoreCategoriesFromSync(incompleteChunks),
+    legacyCategories,
+    'Missing chunks should fall back to legacy categories'
+  );
+
+  const originalWarn = console.warn;
+  console.warn = () => {};
+  try {
+    assert.strictEqual(
+      restoreCategoriesFromSync({
+        categories: legacyCategories,
+        categories_chunk_count: 1,
+        categories_chunk_0: '{invalid json'
+      }),
+      legacyCategories,
+      'Malformed chunk data should fall back to legacy categories'
+    );
+  } finally {
+    console.warn = originalWarn;
   }
 }
 

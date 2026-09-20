@@ -155,7 +155,9 @@ export function validateImportData(data) {
     } else {
       data.settings.workdays = [1, 2, 3, 4, 5];
     }
-    data.settings.syncEnabled = Boolean(data.settings.syncEnabled);
+    if ('syncEnabled' in data.settings) {
+      data.settings.syncEnabled = Boolean(data.settings.syncEnabled);
+    }
   }
 
   if (Array.isArray(data.categories)) {
@@ -212,6 +214,43 @@ export function validateImportData(data) {
 }
 
 /**
+ * 同期ストレージからカテゴリを復元する。
+ * チャンク形式を優先し、復元できない場合のみ旧形式へフォールバックする。
+ *
+ * @param {Object} allSync 同期ストレージの全データ。
+ * @param {string} [parseErrorMessage] JSON 解析失敗時の警告文。
+ * @returns {Array<Object>|null} 復元したカテゴリ。利用可能なデータがなければ null。
+ */
+export function restoreCategoriesFromSync(allSync, parseErrorMessage = 'Failed to parse chunked categories:') {
+  if (allSync && typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
+    const chunks = [];
+    let hasAllChunks = true;
+
+    for (let i = 0; i < allSync.categories_chunk_count; i++) {
+      const chunk = allSync[`categories_chunk_${i}`];
+      if (typeof chunk !== 'string') {
+        hasAllChunks = false;
+        break;
+      }
+      chunks.push(chunk);
+    }
+
+    if (hasAllChunks) {
+      try {
+        const parsed = JSON.parse(chunks.join(''));
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } catch (e) {
+        console.warn(parseErrorMessage, e);
+      }
+    }
+  }
+
+  return Array.isArray(allSync?.categories) ? allSync.categories : null;
+}
+
+/**
  * 端末で同期が有効な場合に同期ストレージのデータをローカルへ反映する。
  *
  * @returns {Promise<void>} 同期処理の完了を表す Promise。
@@ -225,50 +264,30 @@ export async function syncFromCloudIfNeeded() {
     const isSyncEnabled = local.settings?.syncEnabled ?? false;
     if (!isSyncEnabled) return;
 
-    const syncData = await chrome.storage.sync.get(['settings', 'categories']);
-    validateImportData(syncData);
+    const allSync = await chrome.storage.sync.get(null);
+    if (!allSync || Object.keys(allSync).length === 0) return;
+
+    const categoriesFromSync = restoreCategoriesFromSync(allSync);
 
     const updates = {};
-    if (Array.isArray(syncData.categories)) {
-      updates.categories = syncData.categories;
-    } else {
-      // Check chunked keys if unchunked fallback is missing/not array
-      const allSync = await chrome.storage.sync.get(null);
-      if (typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
-        let reconstructed = '';
-        for (let i = 0; i < allSync.categories_chunk_count; i++) {
-          if (typeof allSync[`categories_chunk_${i}`] === 'string') {
-            reconstructed += allSync[`categories_chunk_${i}`];
-          }
-        }
-        try {
-          const parsed = JSON.parse(reconstructed);
-          if (Array.isArray(parsed)) {
-            validateImportData({ categories: parsed });
-            updates.categories = parsed;
-          }
-        } catch (e) {
-          console.warn('Failed to parse chunked categories:', e);
-        }
-      }
+    if (categoriesFromSync) {
+      const dataToValidate = { categories: categoriesFromSync };
+      validateImportData(dataToValidate);
+      updates.categories = dataToValidate.categories;
     }
 
-    if (syncData.settings === undefined) {
-      updates.settings = {
-        ...DEFAULT_SETTINGS,
-        ...(local.settings || {}),
-        syncEnabled: true
-      };
-    } else {
+    if (allSync.settings && typeof allSync.settings === 'object') {
       const currentLocalSettings = local.settings || {};
       updates.settings = {
         ...DEFAULT_SETTINGS,
-        ...syncData.settings,
+        ...allSync.settings,
         syncEnabled: currentLocalSettings.syncEnabled ?? true
       };
     }
 
-    await chrome.storage.local.set(updates);
+    if (Object.keys(updates).length > 0) {
+      await chrome.storage.local.set(updates);
+    }
   } catch (e) {
     console.warn('Failed to sync from cloud:', e);
   }
