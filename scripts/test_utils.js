@@ -1,6 +1,6 @@
 // scripts/test_utils.js - Unit tests for FlexPaste-Solo utils.js
 import assert from 'node:assert';
-import { adjustTime, resolveVariables, restoreCategoriesFromSync, syncFromCloudIfNeeded, validateImportData } from '../projects/app/utils.js';
+import { adjustTime, getByteLength, resolveVariables, restoreCategoriesFromSync, splitStringToByteChunks, syncFromCloudIfNeeded, validateImportData } from '../projects/app/utils.js';
 import { getEditorContentString, populateEditorFromText, validateAndNormalizeBackup } from '../projects/app/options.js';
 
 console.log('Running unit tests for utils.js & options.js...');
@@ -459,6 +459,51 @@ console.log('Running unit tests for utils.js & options.js...');
   } finally {
     globalThis.document = originalDocument;
   }
+}
+
+// 12. Test splitStringToByteChunks & getByteLength with multibyte Japanese text
+{
+  const jaText = 'あ'.repeat(1200); // 1200 Japanese chars = 3600 UTF-8 bytes
+  assert.strictEqual(getByteLength(jaText), 3600, '1200 Japanese characters should equal 3600 UTF-8 bytes');
+
+  const chunks = splitStringToByteChunks(jaText, 3500);
+  assert.strictEqual(chunks.length, 2, '3600 UTF-8 bytes should be split into 2 chunks with maxBytes=3500');
+
+  // Verify reconstructed text matches original exactly
+  assert.strictEqual(chunks.join(''), jaText, 'Reconstructed text from byte chunks must match original text');
+
+  // Verify each chunk is strictly under maxBytes (3500 UTF-8 bytes)
+  for (let i = 0; i < chunks.length; i++) {
+    const chunkByteLen = getByteLength(chunks[i]);
+    assert.ok(chunkByteLen <= 3500, `Chunk ${i} byte length (${chunkByteLen}) must be <= 3500 bytes`);
+  }
+
+  // Test restoration of multi-chunk Japanese text via restoreCategoriesFromSync
+  const testCategories = [
+    {
+      id: 'cat_ja_1',
+      title: '日本語カテゴリ',
+      templates: [
+        {
+          id: 'tpl_ja_1',
+          title: '長いテンプレート',
+          content: 'テスト文字列：' + 'こんにちは！FlexPaste-Soloです。'.repeat(200)
+        }
+      ]
+    }
+  ];
+
+  const serializedJaCats = JSON.stringify(testCategories);
+  const jaChunks = splitStringToByteChunks(serializedJaCats, 3500);
+  const syncPayload = {
+    categories_chunk_count: jaChunks.length
+  };
+  jaChunks.forEach((c, idx) => {
+    syncPayload[`categories_chunk_${idx}`] = c;
+  });
+
+  const restoredCats = restoreCategoriesFromSync(syncPayload);
+  assert.deepStrictEqual(restoredCats, testCategories, 'Restored categories from byte-split sync payload must match original categories');
 }
 
 console.log('All unit tests passed successfully!');

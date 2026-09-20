@@ -121,6 +121,57 @@ export const DEFAULT_SETTINGS = {
 };
 
 /**
+ * 文字列の UTF-8 バイト長を取得する。
+ *
+ * @param {string} str 対象の文字列。
+ * @returns {number} UTF-8 バイト長。
+ */
+export function getByteLength(str) {
+  if (typeof str !== 'string') return 0;
+  if (typeof TextEncoder !== 'undefined') {
+    return new TextEncoder().encode(str).length;
+  }
+  return unescape(encodeURIComponent(str)).length;
+}
+
+/**
+ * UTF-8 バイト境界を維持して文字列を指定バイト数以下ごとに分割する。
+ *
+ * @param {string} str 分割対象の文字列。
+ * @param {number} [maxBytes=3500] 1 チャンクあたりの最大バイト数（デフォルト: 3500 バイト）。
+ * @returns {Array<string>} 分割された文字列チャンクの配列。
+ */
+export function splitStringToByteChunks(str, maxBytes = 3500) {
+  if (typeof str !== 'string' || !str) return [];
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(str);
+  const totalBytes = bytes.length;
+  if (totalBytes <= maxBytes) {
+    return [str];
+  }
+
+  const decoder = new TextDecoder();
+  const chunks = [];
+  let start = 0;
+
+  while (start < totalBytes) {
+    let end = start + maxBytes;
+    if (end >= totalBytes) {
+      end = totalBytes;
+    } else {
+      while (end > start && (bytes[end] & 0xc0) === 0x80) {
+        end--;
+      }
+    }
+    const chunkBytes = bytes.subarray(start, end);
+    chunks.push(decoder.decode(chunkBytes));
+    start = end;
+  }
+
+  return chunks;
+}
+
+/**
  * インポートまたは同期された設定とカテゴリを安全な値へ正規化する。
  *
  * @param {Object} data 正規化対象のデータ。処理結果はこのオブジェクトへ反映される。

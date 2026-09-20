@@ -1,5 +1,5 @@
 // options.js - Options Page Script for FlexPaste-Solo
-import { DEFAULT_DATA, DEFAULT_SETTINGS, getMessage, resolveVariables, restoreCategoriesFromSync, syncFromCloudIfNeeded } from './utils.js';
+import { DEFAULT_DATA, DEFAULT_SETTINGS, getMessage, resolveVariables, restoreCategoriesFromSync, splitStringToByteChunks, syncFromCloudIfNeeded } from './utils.js';
 
 /**
  * 利用可能な動的変数と表示情報の対応表を返す。
@@ -312,15 +312,16 @@ async function saveCategoriesToSync(categories, force = false) {
     return;
   }
   const serialized = JSON.stringify(categories);
-  const CHUNK_SIZE = 7500; // Keep safely below 8192 bytes limit per item
-  const numChunks = Math.ceil(serialized.length / CHUNK_SIZE);
+  // Strictly enforce safe byte chunks (3500 UTF-8 bytes max per chunk) to stay well under Chrome's 8192 byte QUOTA_BYTES_PER_ITEM limit
+  const chunks = splitStringToByteChunks(serialized, 3500);
+  const numChunks = chunks.length;
 
   const syncItems = {
     categories_chunk_count: numChunks
   };
 
   for (let i = 0; i < numChunks; i++) {
-    syncItems[`categories_chunk_${i}`] = serialized.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+    syncItems[`categories_chunk_${i}`] = chunks[i];
   }
 
   // Set new chunked keys (excluding unchunked single categories item to strictly obey 8KB per-item quota)
