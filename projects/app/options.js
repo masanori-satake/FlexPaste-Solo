@@ -1,6 +1,11 @@
 // options.js - Options Page Script for FlexPaste-Solo
 import { DEFAULT_DATA, DEFAULT_SETTINGS, getMessage, resolveVariables, syncFromCloudIfNeeded } from './utils.js';
 
+/**
+ * 利用可能な動的変数と表示情報の対応表を返す。
+ *
+ * @returns {Object<string, {label: string, icon: string}>} 動的変数の表示情報。
+ */
 function getVariableMap() {
   return {
     '{{date}}': { label: getMessage('chipTag_date'), icon: 'calendar_today' },
@@ -157,7 +162,7 @@ function showToast(message) {
   }, 2500);
 }
 
-// Sync modal state and helpers
+/** 同期方法を選択するモーダルを初期状態で開く。 */
 function openSyncModal() {
   const syncModalScrim = document.getElementById('sync-modal-scrim');
   const confirmBtn = document.getElementById('confirm-sync-btn');
@@ -169,11 +174,13 @@ function openSyncModal() {
   if (syncModalScrim) syncModalScrim.style.display = 'flex';
 }
 
+/** 同期方法を選択するモーダルを閉じる。 */
 function closeSyncModal() {
   const syncModalScrim = document.getElementById('sync-modal-scrim');
   if (syncModalScrim) syncModalScrim.style.display = 'none';
 }
 
+/** 同期方法が両方選択されている場合のみ確定ボタンを有効にする。 */
 function checkSyncFormValidation() {
   const settingsOpt = document.querySelector('input[name="sync-settings-option"]:checked');
   const categoriesOpt = document.querySelector('input[name="sync-categories-option"]:checked');
@@ -188,7 +195,11 @@ function checkSyncFormValidation() {
   }
 }
 
-// Storage helpers with sync
+/**
+ * 同期データを反映してからローカルストレージを読み込む。
+ *
+ * @param {Function} [callback] 読み込み完了後に呼び出すコールバック。
+ */
 function loadStorage(callback) {
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local && typeof chrome.storage.local.get === 'function') {
     syncFromCloudIfNeeded().then(() => {
@@ -212,6 +223,11 @@ function loadStorage(callback) {
   }
 }
 
+/**
+ * 同期が有効な場合にカテゴリを同期ストレージへ保存する。
+ *
+ * @param {Array<Object>} categories 保存対象のカテゴリ。
+ */
 function saveCategories(categories) {
   if (appState.settings.syncEnabled && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
     chrome.storage.sync.set({ categories: appState.categories }).catch(e => {
@@ -220,6 +236,11 @@ function saveCategories(categories) {
   }
 }
 
+/**
+ * 同期が有効な場合に端末固有値を除いた設定を同期ストレージへ保存する。
+ *
+ * @param {Object} settings 保存対象の設定。
+ */
 function saveSettings(settings) {
   if (appState.settings.syncEnabled && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
     const { syncEnabled, ...syncableSettings } = appState.settings;
@@ -229,6 +250,11 @@ function saveSettings(settings) {
   }
 }
 
+/**
+ * 現在の設定とカテゴリをローカルおよび同期ストレージへ保存する。
+ *
+ * @param {boolean} [showNotification=true] 保存完了通知を表示するかどうか。
+ */
 function saveStorage(showNotification = true) {
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local && typeof chrome.storage.local.set === 'function') {
     chrome.storage.local.set({
@@ -274,6 +300,7 @@ function refreshPendingUsePasteStates() {
   });
 }
 
+/** 現在の設定に合わせて同期スイッチと同期中表示を更新する。 */
 function renderSyncControls() {
   const syncEnabledSwitch = document.getElementById('sync-enabled-switch');
   const syncIndicator = document.getElementById('sync-indicator');
@@ -465,6 +492,7 @@ function updateAllPreviews() {
   });
 }
 
+/** 静的な設定画面の文言とツールチップを現在の言語にローカライズする。 */
 function localizeStaticUI() {
   document.title = getMessage('optionsTitle');
 
@@ -1153,7 +1181,7 @@ export function validateAndNormalizeBackup(data) {
   return validData;
 }
 
-// Setup Event Handlers
+/** 設定画面の操作に必要なイベントハンドラーを登録する。 */
 function setupEventHandlers() {
   // Device Sync Switch Handler
   const syncEnabledSwitch = document.getElementById('sync-enabled-switch');

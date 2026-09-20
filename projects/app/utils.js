@@ -120,7 +120,12 @@ export const DEFAULT_SETTINGS = {
   syncEnabled: false
 };
 
-// Validate and normalize imported or synced settings/categories data
+/**
+ * インポートまたは同期された設定とカテゴリを安全な値へ正規化する。
+ *
+ * @param {Object} data 正規化対象のデータ。処理結果はこのオブジェクトへ反映される。
+ * @returns {void}
+ */
 export function validateImportData(data) {
   if (!data || typeof data !== 'object') return;
 
@@ -129,6 +134,13 @@ export function validateImportData(data) {
   const MAX_TITLE_LEN = 200;
   const MAX_CONTENT_LEN = 10000;
 
+  /**
+   * 制御文字を除去し、指定された長さに切り詰める。
+   *
+   * @param {*} str 正規化する値。
+   * @param {number} maxLen 最大文字数。
+   * @returns {string} 正規化された文字列。
+   */
   const sanitizeStr = (str, maxLen) => {
     if (typeof str !== 'string') return '';
     return str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').slice(0, maxLen);
@@ -179,7 +191,11 @@ export function validateImportData(data) {
   }
 }
 
-// Sync data from chrome.storage.sync to local if syncEnabled is true on local device
+/**
+ * 端末で同期が有効な場合に同期ストレージのデータをローカルへ反映する。
+ *
+ * @returns {Promise<void>} 同期処理の完了を表す Promise。
+ */
 export async function syncFromCloudIfNeeded() {
   if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local || !chrome.storage.sync) {
     return;
