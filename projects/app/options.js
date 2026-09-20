@@ -71,6 +71,11 @@ if (typeof document !== 'undefined') {
   }, true);
 }
 
+/**
+ * 入力要素の編集中または IME 変換中かどうかを判定する。
+ *
+ * @returns {boolean} 編集中の場合は true。
+ */
 function isEditing() {
   if (isComposing) return true;
   const active = document.activeElement;
@@ -82,6 +87,7 @@ function isEditing() {
   return false;
 }
 
+/** 編集終了後に保留中のリモート同期内容を画面へ反映する。 */
 function handleDeferredUpdatesIfIdle() {
   if (pendingRemoteSync && !isEditing()) {
     pendingRemoteSync = false;
@@ -111,7 +117,12 @@ function createChipNode(tag) {
   return span;
 }
 
-// Helper: Convert raw template content text (containing {{variable}}) into DOM nodes with inline chips
+/**
+ * 動的変数を含むテンプレート文字列をインラインチップ付きの DOM に変換する。
+ *
+ * @param {HTMLElement} container 変換結果を描画する編集要素。
+ * @param {string} text 変換対象のテンプレート文字列。
+ */
 export function populateEditorFromText(container, text) {
   container.innerHTML = '';
   if (!text) return;
@@ -154,7 +165,12 @@ export function populateEditorFromText(container, text) {
   }
 }
 
-// Helper: Convert contenteditable element's DOM back to raw template text string (with {{variable}})
+/**
+ * contenteditable 要素の DOM を動的変数を含むテンプレート文字列へ戻す。
+ *
+ * @param {HTMLElement} container 読み取り対象の編集要素。
+ * @returns {string} 復元したテンプレート文字列。
+ */
 export function getEditorContentString(container) {
   let result = '';
 
