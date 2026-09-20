@@ -159,8 +159,16 @@ export function validateImportData(data) {
   }
 
   if (Array.isArray(data.categories)) {
+    const seenCatIds = new Set();
+    const seenTplIds = new Set();
+
     data.categories = data.categories.slice(0, MAX_CATEGORIES).map((cat, catIdx) => {
-      const catId = typeof cat?.id === 'string' && cat.id ? sanitizeStr(cat.id, 100) : `cat_${Date.now()}_${catIdx}`;
+      let catId = typeof cat?.id === 'string' && cat.id ? sanitizeStr(cat.id, 100) : `cat_${Date.now()}_${catIdx}`;
+      if (!catId || seenCatIds.has(catId)) {
+        catId = `cat_${Date.now()}_${catIdx}_${Math.random().toString(36).substring(2, 7)}`;
+      }
+      seenCatIds.add(catId);
+
       const catTitle = typeof cat?.title === 'string' ? sanitizeStr(cat.title, MAX_TITLE_LEN) : `Category ${catIdx + 1}`;
       const timeAdjInterval = [0, 5, 10, 15, 30].includes(Number(cat?.time_adj_interval)) ? Number(cat.time_adj_interval) : 0;
       const usePaste = typeof cat?.use_paste === 'boolean' ? cat.use_paste : cat?.use_paste === 'true';
@@ -169,7 +177,12 @@ export function validateImportData(data) {
       const def3 = typeof cat?.def_3 === 'string' ? sanitizeStr(cat.def_3, MAX_TITLE_LEN) : '';
 
       const templates = Array.isArray(cat?.templates) ? cat.templates.slice(0, MAX_TEMPLATES).map((tpl, tplIdx) => {
-        const tplId = typeof tpl?.id === 'string' && tpl.id ? sanitizeStr(tpl.id, 100) : `tpl_${Date.now()}_${tplIdx}`;
+        let tplId = typeof tpl?.id === 'string' && tpl.id ? sanitizeStr(tpl.id, 100) : `tpl_${Date.now()}_${tplIdx}`;
+        if (!tplId || seenTplIds.has(tplId)) {
+          tplId = `tpl_${Date.now()}_${tplIdx}_${Math.random().toString(36).substring(2, 7)}`;
+        }
+        seenTplIds.add(tplId);
+
         return {
           id: tplId,
           title: typeof tpl?.title === 'string' ? sanitizeStr(tpl.title, MAX_TITLE_LEN) : `Template ${tplIdx + 1}`,

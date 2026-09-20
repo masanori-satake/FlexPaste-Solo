@@ -152,4 +152,35 @@ console.log('Running unit tests for utils.js & options.js...');
   assert.strictEqual(testData.categories[0].templates[0].id, 'tpl_sync_1', 'Template ID should be preserved');
 }
 
+// 7. Test validateImportData duplicate ID handling
+{
+  const duplicateIdData = {
+    settings: { workdays: [1, 2, 3, 4, 5] },
+    categories: [
+      {
+        id: 'cat_dup',
+        title: 'Category 1',
+        templates: [
+          { id: 'tpl_dup', title: 'Tpl 1', content: 'A' },
+          { id: 'tpl_dup', title: 'Tpl 2', content: 'B' }
+        ]
+      },
+      {
+        id: 'cat_dup',
+        title: 'Category 2',
+        templates: [
+          { id: 'tpl_3', title: 'Tpl 3', content: 'C' }
+        ]
+      }
+    ]
+  };
+
+  validateImportData(duplicateIdData);
+  assert.strictEqual(duplicateIdData.categories.length, 2, 'Should keep both categories');
+  assert.notStrictEqual(duplicateIdData.categories[0].id, duplicateIdData.categories[1].id, 'Duplicate category IDs must be unique');
+  assert.strictEqual(duplicateIdData.categories[0].id, 'cat_dup', 'First category ID should be preserved');
+  assert.notStrictEqual(duplicateIdData.categories[0].templates[0].id, duplicateIdData.categories[0].templates[1].id, 'Duplicate template IDs must be unique');
+  assert.strictEqual(duplicateIdData.categories[0].templates[0].id, 'tpl_dup', 'First template ID should be preserved');
+}
+
 console.log('All unit tests passed successfully!');
