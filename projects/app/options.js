@@ -307,40 +307,56 @@ function loadStorage(callback) {
  *
  * @param {Array<Object>} categories 保存対象のカテゴリ。
  */
-async function saveCategoriesToSync(categories, force = false) {
-  if ((!force && !appState.settings.syncEnabled) || typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.sync) {
-    return;
-  }
-  const serialized = JSON.stringify(categories);
-  // Strictly enforce safe byte chunks (3500 UTF-8 bytes max per chunk) to stay well under Chrome's 8192 byte QUOTA_BYTES_PER_ITEM limit
-  const chunks = splitStringToByteChunks(serialized, 3500);
-  const numChunks = chunks.length;
+let syncSaveQueue = Promise.resolve();
 
-  const syncItems = {
-    categories_chunk_count: numChunks
+/**
+ * 同期が有効な場合にカテゴリを分割して同期ストレージへ保存する。
+ * 各保存処理をシリアライズし、順次実行を保証する。
+ *
+ * @param {Array<Object>} categories 保存対象のカテゴリ。
+ * @param {boolean} [force=false] 強制保存を行うかどうか。
+ * @returns {Promise<void>}
+ */
+function saveCategoriesToSync(categories, force = false) {
+  if ((!force && !appState.settings.syncEnabled) || typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.sync) {
+    return Promise.resolve();
+  }
+
+  const runSave = async () => {
+    const serialized = JSON.stringify(categories);
+    // Strictly enforce safe byte chunks (3500 UTF-8 bytes max per chunk) to stay well under Chrome's 8192 byte QUOTA_BYTES_PER_ITEM limit
+    const chunks = splitStringToByteChunks(serialized, 3500);
+    const numChunks = chunks.length;
+
+    const syncItems = {
+      categories_chunk_count: numChunks
+    };
+
+    for (let i = 0; i < numChunks; i++) {
+      syncItems[`categories_chunk_${i}`] = chunks[i];
+    }
+
+    // Set new chunked keys (excluding unchunked single categories item to strictly obey 8KB per-item quota)
+    await chrome.storage.sync.set(syncItems);
+
+    // Remove deprecated unchunked categories key if present
+    await chrome.storage.sync.remove('categories');
+
+    // Clean up any extra trailing chunk keys from previous larger saves
+    const allSyncKeys = await chrome.storage.sync.get(null);
+    const keysToRemove = Object.keys(allSyncKeys).filter(k => {
+      if (!k.startsWith('categories_chunk_')) return false;
+      const idx = parseInt(k.replace('categories_chunk_', ''), 10);
+      return !isNaN(idx) && idx >= numChunks;
+    });
+
+    if (keysToRemove.length > 0) {
+      await chrome.storage.sync.remove(keysToRemove);
+    }
   };
 
-  for (let i = 0; i < numChunks; i++) {
-    syncItems[`categories_chunk_${i}`] = chunks[i];
-  }
-
-  // Set new chunked keys (excluding unchunked single categories item to strictly obey 8KB per-item quota)
-  await chrome.storage.sync.set(syncItems);
-
-  // Remove deprecated unchunked categories key if present
-  await chrome.storage.sync.remove('categories');
-
-  // Clean up any extra trailing chunk keys from previous larger saves
-  const allSyncKeys = await chrome.storage.sync.get(null);
-  const keysToRemove = Object.keys(allSyncKeys).filter(k => {
-    if (!k.startsWith('categories_chunk_')) return false;
-    const idx = parseInt(k.replace('categories_chunk_', ''), 10);
-    return !isNaN(idx) && idx >= numChunks;
-  });
-
-  if (keysToRemove.length > 0) {
-    await chrome.storage.sync.remove(keysToRemove);
-  }
+  syncSaveQueue = syncSaveQueue.then(runSave, runSave);
+  return syncSaveQueue;
 }
 
 function saveCategories(categories) {

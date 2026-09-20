@@ -140,12 +140,8 @@ export function getByteLength(str) {
  * @param {string} str 分割対象の文字列。
  * @param {number} [maxBytes=3500] 1 チャンクあたりの最大バイト数（デフォルト: 3500 バイト）。
  * @returns {Array<string>} 分割された文字列チャンクの配列。
- * @throws {RangeError} maxBytes が正の安全な整数でない場合、または UTF-8 文字を 1 つも格納できない場合。
  */
 export function splitStringToByteChunks(str, maxBytes = 3500) {
-  if (!Number.isSafeInteger(maxBytes) || maxBytes <= 0) {
-    throw new RangeError('maxBytes must be a positive safe integer');
-  }
   if (typeof str !== 'string' || !str) return [];
   const encoder = new TextEncoder();
   const bytes = encoder.encode(str);
@@ -166,9 +162,6 @@ export function splitStringToByteChunks(str, maxBytes = 3500) {
       while (end > start && (bytes[end] & 0xc0) === 0x80) {
         end--;
       }
-    }
-    if (end === start) {
-      throw new RangeError('maxBytes is too small to contain the next UTF-8 character');
     }
     const chunkBytes = bytes.subarray(start, end);
     chunks.push(decoder.decode(chunkBytes));
