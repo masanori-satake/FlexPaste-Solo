@@ -1,7 +1,7 @@
 // scripts/test_utils.js - Unit tests for FlexPaste-Solo utils.js
 import assert from 'node:assert';
 import { adjustTime, resolveVariables, restoreCategoriesFromSync, syncFromCloudIfNeeded, validateImportData } from '../projects/app/utils.js';
-import { validateAndNormalizeBackup } from '../projects/app/options.js';
+import { getEditorContentString, populateEditorFromText, validateAndNormalizeBackup } from '../projects/app/options.js';
 
 console.log('Running unit tests for utils.js & options.js...');
 
@@ -319,6 +319,123 @@ console.log('Running unit tests for utils.js & options.js...');
     );
   } finally {
     console.warn = originalWarn;
+  }
+}
+
+// 11. Test populateEditorFromText and getEditorContentString for newline and trailing blank line preservation
+{
+  // Simple Mock DOM Node for Node.js unit testing
+  class MockNode {
+    constructor(nodeType, nodeValue = '', tagName = '') {
+      this.nodeType = nodeType;
+      this.nodeValue = nodeValue;
+      this.tagName = tagName;
+      this.childNodes = [];
+      this.nextSibling = null;
+      this.classList = {
+        contains: (cls) => this._cls === cls
+      };
+      this.dataset = {};
+    }
+    appendChild(child) {
+      if (this.childNodes.length > 0) {
+        this.childNodes[this.childNodes.length - 1].nextSibling = child;
+      }
+      this.childNodes.push(child);
+      return child;
+    }
+  }
+
+  const mockDocument = {
+    createElement: (tag) => new MockNode(1, '', tag.toUpperCase()),
+    createTextNode: (text) => new MockNode(3, text)
+  };
+
+  const originalDocument = globalThis.document;
+  globalThis.document = mockDocument;
+
+  try {
+    // Case A: Normal 2-line text
+    {
+      const container = new MockNode(1, '', 'DIV');
+      populateEditorFromText(container, 'Hello\nWorld');
+      const textResult = getEditorContentString(container);
+      assert.strictEqual(textResult, 'Hello\nWorld', 'Should preserve 2-line text without trailing blank line');
+    }
+
+    // Case B: Trailing blank line (1 trailing newline)
+    {
+      const container = new MockNode(1, '', 'DIV');
+      populateEditorFromText(container, 'Hello\n');
+      const textResult = getEditorContentString(container);
+      assert.strictEqual(textResult, 'Hello\n', 'Should accurately preserve single trailing blank line');
+    }
+
+    // Case C: Multiple trailing blank lines (2 trailing newlines)
+    {
+      const container = new MockNode(1, '', 'DIV');
+      populateEditorFromText(container, 'Hello\n\n');
+      const textResult = getEditorContentString(container);
+      assert.strictEqual(textResult, 'Hello\n\n', 'Should accurately preserve multiple trailing blank lines');
+    }
+
+    // Case D: Chrome contenteditable DIV structure: <div>Hello</div><div><br></div>
+    {
+      const container = new MockNode(1, '', 'DIV');
+
+      const div1 = new MockNode(1, '', 'DIV');
+      div1.appendChild(new MockNode(3, 'Hello'));
+      container.appendChild(div1);
+
+      const div2 = new MockNode(1, '', 'DIV');
+      div2.appendChild(new MockNode(1, '', 'BR'));
+      container.appendChild(div2);
+
+      const textResult = getEditorContentString(container);
+      assert.strictEqual(textResult, 'Hello\n', 'Chrome contenteditable <div>Hello</div><div><br></div> should return "Hello\\n"');
+    }
+
+    // Case E: Chrome contenteditable DIV structure with 2 empty lines: <div>Hello</div><div><br></div><div><br></div>
+    {
+      const container = new MockNode(1, '', 'DIV');
+
+      const div1 = new MockNode(1, '', 'DIV');
+      div1.appendChild(new MockNode(3, 'Hello'));
+      container.appendChild(div1);
+
+      const div2 = new MockNode(1, '', 'DIV');
+      div2.appendChild(new MockNode(1, '', 'BR'));
+      container.appendChild(div2);
+
+      const div3 = new MockNode(1, '', 'DIV');
+      div3.appendChild(new MockNode(1, '', 'BR'));
+      container.appendChild(div3);
+
+      const textResult = getEditorContentString(container);
+      assert.strictEqual(textResult, 'Hello\n\n', 'Chrome contenteditable with 2 trailing empty divs should return "Hello\\n\\n"');
+    }
+
+    // Case F: Intermediate empty block between text blocks: <div>Hello</div><div><br></div><div>World</div>
+    {
+      const container = new MockNode(1, '', 'DIV');
+
+      const div1 = new MockNode(1, '', 'DIV');
+      div1.appendChild(new MockNode(3, 'Hello'));
+      container.appendChild(div1);
+
+      const div2 = new MockNode(1, '', 'DIV');
+      div2.appendChild(new MockNode(1, '', 'BR'));
+      container.appendChild(div2);
+
+      const div3 = new MockNode(1, '', 'DIV');
+      div3.appendChild(new MockNode(3, 'World'));
+      container.appendChild(div3);
+
+      const textResult = getEditorContentString(container);
+      assert.strictEqual(textResult, 'Hello\n\nWorld', 'Chrome contenteditable with intermediate empty div should return "Hello\\n\\nWorld"');
+    }
+  } finally {
+    globalThis.document = originalDocument;
   }
 }
 
