@@ -152,4 +152,71 @@ console.log('Running unit tests for utils.js & options.js...');
   assert.strictEqual(testData.categories[0].templates[0].id, 'tpl_sync_1', 'Template ID should be preserved');
 }
 
+// 7. Test validateImportData duplicate ID handling
+{
+  const duplicateIdData = {
+    settings: { workdays: [1, 2, 3, 4, 5] },
+    categories: [
+      {
+        id: 'cat_dup',
+        title: 'Category 1',
+        templates: [
+          { id: 'tpl_dup', title: 'Tpl 1', content: 'A' },
+          { id: 'tpl_dup', title: 'Tpl 2', content: 'B' }
+        ]
+      },
+      {
+        id: 'cat_dup',
+        title: 'Category 2',
+        templates: [
+          { id: 'tpl_3', title: 'Tpl 3', content: 'C' }
+        ]
+      }
+    ]
+  };
+
+  validateImportData(duplicateIdData);
+  assert.strictEqual(duplicateIdData.categories.length, 2, 'Should keep both categories');
+  assert.notStrictEqual(duplicateIdData.categories[0].id, duplicateIdData.categories[1].id, 'Duplicate category IDs must be unique');
+  assert.strictEqual(duplicateIdData.categories[0].id, 'cat_dup', 'First category ID should be preserved');
+  assert.notStrictEqual(duplicateIdData.categories[0].templates[0].id, duplicateIdData.categories[0].templates[1].id, 'Duplicate template IDs must be unique');
+  assert.strictEqual(duplicateIdData.categories[0].templates[0].id, 'tpl_dup', 'First template ID should be preserved');
+}
+
+// 8. Test generated IDs are retried when they collide with retained IDs
+{
+  const originalRandomUUID = crypto.randomUUID;
+  const generatedIds = [
+    'category-collision',
+    'category-unique',
+    'template-collision',
+    'template-unique'
+  ];
+  crypto.randomUUID = () => generatedIds.shift();
+
+  try {
+    const generatedIdCollisionData = {
+      categories: [
+        {
+          id: 'cat_category-collision',
+          templates: [{ id: 'tpl_template-collision', title: 'First', content: 'A' }]
+        },
+        {
+          id: '',
+          templates: [
+            { id: 'tpl_dup', title: 'Second', content: 'B' },
+            { id: 'tpl_dup', title: 'Third', content: 'C' }
+          ]
+        }
+      ]
+    };
+
+    validateImportData(generatedIdCollisionData);
+    assert.strictEqual(generatedIdCollisionData.categories[1].id, 'cat_category-unique', 'Empty category IDs must retry generated collisions');
+    assert.strictEqual(generatedIdCollisionData.categories[1].templates[1].id, 'tpl_template-unique', 'Duplicate template IDs must retry generated collisions');
+  } finally {
+    crypto.randomUUID = originalRandomUUID;
+  }
+}
+
 console.log('All unit tests passed successfully!');

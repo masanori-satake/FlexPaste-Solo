@@ -14,3 +14,8 @@
 **Vulnerability:** User-supplied backup JSON files containing non-printable ASCII control characters (such as NULL bytes `\x00` or bell `\x07`) can lead to string corruption, unexpected UI behavior, or breakdown when injected into extension storage and DOM nodes.
 **Learning:** Raw unescaped ASCII control characters (U+0000–U+001F) cause `JSON.parse` to throw a `SyntaxError`, whereas escaped unicode forms (such as `\u0000`) pass `JSON.parse` successfully and are decoded into JavaScript string control characters. These decoded control characters in extension storage or DOM elements can create subtle rendering or execution issues.
 **Prevention:** Strip ASCII control characters `[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]` during import normalization while explicitly preserving valid multi-line formatting whitespace (`\t`, `\n`, `\r`).
+
+## 2026-05-20 - Unique ID Enforcement in Sync Data Normalization
+**Vulnerability:** Ingesting synced or imported category/template structures without unique ID collision checks can allow duplicate category or template IDs (`cat.id` / `tpl.id`). This causes DOM element ID conflicts, context menu item registration failures in Chrome, or state corruption/unintended item overwrites.
+**Learning:** `validateImportData` sanitized string lengths and item counts but lacked ID collision tracking (`seenCatIds` / `seenTplIds`), leaving sync data vulnerable to ID hijacking or collision side effects across devices.
+**Prevention:** Track all processed category and template IDs in `Set` structures during data normalization, and automatically reassign guaranteed unique random IDs whenever duplicate or empty IDs are detected.
