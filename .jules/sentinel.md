@@ -19,3 +19,8 @@
 **Vulnerability:** Ingesting synced or imported category/template structures without unique ID collision checks can allow duplicate category or template IDs (`cat.id` / `tpl.id`). This causes DOM element ID conflicts, context menu item registration failures in Chrome, or state corruption/unintended item overwrites.
 **Learning:** `validateImportData` sanitized string lengths and item counts but lacked ID collision tracking (`seenCatIds` / `seenTplIds`), leaving sync data vulnerable to ID hijacking or collision side effects across devices.
 **Prevention:** Track all processed category and template IDs in `Set` structures during data normalization, and automatically reassign guaranteed unique random IDs whenever duplicate or empty IDs are detected.
+
+## 2026-06-15 - Integer Range Boundaries for Chunked Sync Metadata
+**Vulnerability:** Untrusted or tampered `categories_chunk_count` values in `chrome.storage.sync` (such as negative numbers, non-integers, `Infinity`, or excessively large numbers like `1000000`) can cause high CPU usage or loop exceptions when restoring chunked data in client extensions.
+**Learning:** Checking `typeof count === 'number'` is insufficient because Javascript `number` includes `Infinity`, `NaN`, and floating point numbers, allowing malformed sync metadata to cause unexpected iteration loops.
+**Prevention:** Validate chunk metadata using `Number.isInteger(count)` and enforce strict positive range bounds (e.g. `count > 0 && count <= 100`).

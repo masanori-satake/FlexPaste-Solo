@@ -222,11 +222,12 @@ export function validateImportData(data) {
  * @returns {Array<Object>|null} 復元したカテゴリ。利用可能なデータがなければ null。
  */
 export function restoreCategoriesFromSync(allSync, parseErrorMessage = 'Failed to parse chunked categories:') {
-  if (allSync && typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
+  const count = allSync?.categories_chunk_count;
+  if (allSync && Number.isInteger(count) && count > 0 && count <= 100) {
     const chunks = [];
     let hasAllChunks = true;
 
-    for (let i = 0; i < allSync.categories_chunk_count; i++) {
+    for (let i = 0; i < count; i++) {
       const chunk = allSync[`categories_chunk_${i}`];
       if (typeof chunk !== 'string') {
         hasAllChunks = false;

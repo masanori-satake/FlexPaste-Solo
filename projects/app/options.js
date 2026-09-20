@@ -114,7 +114,7 @@ function createChipNode(tag) {
 // Helper: Convert raw template content text (containing {{variable}}) into DOM nodes with inline chips
 export function populateEditorFromText(container, text) {
   container.innerHTML = '';
-  if (!text) return;
+  if (typeof text !== 'string' || !text) return;
 
   // Split trailing newlines so they can be rendered as <br> elements,
   // preventing Blink/WebKit contenteditable from collapsing trailing empty lines.
