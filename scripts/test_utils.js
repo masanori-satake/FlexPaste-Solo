@@ -461,6 +461,49 @@ console.log('Running unit tests for utils.js & options.js...');
   }
 }
 
+// 13. Test populateEditorFromText with invalid / malformed tag syntax
+{
+  class MockNode {
+    constructor(nodeType, nodeValue = '', tagName = '') {
+      this.nodeType = nodeType;
+      this.nodeValue = nodeValue;
+      this.tagName = tagName;
+      this.childNodes = [];
+      this.nextSibling = null;
+      this.classList = {
+        contains: (cls) => this._cls === cls
+      };
+      this.dataset = {};
+    }
+    appendChild(child) {
+      if (this.childNodes.length > 0) {
+        this.childNodes[this.childNodes.length - 1].nextSibling = child;
+      }
+      this.childNodes.push(child);
+      return child;
+    }
+  }
+
+  const mockDocument = {
+    createElement: (tag) => new MockNode(1, '', tag.toUpperCase()),
+    createTextNode: (text) => new MockNode(3, text)
+  };
+
+  const originalDocument = globalThis.document;
+  globalThis.document = mockDocument;
+
+  try {
+    const container = new MockNode(1, '', 'DIV');
+    // Valid tag vs invalid tags
+    populateEditorFromText(container, '{{date}} {{invalid<script>}} {{}}');
+    const chips = container.childNodes.filter(n => n.nodeType === 1 && n.tagName === 'SPAN');
+    assert.strictEqual(chips.length, 1, 'Only valid tag syntax should generate a chip node');
+    assert.strictEqual(chips[0].dataset.tag, '{{date}}', 'Chip tag should match valid tag syntax');
+  } finally {
+    globalThis.document = originalDocument;
+  }
+}
+
 // 12. Test splitStringToByteChunks & getByteLength with multibyte Japanese text
 {
   const jaText = 'あ'.repeat(1200); // 1200 Japanese chars = 3600 UTF-8 bytes

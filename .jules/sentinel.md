@@ -24,3 +24,8 @@
 **Vulnerability:** Untrusted or tampered `categories_chunk_count` values in `chrome.storage.sync` (such as negative numbers, non-integers, `Infinity`, or excessively large numbers like `1000000`) can cause high CPU usage or loop exceptions when restoring chunked data in client extensions.
 **Learning:** Checking `typeof count === 'number'` is insufficient because Javascript `number` includes `Infinity`, `NaN`, and floating point numbers, allowing malformed sync metadata to cause unexpected iteration loops.
 **Prevention:** Validate chunk metadata using `Number.isInteger(count)` and enforce strict positive range bounds (e.g. `count > 0 && count <= 100`).
+
+## 2026-07-20 - Input Syntax Validation for Dynamic Variable Chips in ContentEditable
+**Vulnerability:** Accepting unvalidated tag strings during Drag and Drop or programmatic chip creation can allow malformed or unexpected tag strings (e.g., HTML/script-like patterns or arbitrary string injections) to be rendered as DOM nodes or inserted into template content.
+**Learning:** `dataTransfer` payloads or UI event arguments in contenteditable editors bypass standard input fields, so validating the syntax (`/^\{\{[a-zA-Z0-9_]{1,100}\}\}$/`) at entry points (`createChipNode` and `insertTagAtCursor`) prevents corrupt tag structures from reaching storage or rendering logic.
+**Prevention:** Always validate tag payloads against a strict regex whitelist before creating DOM nodes or inserting them into rich text contenteditable editors.

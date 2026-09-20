@@ -94,7 +94,13 @@ function handleDeferredUpdatesIfIdle() {
 
 // Helper: Create inline variable chip element
 function createChipNode(tag) {
-  const safeTag = typeof tag === 'string' ? tag : String(tag || '');
+  const trimmedTag = typeof tag === 'string' ? tag.trim() : '';
+  // Security: Validate Mustache tag syntax to prevent DOM injection or malformed chip insertion
+  if (!/^\{\{[a-zA-Z0-9_]{1,100}\}\}$/.test(trimmedTag)) {
+    return document.createTextNode('');
+  }
+
+  const safeTag = trimmedTag;
   const varMap = getVariableMap();
   const meta = varMap[safeTag] || { label: safeTag.replace(/[\{\}]/g, ''), icon: 'code' };
   const span = document.createElement('span');
@@ -1175,8 +1181,11 @@ function renderCategoryEditor() {
 
 // Cursor Insertion Helper for contenteditable editor
 function insertTagAtCursor(editor, tag) {
+  if (!editor || typeof tag !== 'string' || !/^\{\{[a-zA-Z0-9_]{1,100}\}\}$/.test(tag.trim())) return;
+
   editor.focus();
   const chipNode = createChipNode(tag);
+  if (!chipNode || chipNode.nodeType === 3 /* Node.TEXT_NODE */) return;
   const sel = window.getSelection();
 
   if (sel && sel.rangeCount > 0 && editor.contains(sel.getRangeAt(0).commonAncestorContainer)) {
