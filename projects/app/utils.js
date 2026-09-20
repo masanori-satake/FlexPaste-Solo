@@ -155,7 +155,9 @@ export function validateImportData(data) {
     } else {
       data.settings.workdays = [1, 2, 3, 4, 5];
     }
-    data.settings.syncEnabled = Boolean(data.settings.syncEnabled);
+    if ('syncEnabled' in data.settings) {
+      data.settings.syncEnabled = Boolean(data.settings.syncEnabled);
+    }
   }
 
   if (Array.isArray(data.categories)) {
@@ -225,50 +227,48 @@ export async function syncFromCloudIfNeeded() {
     const isSyncEnabled = local.settings?.syncEnabled ?? false;
     if (!isSyncEnabled) return;
 
-    const syncData = await chrome.storage.sync.get(['settings', 'categories']);
-    validateImportData(syncData);
+    const allSync = await chrome.storage.sync.get(null);
+    if (!allSync || Object.keys(allSync).length === 0) return;
 
-    const updates = {};
-    if (Array.isArray(syncData.categories)) {
-      updates.categories = syncData.categories;
-    } else {
-      // Check chunked keys if unchunked fallback is missing/not array
-      const allSync = await chrome.storage.sync.get(null);
-      if (typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
-        let reconstructed = '';
-        for (let i = 0; i < allSync.categories_chunk_count; i++) {
-          if (typeof allSync[`categories_chunk_${i}`] === 'string') {
-            reconstructed += allSync[`categories_chunk_${i}`];
-          }
+    let categoriesFromSync = null;
+    if (Array.isArray(allSync.categories)) {
+      categoriesFromSync = allSync.categories;
+    } else if (typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
+      let reconstructed = '';
+      for (let i = 0; i < allSync.categories_chunk_count; i++) {
+        if (typeof allSync[`categories_chunk_${i}`] === 'string') {
+          reconstructed += allSync[`categories_chunk_${i}`];
         }
-        try {
-          const parsed = JSON.parse(reconstructed);
-          if (Array.isArray(parsed)) {
-            validateImportData({ categories: parsed });
-            updates.categories = parsed;
-          }
-        } catch (e) {
-          console.warn('Failed to parse chunked categories:', e);
+      }
+      try {
+        const parsed = JSON.parse(reconstructed);
+        if (Array.isArray(parsed)) {
+          categoriesFromSync = parsed;
         }
+      } catch (e) {
+        console.warn('Failed to parse chunked categories:', e);
       }
     }
 
-    if (syncData.settings === undefined) {
-      updates.settings = {
-        ...DEFAULT_SETTINGS,
-        ...(local.settings || {}),
-        syncEnabled: true
-      };
-    } else {
+    const updates = {};
+    if (categoriesFromSync) {
+      const dataToValidate = { categories: categoriesFromSync };
+      validateImportData(dataToValidate);
+      updates.categories = dataToValidate.categories;
+    }
+
+    if (allSync.settings && typeof allSync.settings === 'object') {
       const currentLocalSettings = local.settings || {};
       updates.settings = {
         ...DEFAULT_SETTINGS,
-        ...syncData.settings,
+        ...allSync.settings,
         syncEnabled: currentLocalSettings.syncEnabled ?? true
       };
     }
 
-    await chrome.storage.local.set(updates);
+    if (Object.keys(updates).length > 0) {
+      await chrome.storage.local.set(updates);
+    }
   } catch (e) {
     console.warn('Failed to sync from cloud:', e);
   }

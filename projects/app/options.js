@@ -228,8 +228,8 @@ function loadStorage(callback) {
  *
  * @param {Array<Object>} categories 保存対象のカテゴリ。
  */
-async function saveCategoriesToSync(categories) {
-  if (!appState.settings.syncEnabled || typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.sync) {
+async function saveCategoriesToSync(categories, force = false) {
+  if ((!force && !appState.settings.syncEnabled) || typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.sync) {
     return;
   }
   const serialized = JSON.stringify(categories);
@@ -1258,12 +1258,12 @@ function setupEventHandlers() {
 
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
         try {
-          const syncData = await chrome.storage.sync.get(['settings', 'categories']);
+          const allSync = await chrome.storage.sync.get(null);
 
           // Handle Settings Sync
           if (settingsOpt === 'from_sync') {
-            if (syncData.settings) {
-              const { syncEnabled, ...cloudSettings } = syncData.settings;
+            if (allSync.settings && typeof allSync.settings === 'object') {
+              const { syncEnabled, ...cloudSettings } = allSync.settings;
               newSettings = {
                 ...DEFAULT_SETTINGS,
                 ...cloudSettings,
@@ -1277,40 +1277,36 @@ function setupEventHandlers() {
 
           // Handle Categories Sync
           if (categoriesOpt === 'from_sync') {
-            if (Array.isArray(syncData.categories)) {
-              const backup = { categories: syncData.categories };
-              const normalized = validateAndNormalizeBackup(backup);
+            let categoriesFromSync = null;
+            if (Array.isArray(allSync.categories)) {
+              categoriesFromSync = allSync.categories;
+            } else if (typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
+              let reconstructed = '';
+              for (let i = 0; i < allSync.categories_chunk_count; i++) {
+                if (typeof allSync[`categories_chunk_${i}`] === 'string') {
+                  reconstructed += allSync[`categories_chunk_${i}`];
+                }
+              }
+              try {
+                const parsed = JSON.parse(reconstructed);
+                if (Array.isArray(parsed)) {
+                  categoriesFromSync = parsed;
+                }
+              } catch (err) {
+                console.warn('Failed to parse chunked categories in modal confirm:', err);
+              }
+            }
+
+            if (categoriesFromSync) {
+              const normalized = validateAndNormalizeBackup({ categories: categoriesFromSync });
               if (normalized && Array.isArray(normalized.categories)) {
                 newCategories = normalized.categories;
               } else {
-                newCategories = syncData.categories;
-              }
-            } else {
-              const allSync = await chrome.storage.sync.get(null);
-              if (typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
-                let reconstructed = '';
-                for (let i = 0; i < allSync.categories_chunk_count; i++) {
-                  if (typeof allSync[`categories_chunk_${i}`] === 'string') {
-                    reconstructed += allSync[`categories_chunk_${i}`];
-                  }
-                }
-                try {
-                  const parsed = JSON.parse(reconstructed);
-                  if (Array.isArray(parsed)) {
-                    const normalized = validateAndNormalizeBackup({ categories: parsed });
-                    if (normalized && Array.isArray(normalized.categories)) {
-                      newCategories = normalized.categories;
-                    } else {
-                      newCategories = parsed;
-                    }
-                  }
-                } catch (err) {
-                  console.warn('Failed to parse chunked categories in modal confirm:', err);
-                }
+                newCategories = categoriesFromSync;
               }
             }
           } else {
-            await saveCategoriesToSync(newCategories);
+            await saveCategoriesToSync(newCategories, true);
           }
         } catch (e) {
           console.warn('Sync conflict resolution error:', e);
@@ -1326,7 +1322,18 @@ function setupEventHandlers() {
         appState.selectedCategoryId = appState.categories[0].id;
       }
 
-      saveStorage(true);
+      // Save to local storage
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local && typeof chrome.storage.local.set === 'function') {
+        chrome.storage.local.set({
+          settings: appState.settings,
+          categories: appState.categories
+        }, () => {
+          showToast(getMessage('toastSaved'));
+        });
+      } else {
+        showToast(getMessage('toastSaved'));
+      }
+
       closeSyncModal();
       renderWorkdays();
       renderSyncControls();
@@ -1646,6 +1653,8 @@ if (typeof document !== 'undefined') {
           renderCategoryList();
           renderCategoryEditor();
         }
+      } else if (areaName === 'sync' && appState.settings.syncEnabled) {
+        syncFromCloudIfNeeded();
       }
     });
   }
