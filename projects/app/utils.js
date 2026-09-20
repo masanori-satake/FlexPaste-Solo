@@ -209,8 +209,28 @@ export async function syncFromCloudIfNeeded() {
     validateImportData(syncData);
 
     const updates = {};
-    if (syncData.categories !== undefined) {
+    if (Array.isArray(syncData.categories)) {
       updates.categories = syncData.categories;
+    } else {
+      // Check chunked keys if unchunked fallback is missing/not array
+      const allSync = await chrome.storage.sync.get(null);
+      if (typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
+        let reconstructed = '';
+        for (let i = 0; i < allSync.categories_chunk_count; i++) {
+          if (typeof allSync[`categories_chunk_${i}`] === 'string') {
+            reconstructed += allSync[`categories_chunk_${i}`];
+          }
+        }
+        try {
+          const parsed = JSON.parse(reconstructed);
+          if (Array.isArray(parsed)) {
+            validateImportData({ categories: parsed });
+            updates.categories = parsed;
+          }
+        } catch (e) {
+          console.warn('Failed to parse chunked categories:', e);
+        }
+      }
     }
 
     if (syncData.settings === undefined) {

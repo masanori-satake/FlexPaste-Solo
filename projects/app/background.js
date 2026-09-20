@@ -141,23 +141,9 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   } else if (areaName === 'sync') {
     chrome.storage.local.get(['settings'], (result) => {
       if (result.settings?.syncEnabled) {
-        chrome.storage.sync.get(['settings', 'categories'], (syncData) => {
-          if (chrome.runtime.lastError || !syncData) return;
-          const updates = {};
-          if (syncData.categories !== undefined) {
-            updates.categories = syncData.categories;
-          }
-          if (syncData.settings !== undefined) {
-            updates.settings = {
-              ...result.settings,
-              ...syncData.settings,
-              syncEnabled: result.settings.syncEnabled
-            };
-          }
-          if (Object.keys(updates).length > 0) {
-            chrome.storage.local.set(updates);
-          }
-        });
+        import('./utils.js').then(({ syncFromCloudIfNeeded }) => {
+          syncFromCloudIfNeeded();
+        }).catch(err => console.warn('Failed to sync from cloud on storage change:', err));
       }
     });
   }

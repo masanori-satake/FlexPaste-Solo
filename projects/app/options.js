@@ -224,13 +224,48 @@ function loadStorage(callback) {
 }
 
 /**
- * 同期が有効な場合にカテゴリを同期ストレージへ保存する。
+ * 同期が有効な場合にカテゴリを分割して同期ストレージへ保存する。
  *
  * @param {Array<Object>} categories 保存対象のカテゴリ。
  */
+async function saveCategoriesToSync(categories) {
+  if (!appState.settings.syncEnabled || typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.sync) {
+    return;
+  }
+  const serialized = JSON.stringify(categories);
+  const CHUNK_SIZE = 7500; // Keep safely below 8192 bytes limit per item
+  const numChunks = Math.ceil(serialized.length / CHUNK_SIZE);
+
+  const syncItems = {
+    categories_chunk_count: numChunks
+  };
+
+  for (let i = 0; i < numChunks; i++) {
+    syncItems[`categories_chunk_${i}`] = serialized.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+  }
+
+  // Set new chunked keys (excluding unchunked single categories item to strictly obey 8KB per-item quota)
+  await chrome.storage.sync.set(syncItems);
+
+  // Remove deprecated unchunked categories key if present
+  await chrome.storage.sync.remove('categories');
+
+  // Clean up any extra trailing chunk keys from previous larger saves
+  const allSyncKeys = await chrome.storage.sync.get(null);
+  const keysToRemove = Object.keys(allSyncKeys).filter(k => {
+    if (!k.startsWith('categories_chunk_')) return false;
+    const idx = parseInt(k.replace('categories_chunk_', ''), 10);
+    return !isNaN(idx) && idx >= numChunks;
+  });
+
+  if (keysToRemove.length > 0) {
+    await chrome.storage.sync.remove(keysToRemove);
+  }
+}
+
 function saveCategories(categories) {
-  if (appState.settings.syncEnabled && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
-    chrome.storage.sync.set({ categories: appState.categories }).catch(e => {
+  if (appState.settings.syncEnabled) {
+    saveCategoriesToSync(categories).catch(e => {
       console.warn('Failed to sync categories to chrome.storage.sync:', e);
     });
   }
@@ -1218,7 +1253,8 @@ function setupEventHandlers() {
 
       if (!settingsOpt || !categoriesOpt) return;
 
-      appState.settings.syncEnabled = true;
+      let newSettings = { ...appState.settings, syncEnabled: true };
+      let newCategories = [...appState.categories];
 
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
         try {
@@ -1227,28 +1263,55 @@ function setupEventHandlers() {
           // Handle Settings Sync
           if (settingsOpt === 'from_sync' && syncData.settings) {
             const { syncEnabled, ...cloudSettings } = syncData.settings;
-            appState.settings = {
+            newSettings = {
               ...DEFAULT_SETTINGS,
               ...cloudSettings,
               syncEnabled: true
             };
           } else {
-            const { syncEnabled, ...syncableSettings } = appState.settings;
+            const { syncEnabled, ...syncableSettings } = newSettings;
             await chrome.storage.sync.set({ settings: syncableSettings });
           }
 
           // Handle Categories Sync
-          if (categoriesOpt === 'from_sync' && Array.isArray(syncData.categories)) {
-            appState.categories = syncData.categories;
-            if (appState.categories.length > 0) {
-              appState.selectedCategoryId = appState.categories[0].id;
+          if (categoriesOpt === 'from_sync') {
+            if (Array.isArray(syncData.categories)) {
+              newCategories = syncData.categories;
+            } else {
+              const allSync = await chrome.storage.sync.get(null);
+              if (typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
+                let reconstructed = '';
+                for (let i = 0; i < allSync.categories_chunk_count; i++) {
+                  if (typeof allSync[`categories_chunk_${i}`] === 'string') {
+                    reconstructed += allSync[`categories_chunk_${i}`];
+                  }
+                }
+                try {
+                  const parsed = JSON.parse(reconstructed);
+                  if (Array.isArray(parsed)) {
+                    validateAndNormalizeBackup({ categories: parsed });
+                    newCategories = parsed;
+                  }
+                } catch (err) {
+                  console.warn('Failed to parse chunked categories in modal confirm:', err);
+                }
+              }
             }
           } else {
-            await chrome.storage.sync.set({ categories: appState.categories });
+            await saveCategoriesToSync(newCategories);
           }
         } catch (e) {
           console.warn('Sync conflict resolution error:', e);
+          showToast('同期の設定処理に失敗しました');
+          return; // Stop and keep modal open without modifying appState or saving
         }
+      }
+
+      // Update state only after all sync operations succeed
+      appState.settings = newSettings;
+      appState.categories = newCategories;
+      if (!appState.categories.some(c => c.id === appState.selectedCategoryId) && appState.categories.length > 0) {
+        appState.selectedCategoryId = appState.categories[0].id;
       }
 
       saveStorage(true);
