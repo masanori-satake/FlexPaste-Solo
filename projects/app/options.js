@@ -1633,13 +1633,16 @@ if (typeof document !== 'undefined') {
         if (changes.settings?.newValue) {
           appState.settings = { ...DEFAULT_SETTINGS, ...changes.settings.newValue };
           renderWorkdays();
+          updateAllPreviews();
           renderSyncControls();
         }
         if (changes.categories?.newValue) {
+          invalidateClipboardPermissionSync();
           appState.categories = changes.categories.newValue;
           if (!appState.categories.some(c => c.id === appState.selectedCategoryId) && appState.categories.length > 0) {
             appState.selectedCategoryId = appState.categories[0].id;
           }
+          syncClipboardPermissions();
           renderCategoryList();
           renderCategoryEditor();
         }
