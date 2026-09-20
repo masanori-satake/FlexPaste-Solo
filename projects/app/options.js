@@ -1222,8 +1222,8 @@ function setupEventHandlers() {
   const syncEnabledSwitch = document.getElementById('sync-enabled-switch');
   if (syncEnabledSwitch) {
     syncEnabledSwitch.addEventListener('click', (e) => {
-      e.preventDefault();
       if (!appState.settings.syncEnabled) {
+        e.preventDefault();
         openSyncModal();
       } else {
         appState.settings.syncEnabled = false;
@@ -1261,13 +1261,15 @@ function setupEventHandlers() {
           const syncData = await chrome.storage.sync.get(['settings', 'categories']);
 
           // Handle Settings Sync
-          if (settingsOpt === 'from_sync' && syncData.settings) {
-            const { syncEnabled, ...cloudSettings } = syncData.settings;
-            newSettings = {
-              ...DEFAULT_SETTINGS,
-              ...cloudSettings,
-              syncEnabled: true
-            };
+          if (settingsOpt === 'from_sync') {
+            if (syncData.settings) {
+              const { syncEnabled, ...cloudSettings } = syncData.settings;
+              newSettings = {
+                ...DEFAULT_SETTINGS,
+                ...cloudSettings,
+                syncEnabled: true
+              };
+            }
           } else {
             const { syncEnabled, ...syncableSettings } = newSettings;
             await chrome.storage.sync.set({ settings: syncableSettings });
@@ -1276,7 +1278,13 @@ function setupEventHandlers() {
           // Handle Categories Sync
           if (categoriesOpt === 'from_sync') {
             if (Array.isArray(syncData.categories)) {
-              newCategories = syncData.categories;
+              const backup = { categories: syncData.categories };
+              const normalized = validateAndNormalizeBackup(backup);
+              if (normalized && Array.isArray(normalized.categories)) {
+                newCategories = normalized.categories;
+              } else {
+                newCategories = syncData.categories;
+              }
             } else {
               const allSync = await chrome.storage.sync.get(null);
               if (typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
@@ -1289,8 +1297,12 @@ function setupEventHandlers() {
                 try {
                   const parsed = JSON.parse(reconstructed);
                   if (Array.isArray(parsed)) {
-                    validateAndNormalizeBackup({ categories: parsed });
-                    newCategories = parsed;
+                    const normalized = validateAndNormalizeBackup({ categories: parsed });
+                    if (normalized && Array.isArray(normalized.categories)) {
+                      newCategories = normalized.categories;
+                    } else {
+                      newCategories = parsed;
+                    }
                   }
                 } catch (err) {
                   console.warn('Failed to parse chunked categories in modal confirm:', err);
@@ -1614,4 +1626,27 @@ if (typeof document !== 'undefined') {
       syncClipboardPermissions();
     });
   });
+
+  if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName === 'local' && appState.settings.syncEnabled) {
+        if (changes.settings?.newValue) {
+          appState.settings = { ...DEFAULT_SETTINGS, ...changes.settings.newValue };
+          renderWorkdays();
+          updateAllPreviews();
+          renderSyncControls();
+        }
+        if (changes.categories?.newValue) {
+          invalidateClipboardPermissionSync();
+          appState.categories = changes.categories.newValue;
+          if (!appState.categories.some(c => c.id === appState.selectedCategoryId) && appState.categories.length > 0) {
+            appState.selectedCategoryId = appState.categories[0].id;
+          }
+          syncClipboardPermissions();
+          renderCategoryList();
+          renderCategoryEditor();
+        }
+      }
+    });
+  }
 }
