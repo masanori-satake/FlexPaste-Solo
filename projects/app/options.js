@@ -376,6 +376,12 @@ function saveStorage(showNotification = true) {
       settings: appState.settings,
       categories: appState.categories
     }, () => {
+      const lastError = chrome.runtime && chrome.runtime.lastError;
+      if (lastError) {
+        console.warn('Failed to save to chrome.storage.local:', lastError);
+        isLocalSaving = false;
+        return;
+      }
       saveSettings(appState.settings);
       saveCategories(appState.categories);
       if (showNotification) showToast(getMessage('toastSaved'));
