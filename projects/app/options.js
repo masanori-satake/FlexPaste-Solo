@@ -52,7 +52,107 @@ let appState = {
 let lastFocusedEditor = null;
 let isComposing = false;
 let pendingRemoteSync = false;
-let isLocalSaving = false;
+let pendingRemoteCategories = null;
+let pendingSaveAfterEditing = false;
+let pendingSaveNotification = false;
+const locallyEditedCategoryIds = new Set();
+
+function cloneStorageValue(value) {
+  return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+}
+
+function storageValuesEqual(left, right) {
+  if (Object.is(left, right)) return true;
+  if (Array.isArray(left) || Array.isArray(right)) {
+    return Array.isArray(left)
+      && Array.isArray(right)
+      && left.length === right.length
+      && left.every((value, index) => storageValuesEqual(value, right[index]));
+  }
+  if (!left || !right || typeof left !== 'object' || typeof right !== 'object') return false;
+
+  const leftKeys = Object.keys(left);
+  const rightKeys = Object.keys(right);
+  return leftKeys.length === rightKeys.length
+    && leftKeys.every(key => Object.hasOwn(right, key) && storageValuesEqual(left[key], right[key]));
+}
+
+/** chrome.storage.local への自己書き込みをキーごとに追跡する。 */
+export function createLocalWriteTracker() {
+  let nextWriteId = 1;
+  const pendingByKey = new Map();
+
+  return {
+    track(values) {
+      const writeId = nextWriteId++;
+      Object.entries(values).forEach(([key, value]) => {
+        const pending = pendingByKey.get(key) || [];
+        pending.push({ writeId, value: cloneStorageValue(value) });
+        pendingByKey.set(key, pending);
+      });
+      return writeId;
+    },
+
+    filter(changes) {
+      const externalChanges = {};
+      Object.entries(changes).forEach(([key, change]) => {
+        const pending = pendingByKey.get(key) || [];
+        const matchIndex = pending.findIndex(entry => storageValuesEqual(entry.value, change.newValue));
+        if (matchIndex === -1) {
+          externalChanges[key] = change;
+          return;
+        }
+
+        pending.splice(matchIndex, 1);
+        if (pending.length === 0) {
+          pendingByKey.delete(key);
+        } else {
+          pendingByKey.set(key, pending);
+        }
+      });
+      return externalChanges;
+    },
+
+    discard(writeId) {
+      pendingByKey.forEach((pending, key) => {
+        const remaining = pending.filter(entry => entry.writeId !== writeId);
+        if (remaining.length === 0) {
+          pendingByKey.delete(key);
+        } else {
+          pendingByKey.set(key, remaining);
+        }
+      });
+    }
+  };
+}
+
+/**
+ * 編集競合を解決する。編集したカテゴリはローカル優先、それ以外はリモート優先とする。
+ */
+export function resolveDeferredCategories(localCategories, remoteCategories, editedCategoryIds) {
+  if (!Array.isArray(remoteCategories)) return localCategories;
+  if (!Array.isArray(localCategories)) return remoteCategories;
+
+  const editedIds = new Set(editedCategoryIds);
+  const localById = new Map(localCategories.map(category => [category.id, category]));
+  const merged = remoteCategories.map(category => (
+    editedIds.has(category.id) && localById.has(category.id)
+      ? localById.get(category.id)
+      : category
+  ));
+  const mergedIds = new Set(merged.map(category => category.id));
+
+  localCategories.forEach((category, index) => {
+    if (editedIds.has(category.id) && !mergedIds.has(category.id)) {
+      merged.splice(Math.min(index, merged.length), 0, category);
+      mergedIds.add(category.id);
+    }
+  });
+
+  return merged;
+}
+
+const localWriteTracker = createLocalWriteTracker();
 
 if (typeof document !== 'undefined') {
   document.addEventListener('compositionstart', () => {
@@ -87,10 +187,49 @@ function isEditing() {
   return false;
 }
 
-/** 編集終了後に保留中のリモート同期内容を画面へ反映する。 */
+/** 編集終了後に保留中のリモート同期内容を競合解決して画面へ反映する。 */
 function handleDeferredUpdatesIfIdle() {
-  if (pendingRemoteSync && !isEditing()) {
-    pendingRemoteSync = false;
+  if (isEditing()) return;
+
+  const remoteCategories = pendingRemoteCategories;
+  const shouldRender = pendingRemoteSync || remoteCategories !== null;
+  if (!shouldRender) {
+    locallyEditedCategoryIds.clear();
+    return;
+  }
+
+  let shouldSave = pendingSaveAfterEditing;
+  const showSaveNotification = pendingSaveNotification;
+
+  if (remoteCategories !== null) {
+    const mergedCategories = resolveDeferredCategories(
+      appState.categories,
+      remoteCategories,
+      locallyEditedCategoryIds
+    );
+    shouldSave ||= !storageValuesEqual(mergedCategories, remoteCategories);
+    invalidateClipboardPermissionSync();
+    appState.categories = mergedCategories;
+    if (!appState.categories.some(c => c.id === appState.selectedCategoryId)) {
+      appState.selectedCategoryId = appState.categories[0]?.id ?? null;
+    }
+    syncClipboardPermissions();
+  }
+
+  pendingRemoteSync = false;
+  pendingRemoteCategories = null;
+  pendingSaveAfterEditing = false;
+  pendingSaveNotification = false;
+  locallyEditedCategoryIds.clear();
+
+  if (remoteCategories !== null && saveDebounceTimer) {
+    clearTimeout(saveDebounceTimer);
+    saveDebounceTimer = null;
+    shouldSave = true;
+  }
+  if (shouldSave) saveStorage(showSaveNotification);
+
+  if (shouldRender) {
     renderWorkdays();
     renderSyncControls();
     renderCategoryList();
@@ -353,11 +492,29 @@ function saveCategories(categories) {
  * @param {Object} settings 保存対象の設定。
  */
 function saveSettings(settings) {
-  if (appState.settings.syncEnabled && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
-    const { syncEnabled, ...syncableSettings } = appState.settings;
+  if (settings.syncEnabled && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+    const { syncEnabled, ...syncableSettings } = settings;
     chrome.storage.sync.set({ settings: syncableSettings }).catch(e => {
       console.warn('Failed to sync settings to chrome.storage.sync:', e);
     });
+  }
+}
+
+function setLocalStorage(values, onSuccess) {
+  const writeId = localWriteTracker.track(values);
+  try {
+    chrome.storage.local.set(values, () => {
+      const error = chrome.runtime && chrome.runtime.lastError;
+      if (error) {
+        localWriteTracker.discard(writeId);
+        console.warn('Failed to save chrome.storage.local:', error.message);
+        return;
+      }
+      if (onSuccess) onSuccess();
+    });
+  } catch (error) {
+    localWriteTracker.discard(writeId);
+    console.warn('Failed to save chrome.storage.local:', error);
   }
 }
 
@@ -367,20 +524,24 @@ function saveSettings(settings) {
  * @param {boolean} [showNotification=true] 保存完了通知を表示するかどうか。
  */
 function saveStorage(showNotification = true) {
-  isLocalSaving = true;
+  if (pendingRemoteCategories !== null && isEditing()) {
+    pendingSaveAfterEditing = true;
+    pendingSaveNotification ||= showNotification;
+    return;
+  }
+
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local && typeof chrome.storage.local.set === 'function') {
-    chrome.storage.local.set({
-      settings: appState.settings,
-      categories: appState.categories
-    }, () => {
-      saveSettings(appState.settings);
-      saveCategories(appState.categories);
+    const values = {
+      settings: cloneStorageValue(appState.settings),
+      categories: cloneStorageValue(appState.categories)
+    };
+    setLocalStorage(values, () => {
+      saveSettings(values.settings);
+      saveCategories(values.categories);
       if (showNotification) showToast(getMessage('toastSaved'));
-      setTimeout(() => { isLocalSaving = false; }, 100);
     });
   } else {
     if (showNotification) showToast(getMessage('toastSaved'));
-    setTimeout(() => { isLocalSaving = false; }, 100);
   }
 }
 
@@ -389,6 +550,7 @@ function debouncedSaveStorage(delay = 300) {
     clearTimeout(saveDebounceTimer);
   }
   saveDebounceTimer = setTimeout(() => {
+    saveDebounceTimer = null;
     saveStorage(false);
   }, delay);
 }
@@ -974,6 +1136,7 @@ function renderCategoryEditor() {
     // Title edit with debounced save
     titleEl.addEventListener('input', (e) => {
       tpl.title = e.target.value;
+      locallyEditedCategoryIds.add(currentCat.id);
       debouncedSaveStorage();
     });
 
@@ -988,6 +1151,7 @@ function renderCategoryEditor() {
     // Update model and preview from contenteditable editor
     const updateContent = () => {
       tpl.content = getEditorContentString(contentEl);
+      locallyEditedCategoryIds.add(currentCat.id);
       previewEl.textContent = resolveVariables(tpl.content, {
         workdays: appState.settings.workdays,
         time_adj_interval: currentCat.time_adj_interval || 0,
@@ -1388,9 +1552,9 @@ function setupEventHandlers() {
 
       // Save to local storage
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local && typeof chrome.storage.local.set === 'function') {
-        chrome.storage.local.set({
-          settings: appState.settings,
-          categories: appState.categories
+        setLocalStorage({
+          settings: cloneStorageValue(appState.settings),
+          categories: cloneStorageValue(appState.categories)
         }, () => {
           showToast(getMessage('toastSaved'));
         });
@@ -1411,6 +1575,7 @@ function setupEventHandlers() {
     const currentCat = appState.categories.find(c => c.id === appState.selectedCategoryId);
     if (currentCat) {
       currentCat.title = e.target.value;
+      locallyEditedCategoryIds.add(currentCat.id);
       debouncedSaveStorage();
       renderCategoryList();
     }
@@ -1433,6 +1598,7 @@ function setupEventHandlers() {
 
     if (!currentCat) return;
 
+    locallyEditedCategoryIds.add(currentCat.id);
     pendingUsePasteStates.set(currentCat.id, checkbox.checked);
     pendingUsePasteCheckboxes.set(currentCat.id, checkbox);
     syncClipboardPermissions({
@@ -1449,6 +1615,7 @@ function setupEventHandlers() {
         const currentCat = appState.categories.find(c => c.id === appState.selectedCategoryId);
         if (currentCat) {
           currentCat[`def_${n}`] = e.target.value;
+          locallyEditedCategoryIds.add(currentCat.id);
           debouncedSaveStorage();
           updateAllPreviews();
         }
@@ -1700,49 +1867,49 @@ if (typeof document !== 'undefined') {
 
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
     chrome.storage.onChanged.addListener((changes, areaName) => {
-      if (areaName === 'local' && appState.settings.syncEnabled) {
-        if (isLocalSaving) {
-          return;
-        }
+      if (areaName === 'sync') {
+        if (appState.settings.syncEnabled) syncFromCloudIfNeeded();
+        return;
+      }
+      if (areaName !== 'local') return;
 
-        if (isEditing()) {
-          pendingRemoteSync = true;
-          if (changes.settings?.newValue) {
-            appState.settings = { ...DEFAULT_SETTINGS, ...changes.settings.newValue };
-          }
-          if (changes.categories?.newValue) {
-            invalidateClipboardPermissionSync();
-            appState.categories = changes.categories.newValue;
-            if (!appState.categories.some(c => c.id === appState.selectedCategoryId) && appState.categories.length > 0) {
-              appState.selectedCategoryId = appState.categories[0].id;
-            }
-            syncClipboardPermissions();
-          }
-          return;
-        }
+      const externalChanges = localWriteTracker.filter(changes);
+      if (!appState.settings.syncEnabled || Object.keys(externalChanges).length === 0) return;
+      const hasSettingsChange = Boolean(externalChanges.settings?.newValue);
+      const hasCategoriesChange = Array.isArray(externalChanges.categories?.newValue);
+      if (!hasSettingsChange && !hasCategoriesChange) return;
 
-        let shouldReRender = false;
-        if (changes.settings?.newValue) {
-          appState.settings = { ...DEFAULT_SETTINGS, ...changes.settings.newValue };
-          renderWorkdays();
-          updateAllPreviews();
-          renderSyncControls();
+      // focusout 後の遅延処理が走るまでの間も、直前の編集内容を競合解決対象に保つ。
+      if (isEditing() || locallyEditedCategoryIds.size > 0) {
+        pendingRemoteSync = true;
+        if (hasSettingsChange) {
+          appState.settings = { ...DEFAULT_SETTINGS, ...externalChanges.settings.newValue };
         }
-        if (changes.categories?.newValue) {
-          invalidateClipboardPermissionSync();
-          appState.categories = changes.categories.newValue;
-          if (!appState.categories.some(c => c.id === appState.selectedCategoryId) && appState.categories.length > 0) {
-            appState.selectedCategoryId = appState.categories[0].id;
-          }
-          syncClipboardPermissions();
-          shouldReRender = true;
+        if (hasCategoriesChange) {
+          pendingRemoteCategories = cloneStorageValue(externalChanges.categories.newValue);
         }
-        if (shouldReRender) {
-          renderCategoryList();
-          renderCategoryEditor();
+        return;
+      }
+
+      let shouldReRender = false;
+      if (hasSettingsChange) {
+        appState.settings = { ...DEFAULT_SETTINGS, ...externalChanges.settings.newValue };
+        renderWorkdays();
+        updateAllPreviews();
+        renderSyncControls();
+      }
+      if (hasCategoriesChange) {
+        invalidateClipboardPermissionSync();
+        appState.categories = externalChanges.categories.newValue;
+        if (!appState.categories.some(c => c.id === appState.selectedCategoryId)) {
+          appState.selectedCategoryId = appState.categories[0]?.id ?? null;
         }
-      } else if (areaName === 'sync' && appState.settings.syncEnabled) {
-        syncFromCloudIfNeeded();
+        syncClipboardPermissions();
+        shouldReRender = true;
+      }
+      if (shouldReRender) {
+        renderCategoryList();
+        renderCategoryEditor();
       }
     });
   }

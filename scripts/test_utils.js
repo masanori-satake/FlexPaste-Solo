@@ -1,7 +1,13 @@
 // scripts/test_utils.js - Unit tests for FlexPaste-Solo utils.js
 import assert from 'node:assert';
 import { adjustTime, resolveVariables, restoreCategoriesFromSync, syncFromCloudIfNeeded, validateImportData } from '../projects/app/utils.js';
-import { getEditorContentString, populateEditorFromText, validateAndNormalizeBackup } from '../projects/app/options.js';
+import {
+  createLocalWriteTracker,
+  getEditorContentString,
+  populateEditorFromText,
+  resolveDeferredCategories,
+  validateAndNormalizeBackup
+} from '../projects/app/options.js';
 
 console.log('Running unit tests for utils.js & options.js...');
 
@@ -413,6 +419,77 @@ console.log('Running unit tests for utils.js & options.js...');
   } finally {
     globalThis.document = originalDocument;
   }
+}
+
+// 12. Test local writes are filtered per key and support overlapping writes/failures
+{
+  const tracker = createLocalWriteTracker();
+  const firstWrite = tracker.track({
+    settings: { workdays: [1, 2, 3] },
+    categories: [{ id: 'cat_1', title: 'First' }]
+  });
+  tracker.track({
+    settings: { workdays: [1, 2, 3, 4] },
+    categories: [{ id: 'cat_1', title: 'Second' }]
+  });
+
+  const mixedChanges = tracker.filter({
+    settings: { newValue: { workdays: [7] } },
+    categories: { newValue: [{ id: 'cat_1', title: 'Second' }] }
+  });
+  assert.deepStrictEqual(
+    mixedChanges,
+    { settings: { newValue: { workdays: [7] } } },
+    'A matching self-written category must not hide an unrelated external settings change'
+  );
+
+  assert.deepStrictEqual(
+    tracker.filter({ categories: { newValue: [{ id: 'cat_1', title: 'First' }] } }),
+    {},
+    'Overlapping writes must be matched by value rather than timing/order'
+  );
+
+  tracker.discard(firstWrite);
+  assert.deepStrictEqual(
+    tracker.filter({ settings: { newValue: { workdays: [1, 2, 3] } } }),
+    { settings: { newValue: { workdays: [1, 2, 3] } } },
+    'Values from a failed write must no longer be treated as self-written'
+  );
+}
+
+// 13. Test deferred category conflict priority
+{
+  const localCategories = [
+    { id: 'cat_edited', title: 'Local edit', templates: [] },
+    { id: 'cat_remote', title: 'Stale local value', templates: [] },
+    { id: 'cat_deleted_remotely', title: 'Edited locally', templates: [] }
+  ];
+  const remoteCategories = [
+    { id: 'cat_remote', title: 'Fresh remote value', templates: [] },
+    { id: 'cat_edited', title: 'Conflicting remote edit', templates: [] }
+  ];
+
+  const merged = resolveDeferredCategories(
+    localCategories,
+    remoteCategories,
+    new Set(['cat_edited', 'cat_deleted_remotely'])
+  );
+
+  assert.deepStrictEqual(
+    merged.map(category => [category.id, category.title]),
+    [
+      ['cat_remote', 'Fresh remote value'],
+      ['cat_edited', 'Local edit'],
+      ['cat_deleted_remotely', 'Edited locally']
+    ],
+    'Edited categories must win conflicts while remote values/order win for unedited categories'
+  );
+
+  assert.deepStrictEqual(
+    resolveDeferredCategories(localCategories, remoteCategories, new Set()),
+    remoteCategories,
+    'Without local edits the deferred remote snapshot must win completely'
+  );
 }
 
 console.log('All unit tests passed successfully!');
