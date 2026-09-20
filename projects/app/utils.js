@@ -302,6 +302,20 @@ export function restoreCategoriesFromSync(allSync, parseErrorMessage = 'Failed t
   return Array.isArray(allSync?.categories) ? allSync.categories : null;
 }
 
+let localSyncMutex = Promise.resolve();
+
+/**
+ * ローカルストレージ保存・同期タスクを直列化キューで実行する。
+ *
+ * @param {Function} task 実行する非同期タスク。
+ * @returns {Promise<*>} タスクの実行結果を表す Promise。
+ */
+export function runInLocalSyncMutex(task) {
+  const next = localSyncMutex.then(() => task(), () => task());
+  localSyncMutex = next.catch(() => {});
+  return next;
+}
+
 let syncSaveQueue = Promise.resolve();
 
 /**
@@ -360,74 +374,77 @@ export function saveCategoriesToSync(categories, force = false) {
  *
  * @returns {Promise<void>} 同期処理の完了を表す Promise。
  */
-export async function syncFromCloudIfNeeded() {
+export function syncFromCloudIfNeeded() {
   if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local || !chrome.storage.sync) {
-    return;
+    return Promise.resolve();
   }
-  try {
-    const local = await chrome.storage.local.get(['settings', 'categories', 'local_sync_pending']);
-    const isSyncEnabled = local.settings?.syncEnabled ?? false;
-    if (!isSyncEnabled) return;
 
-    if (local.local_sync_pending) {
-      // Pending local updates exist (e.g. previous save/transmission interrupted or failed).
-      // Attempt to push local changes to cloud instead of overwriting local data with stale cloud data.
-      try {
-        if (local.settings) {
-          const { syncEnabled, ...syncableSettings } = local.settings;
-          await chrome.storage.sync.set({ settings: syncableSettings });
+  return runInLocalSyncMutex(async () => {
+    try {
+      const local = await chrome.storage.local.get(['settings', 'categories', 'local_sync_pending']);
+      const isSyncEnabled = local.settings?.syncEnabled ?? false;
+      if (!isSyncEnabled) return;
+
+      if (local.local_sync_pending) {
+        // Pending local updates exist (e.g. previous save/transmission interrupted or failed).
+        // Attempt to push local changes to cloud instead of overwriting local data with stale cloud data.
+        try {
+          if (local.settings) {
+            const { syncEnabled, ...syncableSettings } = local.settings;
+            await chrome.storage.sync.set({ settings: syncableSettings });
+          }
+          if (Array.isArray(local.categories)) {
+            await saveCategoriesToSync(local.categories, true);
+          }
+          await chrome.storage.local.set({ local_sync_pending: false });
+          return;
+        } catch (err) {
+          console.warn('Failed to push pending local changes to cloud during sync recovery:', err);
+          return;
         }
-        if (Array.isArray(local.categories)) {
-          await saveCategoriesToSync(local.categories, true);
+      }
+
+      const allSync = await chrome.storage.sync.get(null);
+      if (!allSync || Object.keys(allSync).length === 0) return;
+
+      const categoriesFromSync = restoreCategoriesFromSync(allSync);
+
+      const updates = {};
+      // Clean up orphaned chunk keys in cloud if chunk count is valid
+      const count = allSync.categories_chunk_count;
+      if (Number.isInteger(count) && count > 0 && count <= 100) {
+        const orphanKeys = Object.keys(allSync).filter(k => {
+          if (!k.startsWith('categories_chunk_')) return false;
+          const idx = parseInt(k.replace('categories_chunk_', ''), 10);
+          return !isNaN(idx) && idx >= count;
+        });
+        if (orphanKeys.length > 0) {
+          await chrome.storage.sync.remove(orphanKeys);
         }
-        await chrome.storage.local.set({ local_sync_pending: false });
-        return;
-      } catch (err) {
-        console.warn('Failed to push pending local changes to cloud during sync recovery:', err);
-        return;
       }
-    }
 
-    const allSync = await chrome.storage.sync.get(null);
-    if (!allSync || Object.keys(allSync).length === 0) return;
-
-    const categoriesFromSync = restoreCategoriesFromSync(allSync);
-
-    const updates = {};
-    // Clean up orphaned chunk keys in cloud if chunk count is valid
-    const count = allSync.categories_chunk_count;
-    if (Number.isInteger(count) && count > 0 && count <= 100) {
-      const orphanKeys = Object.keys(allSync).filter(k => {
-        if (!k.startsWith('categories_chunk_')) return false;
-        const idx = parseInt(k.replace('categories_chunk_', ''), 10);
-        return !isNaN(idx) && idx >= count;
-      });
-      if (orphanKeys.length > 0) {
-        await chrome.storage.sync.remove(orphanKeys);
+      if (categoriesFromSync) {
+        const dataToValidate = { categories: categoriesFromSync };
+        validateImportData(dataToValidate);
+        updates.categories = dataToValidate.categories;
       }
-    }
 
-    if (categoriesFromSync) {
-      const dataToValidate = { categories: categoriesFromSync };
-      validateImportData(dataToValidate);
-      updates.categories = dataToValidate.categories;
-    }
+      if (allSync.settings && typeof allSync.settings === 'object') {
+        const currentLocalSettings = local.settings || {};
+        updates.settings = {
+          ...DEFAULT_SETTINGS,
+          ...allSync.settings,
+          syncEnabled: currentLocalSettings.syncEnabled ?? true
+        };
+      }
 
-    if (allSync.settings && typeof allSync.settings === 'object') {
-      const currentLocalSettings = local.settings || {};
-      updates.settings = {
-        ...DEFAULT_SETTINGS,
-        ...allSync.settings,
-        syncEnabled: currentLocalSettings.syncEnabled ?? true
-      };
+      if (Object.keys(updates).length > 0) {
+        await chrome.storage.local.set(updates);
+      }
+    } catch (e) {
+      console.warn('Failed to sync from cloud:', e);
     }
-
-    if (Object.keys(updates).length > 0) {
-      await chrome.storage.local.set(updates);
-    }
-  } catch (e) {
-    console.warn('Failed to sync from cloud:', e);
-  }
+  });
 }
 
 export function padZero(num) {

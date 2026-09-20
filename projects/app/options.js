@@ -1,5 +1,5 @@
 // options.js - Options Page Script for FlexPaste-Solo
-import { DEFAULT_DATA, DEFAULT_SETTINGS, getMessage, resolveVariables, restoreCategoriesFromSync, saveCategoriesToSync, syncFromCloudIfNeeded } from './utils.js';
+import { DEFAULT_DATA, DEFAULT_SETTINGS, getMessage, resolveVariables, restoreCategoriesFromSync, runInLocalSyncMutex, saveCategoriesToSync, syncFromCloudIfNeeded } from './utils.js';
 
 /**
  * 利用可能な動的変数と表示情報の対応表を返す。
@@ -336,33 +336,37 @@ function saveSettings(settings) {
 function saveStorage(showNotification = true) {
   isLocalSaving = true;
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local && typeof chrome.storage.local.set === 'function') {
-    const isSyncEnabled = Boolean(appState.settings.syncEnabled);
-    const localData = {
-      settings: appState.settings,
-      categories: appState.categories
-    };
-
-    if (isSyncEnabled) {
-      localData.local_sync_pending = true;
-    }
-
-    chrome.storage.local.set(localData, () => {
-      const lastError = chrome.runtime && chrome.runtime.lastError;
-      if (lastError) {
-        console.warn('Failed to save to chrome.storage.local:', lastError);
-        isLocalSaving = false;
-        return;
-      }
+    runInLocalSyncMutex(async () => {
+      const isSyncEnabled = Boolean(appState.settings.syncEnabled);
+      const localData = {
+        settings: appState.settings,
+        categories: appState.categories
+      };
 
       if (isSyncEnabled) {
-        Promise.all([
-          saveSettings(appState.settings),
-          saveCategories(appState.categories)
-        ]).then(() => {
-          chrome.storage.local.set({ local_sync_pending: false }).catch(() => {});
-        }).catch((e) => {
-          console.warn('Cloud transmission failed, local_sync_pending flag preserved for recovery:', e);
+        localData.local_sync_pending = true;
+      }
+
+      await new Promise((resolve) => {
+        chrome.storage.local.set(localData, () => {
+          const lastError = chrome.runtime && chrome.runtime.lastError;
+          if (lastError) {
+            console.warn('Failed to save to chrome.storage.local:', lastError);
+          }
+          resolve();
         });
+      });
+
+      if (isSyncEnabled) {
+        try {
+          await Promise.all([
+            saveSettings(appState.settings),
+            saveCategories(appState.categories)
+          ]);
+          await chrome.storage.local.set({ local_sync_pending: false });
+        } catch (e) {
+          console.warn('Cloud transmission failed, local_sync_pending flag preserved for recovery:', e);
+        }
       }
 
       if (showNotification) showToast(getMessage('toastSaved'));
