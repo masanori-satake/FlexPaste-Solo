@@ -302,6 +302,59 @@ export function restoreCategoriesFromSync(allSync, parseErrorMessage = 'Failed t
   return Array.isArray(allSync?.categories) ? allSync.categories : null;
 }
 
+let syncSaveQueue = Promise.resolve();
+
+/**
+ * 同期が有効な場合にカテゴリを分割して同期ストレージへ保存する。
+ * 各保存処理をシリアライズし、順次実行を保証する。
+ *
+ * @param {Array<Object>} categories 保存対象のカテゴリ。
+ * @param {boolean} [force=false] 強制保存を行うかどうか。
+ * @returns {Promise<void>}
+ */
+export function saveCategoriesToSync(categories, force = false) {
+  if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.sync) {
+    return Promise.resolve();
+  }
+
+  const runSave = async () => {
+    const serialized = JSON.stringify(categories);
+    // Strictly enforce safe byte chunks (3500 UTF-8 bytes max per chunk) to stay well under Chrome's 8192 byte QUOTA_BYTES_PER_ITEM limit
+    const chunks = splitStringToByteChunks(serialized, 3500);
+    const numChunks = chunks.length;
+
+    const syncItems = {
+      categories_chunk_count: numChunks
+    };
+
+    for (let i = 0; i < numChunks; i++) {
+      syncItems[`categories_chunk_${i}`] = chunks[i];
+    }
+
+    // Set new chunked keys (excluding unchunked single categories item to strictly obey 8KB per-item quota)
+    await chrome.storage.sync.set(syncItems);
+
+    // Remove deprecated unchunked categories key if present
+    await chrome.storage.sync.remove('categories');
+
+    // Clean up any extra trailing chunk keys from previous larger saves
+    const allSyncKeys = await chrome.storage.sync.get(null);
+    const keysToRemove = Object.keys(allSyncKeys).filter(k => {
+      if (!k.startsWith('categories_chunk_')) return false;
+      const idx = parseInt(k.replace('categories_chunk_', ''), 10);
+      return !isNaN(idx) && idx >= numChunks;
+    });
+
+    if (keysToRemove.length > 0) {
+      await chrome.storage.sync.remove(keysToRemove);
+    }
+  };
+
+  const nextPromise = syncSaveQueue.then(runSave, runSave);
+  syncSaveQueue = nextPromise.catch(() => {});
+  return nextPromise;
+}
+
 /**
  * 端末で同期が有効な場合に同期ストレージのデータをローカルへ反映する。
  *
@@ -312,9 +365,28 @@ export async function syncFromCloudIfNeeded() {
     return;
   }
   try {
-    const local = await chrome.storage.local.get(['settings', 'categories']);
+    const local = await chrome.storage.local.get(['settings', 'categories', 'local_sync_pending']);
     const isSyncEnabled = local.settings?.syncEnabled ?? false;
     if (!isSyncEnabled) return;
+
+    if (local.local_sync_pending) {
+      // Pending local updates exist (e.g. previous save/transmission interrupted or failed).
+      // Attempt to push local changes to cloud instead of overwriting local data with stale cloud data.
+      try {
+        if (local.settings) {
+          const { syncEnabled, ...syncableSettings } = local.settings;
+          await chrome.storage.sync.set({ settings: syncableSettings });
+        }
+        if (Array.isArray(local.categories)) {
+          await saveCategoriesToSync(local.categories, true);
+        }
+        await chrome.storage.local.set({ local_sync_pending: false });
+        return;
+      } catch (err) {
+        console.warn('Failed to push pending local changes to cloud during sync recovery:', err);
+        return;
+      }
+    }
 
     const allSync = await chrome.storage.sync.get(null);
     if (!allSync || Object.keys(allSync).length === 0) return;
@@ -322,6 +394,19 @@ export async function syncFromCloudIfNeeded() {
     const categoriesFromSync = restoreCategoriesFromSync(allSync);
 
     const updates = {};
+    // Clean up orphaned chunk keys in cloud if chunk count is valid
+    const count = allSync.categories_chunk_count;
+    if (Number.isInteger(count) && count > 0 && count <= 100) {
+      const orphanKeys = Object.keys(allSync).filter(k => {
+        if (!k.startsWith('categories_chunk_')) return false;
+        const idx = parseInt(k.replace('categories_chunk_', ''), 10);
+        return !isNaN(idx) && idx >= count;
+      });
+      if (orphanKeys.length > 0) {
+        await chrome.storage.sync.remove(orphanKeys);
+      }
+    }
+
     if (categoriesFromSync) {
       const dataToValidate = { categories: categoriesFromSync };
       validateImportData(dataToValidate);
