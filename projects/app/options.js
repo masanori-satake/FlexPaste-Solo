@@ -50,6 +50,47 @@ let appState = {
 };
 
 let lastFocusedEditor = null;
+let isComposing = false;
+let pendingRemoteSync = false;
+let isLocalSaving = false;
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('compositionstart', () => {
+    isComposing = true;
+  }, true);
+
+  document.addEventListener('compositionend', () => {
+    isComposing = false;
+    handleDeferredUpdatesIfIdle();
+  }, true);
+
+  document.addEventListener('focusout', () => {
+    setTimeout(() => {
+      handleDeferredUpdatesIfIdle();
+    }, 50);
+  }, true);
+}
+
+function isEditing() {
+  if (isComposing) return true;
+  const active = document.activeElement;
+  if (!active) return false;
+  const tagName = active.tagName;
+  if (tagName === 'INPUT' || tagName === 'TEXTAREA' || active.isContentEditable || active.classList?.contains('tpl-content-editor')) {
+    return true;
+  }
+  return false;
+}
+
+function handleDeferredUpdatesIfIdle() {
+  if (pendingRemoteSync && !isEditing()) {
+    pendingRemoteSync = false;
+    renderWorkdays();
+    renderSyncControls();
+    renderCategoryList();
+    renderCategoryEditor();
+  }
+}
 
 // Helper: Create inline variable chip element
 function createChipNode(tag) {
@@ -71,51 +112,70 @@ function createChipNode(tag) {
 }
 
 // Helper: Convert raw template content text (containing {{variable}}) into DOM nodes with inline chips
-function populateEditorFromText(container, text) {
+export function populateEditorFromText(container, text) {
   container.innerHTML = '';
   if (!text) return;
 
-  const regex = /\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g;
-  let lastIndex = 0;
-  let match;
-
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      const textNode = document.createTextNode(text.substring(lastIndex, match.index));
-      container.appendChild(textNode);
-    }
-    const fullTag = `{{${match[1]}}}`;
-    const chipNode = createChipNode(fullTag);
-    container.appendChild(chipNode);
-    lastIndex = regex.lastIndex;
+  // Split trailing newlines so they can be rendered as <br> elements,
+  // preventing Blink/WebKit contenteditable from collapsing trailing empty lines.
+  let mainText = text;
+  let trailingNewlineCount = 0;
+  const matchTrailing = text.match(/(\r?\n)+$/);
+  if (matchTrailing) {
+    const trailingStr = matchTrailing[0];
+    trailingNewlineCount = (trailingStr.match(/\n/g) || []).length;
+    mainText = text.slice(0, text.length - trailingStr.length);
   }
 
-  if (lastIndex < text.length) {
-    const textNode = document.createTextNode(text.substring(lastIndex));
-    container.appendChild(textNode);
+  if (mainText) {
+    const regex = /\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(mainText)) !== null) {
+      if (match.index > lastIndex) {
+        const textNode = document.createTextNode(mainText.substring(lastIndex, match.index));
+        container.appendChild(textNode);
+      }
+      const fullTag = `{{${match[1]}}}`;
+      const chipNode = createChipNode(fullTag);
+      container.appendChild(chipNode);
+      lastIndex = regex.lastIndex;
+    }
+
+    if (lastIndex < mainText.length) {
+      const textNode = document.createTextNode(mainText.substring(lastIndex));
+      container.appendChild(textNode);
+    }
+  }
+
+  for (let i = 0; i < trailingNewlineCount; i++) {
+    container.appendChild(document.createElement('br'));
   }
 }
 
 // Helper: Convert contenteditable element's DOM back to raw template text string (with {{variable}})
-function getEditorContentString(container) {
+export function getEditorContentString(container) {
   let result = '';
 
   function processNode(node) {
-    if (node.nodeType === Node.TEXT_NODE) {
+    if (node.nodeType === 3 /* Node.TEXT_NODE */) {
       result += node.nodeValue;
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
+    } else if (node.nodeType === 1 /* Node.ELEMENT_NODE */) {
       if (node.classList && node.classList.contains('tpl-chip')) {
         result += node.dataset.tag || '';
       } else if (node.tagName === 'BR') {
         result += '\n';
       } else if (node.tagName === 'DIV' || node.tagName === 'P') {
+        let addedPrefixNewline = false;
         if (result.length > 0 && !result.endsWith('\n')) {
           result += '\n';
+          addedPrefixNewline = true;
         }
-        // If the block contains only a single BR, ensure a newline is added even if result is empty or ends with a newline
         const children = Array.from(node.childNodes);
-        if (children.length === 1 && children[0].tagName === 'BR') {
-          if (!result.endsWith('\n')) {
+        const isBlockEmpty = children.length === 0 || (children.length === 1 && children[0].tagName === 'BR');
+        if (isBlockEmpty) {
+          if (!addedPrefixNewline) {
             result += '\n';
           }
         } else {
@@ -291,6 +351,7 @@ function saveSettings(settings) {
  * @param {boolean} [showNotification=true] 保存完了通知を表示するかどうか。
  */
 function saveStorage(showNotification = true) {
+  isLocalSaving = true;
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local && typeof chrome.storage.local.set === 'function') {
     chrome.storage.local.set({
       settings: appState.settings,
@@ -299,9 +360,11 @@ function saveStorage(showNotification = true) {
       saveSettings(appState.settings);
       saveCategories(appState.categories);
       if (showNotification) showToast(getMessage('toastSaved'));
+      setTimeout(() => { isLocalSaving = false; }, 100);
     });
-  } else if (showNotification) {
-    showToast(getMessage('toastSaved'));
+  } else {
+    if (showNotification) showToast(getMessage('toastSaved'));
+    setTimeout(() => { isLocalSaving = false; }, 100);
   }
 }
 
@@ -945,32 +1008,32 @@ function renderCategoryEditor() {
           const offset = range.startOffset;
 
           if (e.key === 'Backspace') {
-            if (container.nodeType === Node.ELEMENT_NODE) {
+            if (container.nodeType === 1 /* Node.ELEMENT_NODE */) {
               const prevChild = container.childNodes[offset - 1];
-              if (prevChild && prevChild.nodeType === Node.ELEMENT_NODE && prevChild.classList.contains('tpl-chip')) {
+              if (prevChild && prevChild.nodeType === 1 && prevChild.classList.contains('tpl-chip')) {
                 e.preventDefault();
                 prevChild.remove();
                 updateContent();
               }
-            } else if (container.nodeType === Node.TEXT_NODE && offset === 0) {
+            } else if (container.nodeType === 3 /* Node.TEXT_NODE */ && offset === 0) {
               let prevNode = container.previousSibling;
-              if (prevNode && prevNode.nodeType === Node.ELEMENT_NODE && prevNode.classList.contains('tpl-chip')) {
+              if (prevNode && prevNode.nodeType === 1 && prevNode.classList.contains('tpl-chip')) {
                 e.preventDefault();
                 prevNode.remove();
                 updateContent();
               }
             }
           } else if (e.key === 'Delete') {
-            if (container.nodeType === Node.ELEMENT_NODE) {
+            if (container.nodeType === 1 /* Node.ELEMENT_NODE */) {
               const nextChild = container.childNodes[offset];
-              if (nextChild && nextChild.nodeType === Node.ELEMENT_NODE && nextChild.classList.contains('tpl-chip')) {
+              if (nextChild && nextChild.nodeType === 1 && nextChild.classList.contains('tpl-chip')) {
                 e.preventDefault();
                 nextChild.remove();
                 updateContent();
               }
-            } else if (container.nodeType === Node.TEXT_NODE && offset === container.nodeValue.length) {
+            } else if (container.nodeType === 3 /* Node.TEXT_NODE */ && offset === container.nodeValue.length) {
               let nextNode = container.nextSibling;
-              if (nextNode && nextNode.nodeType === Node.ELEMENT_NODE && nextNode.classList.contains('tpl-chip')) {
+              if (nextNode && nextNode.nodeType === 1 && nextNode.classList.contains('tpl-chip')) {
                 e.preventDefault();
                 nextNode.remove();
                 updateContent();
@@ -1622,6 +1685,27 @@ if (typeof document !== 'undefined') {
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
     chrome.storage.onChanged.addListener((changes, areaName) => {
       if (areaName === 'local' && appState.settings.syncEnabled) {
+        if (isLocalSaving) {
+          return;
+        }
+
+        if (isEditing()) {
+          pendingRemoteSync = true;
+          if (changes.settings?.newValue) {
+            appState.settings = { ...DEFAULT_SETTINGS, ...changes.settings.newValue };
+          }
+          if (changes.categories?.newValue) {
+            invalidateClipboardPermissionSync();
+            appState.categories = changes.categories.newValue;
+            if (!appState.categories.some(c => c.id === appState.selectedCategoryId) && appState.categories.length > 0) {
+              appState.selectedCategoryId = appState.categories[0].id;
+            }
+            syncClipboardPermissions();
+          }
+          return;
+        }
+
+        let shouldReRender = false;
         if (changes.settings?.newValue) {
           appState.settings = { ...DEFAULT_SETTINGS, ...changes.settings.newValue };
           renderWorkdays();
@@ -1635,6 +1719,9 @@ if (typeof document !== 'undefined') {
             appState.selectedCategoryId = appState.categories[0].id;
           }
           syncClipboardPermissions();
+          shouldReRender = true;
+        }
+        if (shouldReRender) {
           renderCategoryList();
           renderCategoryEditor();
         }
