@@ -410,6 +410,7 @@ export function syncFromCloudIfNeeded() {
       const categoriesFromSync = restoreCategoriesFromSync(allSync);
 
       const updates = {};
+      const dataToValidate = {};
       // Clean up orphaned chunk keys in cloud if chunk count is valid
       const count = allSync.categories_chunk_count;
       if (Number.isInteger(count) && count > 0 && count <= 100) {
@@ -424,16 +425,24 @@ export function syncFromCloudIfNeeded() {
       }
 
       if (categoriesFromSync) {
-        const dataToValidate = { categories: categoriesFromSync };
-        validateImportData(dataToValidate);
-        updates.categories = dataToValidate.categories;
+        dataToValidate.categories = categoriesFromSync;
       }
 
       if (allSync.settings && typeof allSync.settings === 'object') {
+        dataToValidate.settings = { ...allSync.settings };
+      }
+
+      validateImportData(dataToValidate);
+
+      if (dataToValidate.categories) {
+        updates.categories = dataToValidate.categories;
+      }
+
+      if (dataToValidate.settings) {
         const currentLocalSettings = local.settings || {};
         updates.settings = {
           ...DEFAULT_SETTINGS,
-          ...allSync.settings,
+          ...dataToValidate.settings,
           syncEnabled: currentLocalSettings.syncEnabled ?? true
         };
       }

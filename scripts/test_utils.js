@@ -242,7 +242,7 @@ console.log('Running unit tests for utils.js & options.js...');
   const serializedCats = JSON.stringify(sampleCategories);
   const legacyCategories = [{ id: 'cat_legacy', title: 'Legacy Category', templates: [] }];
   const mockSyncStorage = {
-    settings: { workdays: [1, 2, 3, 4, 5, 6] },
+    settings: { workdays: [1, '2', 0, 8], syncEnabled: false },
     categories: legacyCategories,
     categories_chunk_count: 1,
     categories_chunk_0: serializedCats
@@ -282,8 +282,8 @@ console.log('Running unit tests for utils.js & options.js...');
   await syncFromCloudIfNeeded();
 
   assert.notStrictEqual(localSavedData, null, 'Local storage should be updated by syncFromCloudIfNeeded');
-  assert.deepStrictEqual(localSavedData.settings.workdays, [1, 2, 3, 4, 5, 6], 'Cloud settings workdays should be applied');
-  assert.strictEqual(localSavedData.settings.syncEnabled, true, 'syncEnabled should remain true in local settings');
+  assert.deepStrictEqual(localSavedData.settings.workdays, [1, 2], 'Cloud settings workdays should be normalized before applying');
+  assert.strictEqual(localSavedData.settings.syncEnabled, true, 'Local syncEnabled should take precedence over cloud settings');
   assert.strictEqual(localSavedData.categories.length, 1, 'Chunked categories from cloud should be reconstructed and saved');
   assert.strictEqual(localSavedData.categories[0].id, 'cat_cloud_1', 'Valid chunked categories should take precedence over legacy categories');
 

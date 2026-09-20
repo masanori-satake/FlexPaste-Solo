@@ -336,7 +336,7 @@ function saveSettings(settings) {
 function saveStorage(showNotification = true) {
   isLocalSaving = true;
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local && typeof chrome.storage.local.set === 'function') {
-    runInLocalSyncMutex(async () => {
+    const savePromise = runInLocalSyncMutex(async () => {
       const isSyncEnabled = Boolean(appState.settings.syncEnabled);
       const localData = {
         settings: appState.settings,
@@ -347,11 +347,13 @@ function saveStorage(showNotification = true) {
         localData.local_sync_pending = true;
       }
 
-      await new Promise((resolve) => {
+      await new Promise((resolve, reject) => {
         chrome.storage.local.set(localData, () => {
           const lastError = chrome.runtime && chrome.runtime.lastError;
           if (lastError) {
             console.warn('Failed to save to chrome.storage.local:', lastError);
+            reject(lastError);
+            return;
           }
           resolve();
         });
@@ -370,8 +372,13 @@ function saveStorage(showNotification = true) {
       }
 
       if (showNotification) showToast(getMessage('toastSaved'));
-      setTimeout(() => { isLocalSaving = false; }, 100);
     });
+
+    savePromise.then(
+      () => setTimeout(() => { isLocalSaving = false; }, 100),
+      () => setTimeout(() => { isLocalSaving = false; }, 100)
+    );
+    return savePromise;
   } else {
     if (showNotification) showToast(getMessage('toastSaved'));
     setTimeout(() => { isLocalSaving = false; }, 100);
