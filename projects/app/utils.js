@@ -161,11 +161,18 @@ export function validateImportData(data) {
   if (Array.isArray(data.categories)) {
     const seenCatIds = new Set();
     const seenTplIds = new Set();
+    const createUniqueId = (prefix, seenIds) => {
+      let id;
+      do {
+        id = `${prefix}_${crypto.randomUUID()}`;
+      } while (seenIds.has(id));
+      return id;
+    };
 
     data.categories = data.categories.slice(0, MAX_CATEGORIES).map((cat, catIdx) => {
-      let catId = typeof cat?.id === 'string' && cat.id ? sanitizeStr(cat.id, 100) : `cat_${Date.now()}_${catIdx}`;
+      let catId = typeof cat?.id === 'string' && cat.id ? sanitizeStr(cat.id, 100) : '';
       if (!catId || seenCatIds.has(catId)) {
-        catId = `cat_${Date.now()}_${catIdx}_${Math.random().toString(36).substring(2, 7)}`;
+        catId = createUniqueId('cat', seenCatIds);
       }
       seenCatIds.add(catId);
 
@@ -177,9 +184,9 @@ export function validateImportData(data) {
       const def3 = typeof cat?.def_3 === 'string' ? sanitizeStr(cat.def_3, MAX_TITLE_LEN) : '';
 
       const templates = Array.isArray(cat?.templates) ? cat.templates.slice(0, MAX_TEMPLATES).map((tpl, tplIdx) => {
-        let tplId = typeof tpl?.id === 'string' && tpl.id ? sanitizeStr(tpl.id, 100) : `tpl_${Date.now()}_${tplIdx}`;
+        let tplId = typeof tpl?.id === 'string' && tpl.id ? sanitizeStr(tpl.id, 100) : '';
         if (!tplId || seenTplIds.has(tplId)) {
-          tplId = `tpl_${Date.now()}_${tplIdx}_${Math.random().toString(36).substring(2, 7)}`;
+          tplId = createUniqueId('tpl', seenTplIds);
         }
         seenTplIds.add(tplId);
 
