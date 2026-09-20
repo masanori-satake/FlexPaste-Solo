@@ -478,6 +478,20 @@ console.log('Running unit tests for utils.js & options.js...');
     assert.ok(chunkByteLen <= 3500, `Chunk ${i} byte length (${chunkByteLen}) must be <= 3500 bytes`);
   }
 
+  for (const invalidMaxBytes of [0, -1, 1.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1, '3500']) {
+    assert.throws(
+      () => splitStringToByteChunks('test', invalidMaxBytes),
+      RangeError,
+      `maxBytes=${String(invalidMaxBytes)} must be rejected`
+    );
+  }
+
+  assert.throws(
+    () => splitStringToByteChunks('あ', 1),
+    RangeError,
+    'A byte limit smaller than the next UTF-8 character must be rejected'
+  );
+
   // Test restoration of multi-chunk Japanese text via restoreCategoriesFromSync
   const testCategories = [
     {
