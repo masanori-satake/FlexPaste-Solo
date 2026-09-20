@@ -214,6 +214,43 @@ export function validateImportData(data) {
 }
 
 /**
+ * 同期ストレージからカテゴリを復元する。
+ * チャンク形式を優先し、復元できない場合のみ旧形式へフォールバックする。
+ *
+ * @param {Object} allSync 同期ストレージの全データ。
+ * @param {string} [parseErrorMessage] JSON 解析失敗時の警告文。
+ * @returns {Array<Object>|null} 復元したカテゴリ。利用可能なデータがなければ null。
+ */
+export function restoreCategoriesFromSync(allSync, parseErrorMessage = 'Failed to parse chunked categories:') {
+  if (allSync && typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
+    const chunks = [];
+    let hasAllChunks = true;
+
+    for (let i = 0; i < allSync.categories_chunk_count; i++) {
+      const chunk = allSync[`categories_chunk_${i}`];
+      if (typeof chunk !== 'string') {
+        hasAllChunks = false;
+        break;
+      }
+      chunks.push(chunk);
+    }
+
+    if (hasAllChunks) {
+      try {
+        const parsed = JSON.parse(chunks.join(''));
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } catch (e) {
+        console.warn(parseErrorMessage, e);
+      }
+    }
+  }
+
+  return Array.isArray(allSync?.categories) ? allSync.categories : null;
+}
+
+/**
  * 端末で同期が有効な場合に同期ストレージのデータをローカルへ反映する。
  *
  * @returns {Promise<void>} 同期処理の完了を表す Promise。
@@ -230,25 +267,7 @@ export async function syncFromCloudIfNeeded() {
     const allSync = await chrome.storage.sync.get(null);
     if (!allSync || Object.keys(allSync).length === 0) return;
 
-    let categoriesFromSync = null;
-    if (Array.isArray(allSync.categories)) {
-      categoriesFromSync = allSync.categories;
-    } else if (typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
-      let reconstructed = '';
-      for (let i = 0; i < allSync.categories_chunk_count; i++) {
-        if (typeof allSync[`categories_chunk_${i}`] === 'string') {
-          reconstructed += allSync[`categories_chunk_${i}`];
-        }
-      }
-      try {
-        const parsed = JSON.parse(reconstructed);
-        if (Array.isArray(parsed)) {
-          categoriesFromSync = parsed;
-        }
-      } catch (e) {
-        console.warn('Failed to parse chunked categories:', e);
-      }
-    }
+    const categoriesFromSync = restoreCategoriesFromSync(allSync);
 
     const updates = {};
     if (categoriesFromSync) {

@@ -1,6 +1,6 @@
 // scripts/test_utils.js - Unit tests for FlexPaste-Solo utils.js
 import assert from 'node:assert';
-import { adjustTime, resolveVariables, syncFromCloudIfNeeded, validateImportData } from '../projects/app/utils.js';
+import { adjustTime, resolveVariables, restoreCategoriesFromSync, syncFromCloudIfNeeded, validateImportData } from '../projects/app/utils.js';
 import { validateAndNormalizeBackup } from '../projects/app/options.js';
 
 console.log('Running unit tests for utils.js & options.js...');
@@ -240,8 +240,10 @@ console.log('Running unit tests for utils.js & options.js...');
   ];
 
   const serializedCats = JSON.stringify(sampleCategories);
+  const legacyCategories = [{ id: 'cat_legacy', title: 'Legacy Category', templates: [] }];
   const mockSyncStorage = {
     settings: { workdays: [1, 2, 3, 4, 5, 6] },
+    categories: legacyCategories,
     categories_chunk_count: 1,
     categories_chunk_0: serializedCats
   };
@@ -283,9 +285,41 @@ console.log('Running unit tests for utils.js & options.js...');
   assert.deepStrictEqual(localSavedData.settings.workdays, [1, 2, 3, 4, 5, 6], 'Cloud settings workdays should be applied');
   assert.strictEqual(localSavedData.settings.syncEnabled, true, 'syncEnabled should remain true in local settings');
   assert.strictEqual(localSavedData.categories.length, 1, 'Chunked categories from cloud should be reconstructed and saved');
-  assert.strictEqual(localSavedData.categories[0].id, 'cat_cloud_1', 'Category ID should match cloud category');
+  assert.strictEqual(localSavedData.categories[0].id, 'cat_cloud_1', 'Valid chunked categories should take precedence over legacy categories');
 
   delete globalThis.chrome;
+}
+
+// 10. Test chunk restoration falls back to legacy categories only when chunks fail
+{
+  const legacyCategories = [{ id: 'cat_legacy', title: 'Legacy Category', templates: [] }];
+  const incompleteChunks = {
+    categories: legacyCategories,
+    categories_chunk_count: 2,
+    categories_chunk_0: '[{"id":"cat_chunked"}]'
+  };
+
+  assert.strictEqual(
+    restoreCategoriesFromSync(incompleteChunks),
+    legacyCategories,
+    'Missing chunks should fall back to legacy categories'
+  );
+
+  const originalWarn = console.warn;
+  console.warn = () => {};
+  try {
+    assert.strictEqual(
+      restoreCategoriesFromSync({
+        categories: legacyCategories,
+        categories_chunk_count: 1,
+        categories_chunk_0: '{invalid json'
+      }),
+      legacyCategories,
+      'Malformed chunk data should fall back to legacy categories'
+    );
+  } finally {
+    console.warn = originalWarn;
+  }
 }
 
 console.log('All unit tests passed successfully!');

@@ -1,5 +1,5 @@
 // options.js - Options Page Script for FlexPaste-Solo
-import { DEFAULT_DATA, DEFAULT_SETTINGS, getMessage, resolveVariables, syncFromCloudIfNeeded } from './utils.js';
+import { DEFAULT_DATA, DEFAULT_SETTINGS, getMessage, resolveVariables, restoreCategoriesFromSync, syncFromCloudIfNeeded } from './utils.js';
 
 /**
  * 利用可能な動的変数と表示情報の対応表を返す。
@@ -1277,25 +1277,10 @@ function setupEventHandlers() {
 
           // Handle Categories Sync
           if (categoriesOpt === 'from_sync') {
-            let categoriesFromSync = null;
-            if (Array.isArray(allSync.categories)) {
-              categoriesFromSync = allSync.categories;
-            } else if (typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
-              let reconstructed = '';
-              for (let i = 0; i < allSync.categories_chunk_count; i++) {
-                if (typeof allSync[`categories_chunk_${i}`] === 'string') {
-                  reconstructed += allSync[`categories_chunk_${i}`];
-                }
-              }
-              try {
-                const parsed = JSON.parse(reconstructed);
-                if (Array.isArray(parsed)) {
-                  categoriesFromSync = parsed;
-                }
-              } catch (err) {
-                console.warn('Failed to parse chunked categories in modal confirm:', err);
-              }
-            }
+            const categoriesFromSync = restoreCategoriesFromSync(
+              allSync,
+              'Failed to parse chunked categories in modal confirm:'
+            );
 
             if (categoriesFromSync) {
               const normalized = validateAndNormalizeBackup({ categories: categoriesFromSync });
