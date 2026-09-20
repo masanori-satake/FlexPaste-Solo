@@ -1,5 +1,5 @@
 // options.js - Options Page Script for FlexPaste-Solo
-import { DEFAULT_DATA, DEFAULT_SETTINGS, getMessage, resolveVariables, restoreCategoriesFromSync, splitStringToByteChunks, syncFromCloudIfNeeded } from './utils.js';
+import { DEFAULT_DATA, DEFAULT_SETTINGS, getMessage, resolveVariables, restoreCategoriesFromSync, runInLocalSyncMutex, saveCategoriesToSync, syncFromCloudIfNeeded } from './utils.js';
 
 /**
  * 利用可能な動的変数と表示情報の対応表を返す。
@@ -302,69 +302,14 @@ function loadStorage(callback) {
   }
 }
 
-/**
- * 同期が有効な場合にカテゴリを分割して同期ストレージへ保存する。
- *
- * @param {Array<Object>} categories 保存対象のカテゴリ。
- */
-let syncSaveQueue = Promise.resolve();
-
-/**
- * 同期が有効な場合にカテゴリを分割して同期ストレージへ保存する。
- * 各保存処理をシリアライズし、順次実行を保証する。
- *
- * @param {Array<Object>} categories 保存対象のカテゴリ。
- * @param {boolean} [force=false] 強制保存を行うかどうか。
- * @returns {Promise<void>}
- */
-function saveCategoriesToSync(categories, force = false) {
-  if ((!force && !appState.settings.syncEnabled) || typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.sync) {
-    return Promise.resolve();
-  }
-
-  const runSave = async () => {
-    const serialized = JSON.stringify(categories);
-    // Strictly enforce safe byte chunks (3500 UTF-8 bytes max per chunk) to stay well under Chrome's 8192 byte QUOTA_BYTES_PER_ITEM limit
-    const chunks = splitStringToByteChunks(serialized, 3500);
-    const numChunks = chunks.length;
-
-    const syncItems = {
-      categories_chunk_count: numChunks
-    };
-
-    for (let i = 0; i < numChunks; i++) {
-      syncItems[`categories_chunk_${i}`] = chunks[i];
-    }
-
-    // Set new chunked keys (excluding unchunked single categories item to strictly obey 8KB per-item quota)
-    await chrome.storage.sync.set(syncItems);
-
-    // Remove deprecated unchunked categories key if present
-    await chrome.storage.sync.remove('categories');
-
-    // Clean up any extra trailing chunk keys from previous larger saves
-    const allSyncKeys = await chrome.storage.sync.get(null);
-    const keysToRemove = Object.keys(allSyncKeys).filter(k => {
-      if (!k.startsWith('categories_chunk_')) return false;
-      const idx = parseInt(k.replace('categories_chunk_', ''), 10);
-      return !isNaN(idx) && idx >= numChunks;
-    });
-
-    if (keysToRemove.length > 0) {
-      await chrome.storage.sync.remove(keysToRemove);
-    }
-  };
-
-  syncSaveQueue = syncSaveQueue.then(runSave, runSave);
-  return syncSaveQueue;
-}
-
 function saveCategories(categories) {
   if (appState.settings.syncEnabled) {
-    saveCategoriesToSync(categories).catch(e => {
+    return saveCategoriesToSync(categories).catch(e => {
       console.warn('Failed to sync categories to chrome.storage.sync:', e);
+      throw e;
     });
   }
+  return Promise.resolve();
 }
 
 /**
@@ -375,10 +320,12 @@ function saveCategories(categories) {
 function saveSettings(settings) {
   if (appState.settings.syncEnabled && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
     const { syncEnabled, ...syncableSettings } = appState.settings;
-    chrome.storage.sync.set({ settings: syncableSettings }).catch(e => {
+    return chrome.storage.sync.set({ settings: syncableSettings }).catch(e => {
       console.warn('Failed to sync settings to chrome.storage.sync:', e);
+      throw e;
     });
   }
+  return Promise.resolve();
 }
 
 /**
@@ -389,21 +336,49 @@ function saveSettings(settings) {
 function saveStorage(showNotification = true) {
   isLocalSaving = true;
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local && typeof chrome.storage.local.set === 'function') {
-    chrome.storage.local.set({
-      settings: appState.settings,
-      categories: appState.categories
-    }, () => {
-      const lastError = chrome.runtime && chrome.runtime.lastError;
-      if (lastError) {
-        console.warn('Failed to save to chrome.storage.local:', lastError);
-        isLocalSaving = false;
-        return;
+    const savePromise = runInLocalSyncMutex(async () => {
+      const isSyncEnabled = Boolean(appState.settings.syncEnabled);
+      const localData = {
+        settings: appState.settings,
+        categories: appState.categories
+      };
+
+      if (isSyncEnabled) {
+        localData.local_sync_pending = true;
       }
-      saveSettings(appState.settings);
-      saveCategories(appState.categories);
+
+      await new Promise((resolve, reject) => {
+        chrome.storage.local.set(localData, () => {
+          const lastError = chrome.runtime && chrome.runtime.lastError;
+          if (lastError) {
+            console.warn('Failed to save to chrome.storage.local:', lastError);
+            reject(lastError);
+            return;
+          }
+          resolve();
+        });
+      });
+
+      if (isSyncEnabled) {
+        try {
+          await Promise.all([
+            saveSettings(appState.settings),
+            saveCategories(appState.categories)
+          ]);
+          await chrome.storage.local.set({ local_sync_pending: false });
+        } catch (e) {
+          console.warn('Cloud transmission failed, local_sync_pending flag preserved for recovery:', e);
+        }
+      }
+
       if (showNotification) showToast(getMessage('toastSaved'));
-      setTimeout(() => { isLocalSaving = false; }, 100);
     });
+
+    savePromise.then(
+      () => setTimeout(() => { isLocalSaving = false; }, 100),
+      () => setTimeout(() => { isLocalSaving = false; }, 100)
+    );
+    return savePromise;
   } else {
     if (showNotification) showToast(getMessage('toastSaved'));
     setTimeout(() => { isLocalSaving = false; }, 100);
