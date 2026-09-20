@@ -1,6 +1,11 @@
 // options.js - Options Page Script for FlexPaste-Solo
-import { DEFAULT_DATA, getMessage, resolveVariables } from './utils.js';
+import { DEFAULT_DATA, DEFAULT_SETTINGS, getMessage, resolveVariables, syncFromCloudIfNeeded } from './utils.js';
 
+/**
+ * 利用可能な動的変数と表示情報の対応表を返す。
+ *
+ * @returns {Object<string, {label: string, icon: string}>} 動的変数の表示情報。
+ */
 function getVariableMap() {
   return {
     '{{date}}': { label: getMessage('chipTag_date'), icon: 'calendar_today' },
@@ -39,7 +44,7 @@ function getVariableMap() {
 }
 
 let appState = {
-  settings: { workdays: [1, 2, 3, 4, 5] },
+  settings: { workdays: [1, 2, 3, 4, 5], syncEnabled: false },
   categories: [],
   selectedCategoryId: null
 };
@@ -157,34 +162,142 @@ function showToast(message) {
   }, 2500);
 }
 
-// Storage helpers
+/** 同期方法を選択するモーダルを初期状態で開く。 */
+function openSyncModal() {
+  const syncModalScrim = document.getElementById('sync-modal-scrim');
+  const confirmBtn = document.getElementById('confirm-sync-btn');
+
+  document.querySelectorAll('input[name="sync-settings-option"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="sync-categories-option"]').forEach(r => r.checked = false);
+
+  if (confirmBtn) confirmBtn.classList.add('disabled');
+  if (syncModalScrim) syncModalScrim.style.display = 'flex';
+}
+
+/** 同期方法を選択するモーダルを閉じる。 */
+function closeSyncModal() {
+  const syncModalScrim = document.getElementById('sync-modal-scrim');
+  if (syncModalScrim) syncModalScrim.style.display = 'none';
+}
+
+/** 同期方法が両方選択されている場合のみ確定ボタンを有効にする。 */
+function checkSyncFormValidation() {
+  const settingsOpt = document.querySelector('input[name="sync-settings-option"]:checked');
+  const categoriesOpt = document.querySelector('input[name="sync-categories-option"]:checked');
+  const confirmBtn = document.getElementById('confirm-sync-btn');
+
+  if (confirmBtn) {
+    if (settingsOpt && categoriesOpt) {
+      confirmBtn.classList.remove('disabled');
+    } else {
+      confirmBtn.classList.add('disabled');
+    }
+  }
+}
+
+/**
+ * 同期データを反映してからローカルストレージを読み込む。
+ *
+ * @param {Function} [callback] 読み込み完了後に呼び出すコールバック。
+ */
 function loadStorage(callback) {
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local && typeof chrome.storage.local.get === 'function') {
-    chrome.storage.local.get(['categories', 'settings'], (result) => {
-      appState.settings = result.settings || JSON.parse(JSON.stringify(DEFAULT_DATA.settings));
-      appState.categories = Array.isArray(result.categories)
-        ? result.categories
-        : JSON.parse(JSON.stringify(DEFAULT_DATA.categories));
-      if (!appState.selectedCategoryId && appState.categories.length > 0) {
-        appState.selectedCategoryId = appState.categories[0].id;
-      }
-      if (callback) callback();
+    syncFromCloudIfNeeded().then(() => {
+      chrome.storage.local.get(['categories', 'settings'], (result) => {
+        appState.settings = { ...DEFAULT_SETTINGS, ...(result.settings || DEFAULT_DATA.settings) };
+        appState.categories = Array.isArray(result.categories)
+          ? result.categories
+          : JSON.parse(JSON.stringify(DEFAULT_DATA.categories));
+        if (!appState.selectedCategoryId && appState.categories.length > 0) {
+          appState.selectedCategoryId = appState.categories[0].id;
+        }
+        if (callback) callback();
+      });
     });
   } else {
     // Fallback for standalone/local testing
-    appState.settings = JSON.parse(JSON.stringify(DEFAULT_DATA.settings));
+    appState.settings = { ...DEFAULT_SETTINGS, ...JSON.parse(JSON.stringify(DEFAULT_DATA.settings)) };
     appState.categories = JSON.parse(JSON.stringify(DEFAULT_DATA.categories));
     appState.selectedCategoryId = appState.categories[0].id;
     if (callback) callback();
   }
 }
 
+/**
+ * 同期が有効な場合にカテゴリを分割して同期ストレージへ保存する。
+ *
+ * @param {Array<Object>} categories 保存対象のカテゴリ。
+ */
+async function saveCategoriesToSync(categories) {
+  if (!appState.settings.syncEnabled || typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.sync) {
+    return;
+  }
+  const serialized = JSON.stringify(categories);
+  const CHUNK_SIZE = 7500; // Keep safely below 8192 bytes limit per item
+  const numChunks = Math.ceil(serialized.length / CHUNK_SIZE);
+
+  const syncItems = {
+    categories_chunk_count: numChunks
+  };
+
+  for (let i = 0; i < numChunks; i++) {
+    syncItems[`categories_chunk_${i}`] = serialized.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+  }
+
+  // Set new chunked keys (excluding unchunked single categories item to strictly obey 8KB per-item quota)
+  await chrome.storage.sync.set(syncItems);
+
+  // Remove deprecated unchunked categories key if present
+  await chrome.storage.sync.remove('categories');
+
+  // Clean up any extra trailing chunk keys from previous larger saves
+  const allSyncKeys = await chrome.storage.sync.get(null);
+  const keysToRemove = Object.keys(allSyncKeys).filter(k => {
+    if (!k.startsWith('categories_chunk_')) return false;
+    const idx = parseInt(k.replace('categories_chunk_', ''), 10);
+    return !isNaN(idx) && idx >= numChunks;
+  });
+
+  if (keysToRemove.length > 0) {
+    await chrome.storage.sync.remove(keysToRemove);
+  }
+}
+
+function saveCategories(categories) {
+  if (appState.settings.syncEnabled) {
+    saveCategoriesToSync(categories).catch(e => {
+      console.warn('Failed to sync categories to chrome.storage.sync:', e);
+    });
+  }
+}
+
+/**
+ * 同期が有効な場合に端末固有値を除いた設定を同期ストレージへ保存する。
+ *
+ * @param {Object} settings 保存対象の設定。
+ */
+function saveSettings(settings) {
+  if (appState.settings.syncEnabled && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+    const { syncEnabled, ...syncableSettings } = appState.settings;
+    chrome.storage.sync.set({ settings: syncableSettings }).catch(e => {
+      console.warn('Failed to sync settings to chrome.storage.sync:', e);
+    });
+  }
+}
+
+/**
+ * 現在の設定とカテゴリをローカルおよび同期ストレージへ保存する。
+ *
+ * @param {boolean} [showNotification=true] 保存完了通知を表示するかどうか。
+ */
 function saveStorage(showNotification = true) {
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local && typeof chrome.storage.local.set === 'function') {
     chrome.storage.local.set({
       settings: appState.settings,
       categories: appState.categories
     }, () => {
+      saveSettings(appState.settings);
+      saveCategories(appState.categories);
       if (showNotification) showToast(getMessage('toastSaved'));
     });
   } else if (showNotification) {
@@ -220,6 +333,19 @@ function refreshPendingUsePasteStates() {
       pendingUsePasteStates.set(categoryId, checkbox.checked);
     }
   });
+}
+
+/** 現在の設定に合わせて同期スイッチと同期中表示を更新する。 */
+function renderSyncControls() {
+  const syncEnabledSwitch = document.getElementById('sync-enabled-switch');
+  const syncIndicator = document.getElementById('sync-indicator');
+
+  if (syncEnabledSwitch) {
+    syncEnabledSwitch.checked = Boolean(appState.settings.syncEnabled);
+  }
+  if (syncIndicator) {
+    syncIndicator.classList.toggle('hidden', !appState.settings.syncEnabled);
+  }
 }
 
 function updateSelectedUsePasteCheckbox() {
@@ -401,6 +527,7 @@ function updateAllPreviews() {
   });
 }
 
+/** 静的な設定画面の文言とツールチップを現在の言語にローカライズする。 */
 function localizeStaticUI() {
   document.title = getMessage('optionsTitle');
 
@@ -409,6 +536,45 @@ function localizeStaticUI() {
 
   const elemWorkdays = document.getElementById('i18n-workdays-label');
   if (elemWorkdays) elemWorkdays.textContent = getMessage('workdaysLabel');
+
+  const elemDeviceSyncLabel = document.getElementById('i18n-device-sync-label');
+  if (elemDeviceSyncLabel) elemDeviceSyncLabel.textContent = getMessage('deviceSyncLabel');
+
+  const containerDeviceSync = document.getElementById('container-device-sync');
+  if (containerDeviceSync) containerDeviceSync.title = getMessage('deviceSyncTooltip');
+
+  const syncIndicator = document.getElementById('sync-indicator');
+  if (syncIndicator) syncIndicator.title = getMessage('syncActiveTooltip');
+
+  const elemSyncModalTitle = document.getElementById('i18n-sync-modal-title');
+  if (elemSyncModalTitle) elemSyncModalTitle.textContent = getMessage('syncModalTitle');
+
+  const elemSyncModalNote = document.getElementById('i18n-sync-modal-note');
+  if (elemSyncModalNote) elemSyncModalNote.textContent = getMessage('syncModalNote');
+
+  const elemSyncModalSettingsTitle = document.getElementById('i18n-sync-modal-settings-title');
+  if (elemSyncModalSettingsTitle) elemSyncModalSettingsTitle.textContent = getMessage('syncModalSettingsTitle');
+
+  const elemSyncOptSettingsFromSync = document.getElementById('i18n-sync-option-settings-from-sync');
+  if (elemSyncOptSettingsFromSync) elemSyncOptSettingsFromSync.textContent = getMessage('syncOptionSettingsFromSync');
+
+  const elemSyncOptSettingsToSync = document.getElementById('i18n-sync-option-settings-to-sync');
+  if (elemSyncOptSettingsToSync) elemSyncOptSettingsToSync.textContent = getMessage('syncOptionSettingsToSync');
+
+  const elemSyncModalCategoriesTitle = document.getElementById('i18n-sync-modal-categories-title');
+  if (elemSyncModalCategoriesTitle) elemSyncModalCategoriesTitle.textContent = getMessage('syncModalCategoriesTitle');
+
+  const elemSyncOptCategoriesFromSync = document.getElementById('i18n-sync-option-categories-from-sync');
+  if (elemSyncOptCategoriesFromSync) elemSyncOptCategoriesFromSync.textContent = getMessage('syncOptionCategoriesFromSync');
+
+  const elemSyncOptCategoriesToSync = document.getElementById('i18n-sync-option-categories-to-sync');
+  if (elemSyncOptCategoriesToSync) elemSyncOptCategoriesToSync.textContent = getMessage('syncOptionCategoriesToSync');
+
+  const btnCancelSync = document.getElementById('cancel-sync-btn');
+  if (btnCancelSync) btnCancelSync.textContent = getMessage('cancel');
+
+  const btnConfirmSync = document.getElementById('confirm-sync-btn');
+  if (btnConfirmSync) btnConfirmSync.textContent = getMessage('confirm');
 
   const daysMap = {
     'pill-sun': { text: 'sun', full: 'sunFull' },
@@ -1050,8 +1216,113 @@ export function validateAndNormalizeBackup(data) {
   return validData;
 }
 
-// Setup Event Handlers
+/** 設定画面の操作に必要なイベントハンドラーを登録する。 */
 function setupEventHandlers() {
+  // Device Sync Switch Handler
+  const syncEnabledSwitch = document.getElementById('sync-enabled-switch');
+  if (syncEnabledSwitch) {
+    syncEnabledSwitch.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!appState.settings.syncEnabled) {
+        openSyncModal();
+      } else {
+        appState.settings.syncEnabled = false;
+        saveStorage(true);
+        renderSyncControls();
+      }
+    });
+  }
+
+  // Sync Modal Options Change
+  document.querySelectorAll('input[name="sync-settings-option"], input[name="sync-categories-option"]').forEach(r => {
+    r.addEventListener('change', checkSyncFormValidation);
+  });
+
+  // Cancel Sync Modal
+  const cancelSyncBtn = document.getElementById('cancel-sync-btn');
+  if (cancelSyncBtn) {
+    cancelSyncBtn.addEventListener('click', closeSyncModal);
+  }
+
+  // Confirm Sync Modal
+  const confirmSyncBtn = document.getElementById('confirm-sync-btn');
+  if (confirmSyncBtn) {
+    confirmSyncBtn.addEventListener('click', async () => {
+      const settingsOpt = document.querySelector('input[name="sync-settings-option"]:checked')?.value;
+      const categoriesOpt = document.querySelector('input[name="sync-categories-option"]:checked')?.value;
+
+      if (!settingsOpt || !categoriesOpt) return;
+
+      let newSettings = { ...appState.settings, syncEnabled: true };
+      let newCategories = [...appState.categories];
+
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+        try {
+          const syncData = await chrome.storage.sync.get(['settings', 'categories']);
+
+          // Handle Settings Sync
+          if (settingsOpt === 'from_sync' && syncData.settings) {
+            const { syncEnabled, ...cloudSettings } = syncData.settings;
+            newSettings = {
+              ...DEFAULT_SETTINGS,
+              ...cloudSettings,
+              syncEnabled: true
+            };
+          } else {
+            const { syncEnabled, ...syncableSettings } = newSettings;
+            await chrome.storage.sync.set({ settings: syncableSettings });
+          }
+
+          // Handle Categories Sync
+          if (categoriesOpt === 'from_sync') {
+            if (Array.isArray(syncData.categories)) {
+              newCategories = syncData.categories;
+            } else {
+              const allSync = await chrome.storage.sync.get(null);
+              if (typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
+                let reconstructed = '';
+                for (let i = 0; i < allSync.categories_chunk_count; i++) {
+                  if (typeof allSync[`categories_chunk_${i}`] === 'string') {
+                    reconstructed += allSync[`categories_chunk_${i}`];
+                  }
+                }
+                try {
+                  const parsed = JSON.parse(reconstructed);
+                  if (Array.isArray(parsed)) {
+                    validateAndNormalizeBackup({ categories: parsed });
+                    newCategories = parsed;
+                  }
+                } catch (err) {
+                  console.warn('Failed to parse chunked categories in modal confirm:', err);
+                }
+              }
+            }
+          } else {
+            await saveCategoriesToSync(newCategories);
+          }
+        } catch (e) {
+          console.warn('Sync conflict resolution error:', e);
+          showToast('同期の設定処理に失敗しました');
+          return; // Stop and keep modal open without modifying appState or saving
+        }
+      }
+
+      // Update state only after all sync operations succeed
+      appState.settings = newSettings;
+      appState.categories = newCategories;
+      if (!appState.categories.some(c => c.id === appState.selectedCategoryId) && appState.categories.length > 0) {
+        appState.selectedCategoryId = appState.categories[0].id;
+      }
+
+      saveStorage(true);
+      closeSyncModal();
+      renderWorkdays();
+      renderSyncControls();
+      renderCategoryList();
+      renderCategoryEditor();
+    });
+  }
+
   // Category Title Change
   document.getElementById('current-cat-title').addEventListener('input', (e) => {
     const currentCat = appState.categories.find(c => c.id === appState.selectedCategoryId);
@@ -1336,6 +1607,7 @@ if (typeof document !== 'undefined') {
     localizeStaticUI();
     loadStorage(() => {
       renderWorkdays();
+      renderSyncControls();
       renderCategoryList();
       renderCategoryEditor();
       setupEventHandlers();

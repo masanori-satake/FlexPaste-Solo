@@ -115,6 +115,145 @@ const DEFAULT_DATA_EN = {
 
 export const DEFAULT_DATA = isJapaneseLocale() ? DEFAULT_DATA_JA : DEFAULT_DATA_EN;
 
+export const DEFAULT_SETTINGS = {
+  workdays: [1, 2, 3, 4, 5],
+  syncEnabled: false
+};
+
+/**
+ * インポートまたは同期された設定とカテゴリを安全な値へ正規化する。
+ *
+ * @param {Object} data 正規化対象のデータ。処理結果はこのオブジェクトへ反映される。
+ * @returns {void}
+ */
+export function validateImportData(data) {
+  if (!data || typeof data !== 'object') return;
+
+  const MAX_CATEGORIES = 100;
+  const MAX_TEMPLATES = 100;
+  const MAX_TITLE_LEN = 200;
+  const MAX_CONTENT_LEN = 10000;
+
+  /**
+   * 制御文字を除去し、指定された長さに切り詰める。
+   *
+   * @param {*} str 正規化する値。
+   * @param {number} maxLen 最大文字数。
+   * @returns {string} 正規化された文字列。
+   */
+  const sanitizeStr = (str, maxLen) => {
+    if (typeof str !== 'string') return '';
+    return str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').slice(0, maxLen);
+  };
+
+  if (data.settings && typeof data.settings === 'object') {
+    if (Array.isArray(data.settings.workdays)) {
+      const workdays = data.settings.workdays
+        .map(d => Number(d))
+        .filter(d => Number.isInteger(d) && d >= 1 && d <= 7);
+      data.settings.workdays = workdays.length > 0 ? Array.from(new Set(workdays)) : [1, 2, 3, 4, 5];
+    } else {
+      data.settings.workdays = [1, 2, 3, 4, 5];
+    }
+    data.settings.syncEnabled = Boolean(data.settings.syncEnabled);
+  }
+
+  if (Array.isArray(data.categories)) {
+    data.categories = data.categories.slice(0, MAX_CATEGORIES).map((cat, catIdx) => {
+      const catId = typeof cat?.id === 'string' && cat.id ? sanitizeStr(cat.id, 100) : `cat_${Date.now()}_${catIdx}`;
+      const catTitle = typeof cat?.title === 'string' ? sanitizeStr(cat.title, MAX_TITLE_LEN) : `Category ${catIdx + 1}`;
+      const timeAdjInterval = [0, 5, 10, 15, 30].includes(Number(cat?.time_adj_interval)) ? Number(cat.time_adj_interval) : 0;
+      const usePaste = typeof cat?.use_paste === 'boolean' ? cat.use_paste : cat?.use_paste === 'true';
+      const def1 = typeof cat?.def_1 === 'string' ? sanitizeStr(cat.def_1, MAX_TITLE_LEN) : '';
+      const def2 = typeof cat?.def_2 === 'string' ? sanitizeStr(cat.def_2, MAX_TITLE_LEN) : '';
+      const def3 = typeof cat?.def_3 === 'string' ? sanitizeStr(cat.def_3, MAX_TITLE_LEN) : '';
+
+      const templates = Array.isArray(cat?.templates) ? cat.templates.slice(0, MAX_TEMPLATES).map((tpl, tplIdx) => {
+        const tplId = typeof tpl?.id === 'string' && tpl.id ? sanitizeStr(tpl.id, 100) : `tpl_${Date.now()}_${tplIdx}`;
+        return {
+          id: tplId,
+          title: typeof tpl?.title === 'string' ? sanitizeStr(tpl.title, MAX_TITLE_LEN) : `Template ${tplIdx + 1}`,
+          content: typeof tpl?.content === 'string' ? sanitizeStr(tpl.content, MAX_CONTENT_LEN) : ''
+        };
+      }) : [];
+
+      return {
+        id: catId,
+        title: catTitle,
+        time_adj_interval: timeAdjInterval,
+        use_paste: usePaste,
+        def_1: def1,
+        def_2: def2,
+        def_3: def3,
+        templates
+      };
+    });
+  }
+}
+
+/**
+ * 端末で同期が有効な場合に同期ストレージのデータをローカルへ反映する。
+ *
+ * @returns {Promise<void>} 同期処理の完了を表す Promise。
+ */
+export async function syncFromCloudIfNeeded() {
+  if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local || !chrome.storage.sync) {
+    return;
+  }
+  try {
+    const local = await chrome.storage.local.get(['settings', 'categories']);
+    const isSyncEnabled = local.settings?.syncEnabled ?? false;
+    if (!isSyncEnabled) return;
+
+    const syncData = await chrome.storage.sync.get(['settings', 'categories']);
+    validateImportData(syncData);
+
+    const updates = {};
+    if (Array.isArray(syncData.categories)) {
+      updates.categories = syncData.categories;
+    } else {
+      // Check chunked keys if unchunked fallback is missing/not array
+      const allSync = await chrome.storage.sync.get(null);
+      if (typeof allSync.categories_chunk_count === 'number' && allSync.categories_chunk_count > 0) {
+        let reconstructed = '';
+        for (let i = 0; i < allSync.categories_chunk_count; i++) {
+          if (typeof allSync[`categories_chunk_${i}`] === 'string') {
+            reconstructed += allSync[`categories_chunk_${i}`];
+          }
+        }
+        try {
+          const parsed = JSON.parse(reconstructed);
+          if (Array.isArray(parsed)) {
+            validateImportData({ categories: parsed });
+            updates.categories = parsed;
+          }
+        } catch (e) {
+          console.warn('Failed to parse chunked categories:', e);
+        }
+      }
+    }
+
+    if (syncData.settings === undefined) {
+      updates.settings = {
+        ...DEFAULT_SETTINGS,
+        ...(local.settings || {}),
+        syncEnabled: true
+      };
+    } else {
+      const currentLocalSettings = local.settings || {};
+      updates.settings = {
+        ...DEFAULT_SETTINGS,
+        ...syncData.settings,
+        syncEnabled: currentLocalSettings.syncEnabled ?? true
+      };
+    }
+
+    await chrome.storage.local.set(updates);
+  } catch (e) {
+    console.warn('Failed to sync from cloud:', e);
+  }
+}
+
 export function padZero(num) {
   return String(num).padStart(2, '0');
 }

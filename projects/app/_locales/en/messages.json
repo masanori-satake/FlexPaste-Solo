@@ -123,6 +123,58 @@
     "message": "Turn ON for apps where templates cannot be inserted directly.",
     "description": "Tooltip for paste input option"
   },
+  "deviceSyncLabel": {
+    "message": "Device Sync (β)",
+    "description": "Label for device sync toggle option"
+  },
+  "deviceSyncTooltip": {
+    "message": "Sync settings and template data automatically across browsers signed into the same Google account using chrome.storage.sync.",
+    "description": "Tooltip for device sync option"
+  },
+  "syncActiveTooltip": {
+    "message": "Device Sync (Sync) is active",
+    "description": "Tooltip when device sync is active"
+  },
+  "syncModalTitle": {
+    "message": "Device Sync Settings",
+    "description": "Title of sync modal"
+  },
+  "syncModalNote": {
+    "message": "*Syncs only between the same browser signed into the same account (Direct sync between Chrome and Edge is not supported).",
+    "description": "Note in sync modal"
+  },
+  "syncModalSettingsTitle": {
+    "message": "Settings (Workdays, etc.) sync:",
+    "description": "Settings sync option title"
+  },
+  "syncOptionSettingsFromSync": {
+    "message": "Apply data from cloud sync storage to this device",
+    "description": "Sync option settings from cloud"
+  },
+  "syncOptionSettingsToSync": {
+    "message": "Overwrite cloud sync storage with data from this device",
+    "description": "Sync option settings to cloud"
+  },
+  "syncModalCategoriesTitle": {
+    "message": "Categories & Templates data sync:",
+    "description": "Categories sync option title"
+  },
+  "syncOptionCategoriesFromSync": {
+    "message": "Apply data from cloud sync storage to this device",
+    "description": "Sync option categories from cloud"
+  },
+  "syncOptionCategoriesToSync": {
+    "message": "Overwrite cloud sync storage with data from this device",
+    "description": "Sync option categories to cloud"
+  },
+  "cancel": {
+    "message": "Cancel",
+    "description": "Cancel button text"
+  },
+  "confirm": {
+    "message": "Confirm",
+    "description": "Confirm button text"
+  },
   "adjNone": {
     "message": "Do not adjust",
     "description": "Time adjustment option: none"

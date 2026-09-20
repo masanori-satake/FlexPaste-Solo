@@ -1,8 +1,8 @@
 # FlexPaste-Solo
 
-[![version](https://img.shields.io/badge/version-1.0.9-blue)](projects/app/manifest.json)
+[![version](https://img.shields.io/badge/version-1.0.11-blue)](projects/app/manifest.json)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Privacy-Local Only](https://img.shields.io/badge/Privacy-Local%20Only-brightgreen)](PRIVACY.md)
+[![Privacy-Local First](https://img.shields.io/badge/Privacy-Local%20First-brightgreen)](PRIVACY.md)
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-orange)](projects/app/manifest.json)
 [![CI](https://github.com/masanori-satake/FlexPaste-Solo/actions/workflows/ci.yml/badge.svg)](https://github.com/masanori-satake/FlexPaste-Solo/actions/workflows/ci.yml)
 
@@ -16,7 +16,7 @@
 
 ## 特徴
 
-- **100% ローカル完結 (プライバシー最優先):** 外部サーバー通信、トラッキング、アナリティクス、リモートAPI呼び出しは一切行いません。すべての処理をユーザーのブラウザ内で完結させます。
+- **完全ローカル実行 & 端末間同期(β):** デフォルトではすべてのデータがブラウザ内の `chrome.storage.local` に保存されます（外部サーバーへの送信は一切行われません）。設定画面で「端末間同期(β)」を有効にした場合のみ、ブラウザのアカウント同期機能（`chrome.storage.sync`）を経由して同一アカウント・同一ブラウザ間で設定およびテンプレートデータが自動同期されます。
 - **2階層コンテキストメニュー:** カテゴリ別のグループ化により、膨大な定型文も迷わずスムーズに選択・挿入可能です。
 - **リアルタイム動的変数エンジン:** 日時 (`{{date_with_day}}`, `{{time}}`)、相対日付 (`{{tomorrow}}`)、月末・稼働日 (`{{month_last_workday}}`)、カテゴリ定義文 (`{{def_1}}`, `{{def_2}}`, `{{def_3}}`) をリアルタイム変換。
 - **ノーコード変数挿入 & リアルタイムプレビュー UI:** 設定画面でチップをドラッグ＆ドロップ（またはクリック）するだけでマスタッシュタグを挿入でき、プレビューで最終出力を事前に確認できます。
@@ -42,7 +42,7 @@
 
 ## プライバシーとセキュリティ
 
-- **Local Only:** 本拡張機能は一切の外部通信を行いません。詳細なポリシーは [PRIVACY.md](PRIVACY.md) および [SECURITY.md](SECURITY.md) を参照してください。
+- **Local First & 外部送信なし:** 本拡張機能は開発者の外部サーバー通信、トラッキング、アナリティクス、テレメトリを一切行いません。データはデフォルトでブラウザ内の `chrome.storage.local` にのみ保存され、端末間同期(β)を明示的に有効にした場合のみ、Googleアカウントのブラウザ同期（`chrome.storage.sync`）経由で保存・同期されます。詳細なポリシーは [PRIVACY.md](PRIVACY.md) および [SECURITY.md](SECURITY.md) を参照してください。
 - **トラッキングなし:** アクセス解析や広告、外部サービスへのデータ送信は一切行いません。
 - **透明性:** 外部ライブラリを一切使用しない Vanilla JS 構成。
 

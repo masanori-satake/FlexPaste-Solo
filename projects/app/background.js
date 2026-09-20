@@ -134,10 +134,18 @@ if (chrome.action && chrome.action.onClicked) {
   });
 }
 
-// Rebuild context menus when storage changes
+// Rebuild context menus and sync from cloud when storage changes
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === 'local' && (changes.categories || changes.settings)) {
     rebuildContextMenus();
+  } else if (areaName === 'sync') {
+    chrome.storage.local.get(['settings'], (result) => {
+      if (result.settings?.syncEnabled) {
+        import('./utils.js').then(({ syncFromCloudIfNeeded }) => {
+          syncFromCloudIfNeeded();
+        }).catch(err => console.warn('Failed to sync from cloud on storage change:', err));
+      }
+    });
   }
 });
 
