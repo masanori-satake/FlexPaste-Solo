@@ -4,6 +4,8 @@ import json
 import sys
 
 def create_package():
+    """Chrome 拡張機能をバージョン付き ZIP アーカイブにまとめる。"""
+
     with open('projects/app/version.json', 'r', encoding='utf-8') as f:
         version = json.load(f)['version']
 
