@@ -1695,6 +1695,15 @@ function setupEventHandlers() {
     chipsContainer.addEventListener('scroll', hideChipTooltip, { passive: true });
   }
 
+  // Touchscreen & Tablet Mode Safeguards: Immediately dismiss tooltips on scroll, touchmove, or touching outside chips
+  window.addEventListener('scroll', hideChipTooltip, { passive: true });
+  window.addEventListener('touchmove', hideChipTooltip, { passive: true });
+  document.addEventListener('pointerdown', (e) => {
+    if (!e.target.closest('.chip')) {
+      hideChipTooltip();
+    }
+  }, { passive: true });
+
   // Backup Export
   document.getElementById('btn-export').addEventListener('click', () => {
     const exportData = {
