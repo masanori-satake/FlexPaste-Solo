@@ -479,6 +479,23 @@ export function formatDateWithDay(date) {
   }
 }
 
+export function formatDateShortWithDay(date) {
+  if (isJapaneseLocale()) {
+    const weekdaysJa = ['日', '月', '火', '水', '木', '金', '土'];
+    const m = date.getMonth() + 1;
+    const d = date.getDate();
+    const w = weekdaysJa[date.getDay()];
+    return `${m}/${d}(${w})`;
+  } else {
+    const weekdaysEn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const w = weekdaysEn[date.getDay()];
+    const m = monthsEn[date.getMonth()];
+    const d = date.getDate();
+    return `${w}, ${m} ${d}`;
+  }
+}
+
 export function formatDate(date) {
   const y = date.getFullYear();
   const m = padZero(date.getMonth() + 1);
@@ -552,12 +569,13 @@ export function getNextWeekDays(now) {
   for (let i = 0; i < 7; i++) {
     const targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilNextMonday + i, now.getHours(), now.getMinutes(), now.getSeconds());
     result[`next_week_${dayNames[i]}_with_day`] = formatDateWithDay(targetDate);
+    result[`next_week_${dayNames[i]}_short_with_day`] = formatDateShortWithDay(targetDate);
   }
 
   return result;
 }
 
-export function calculateMonthLastWorkday(now, workdays) {
+export function calculateMonthLastWorkdayDate(now, workdays) {
   let activeWorkdays = Array.isArray(workdays)
     ? workdays
         .filter(d => (typeof d === 'number' || (typeof d === 'string' && d.trim() !== '')) && !Array.isArray(d))
@@ -570,19 +588,23 @@ export function calculateMonthLastWorkday(now, workdays) {
   }
 
   // Last day of current month
-  let d = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  let d = new Date(now.getFullYear(), now.getMonth() + 1, 0, now.getHours(), now.getMinutes(), now.getSeconds());
   const daysInMonth = d.getDate();
 
   for (let i = 0; i < daysInMonth; i++) {
     const day = d.getDay();
     const isoDay = day === 0 ? 7 : day;
     if (activeWorkdays.includes(isoDay)) {
-      return formatDate(d);
+      return d;
     }
     d.setDate(d.getDate() - 1);
   }
 
-  return formatDate(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+  return new Date(now.getFullYear(), now.getMonth() + 1, 0, now.getHours(), now.getMinutes(), now.getSeconds());
+}
+
+export function calculateMonthLastWorkday(now, workdays) {
+  return formatDate(calculateMonthLastWorkdayDate(now, workdays));
 }
 
 // ⚡ Bolt Optimization: Early return and lazy variable computation.
@@ -599,7 +621,7 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
   const cache = new Map();
 
   // Lazy base date and object helpers to avoid redundant Date instantiations across variables
-  let inOneHour, yesterday, tomorrow, nextWeek, nextWorkdayDate, nextWeekDays;
+  let inOneHour, yesterday, tomorrow, nextWeek, nextWorkdayDate, monthEndDate, monthLastWorkdayDate, nextWeekDays;
 
   function getInOneHour() {
     if (!inOneHour) inOneHour = new Date(now.getTime() + 60 * 60 * 1000);
@@ -620,6 +642,14 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
   function getNextWorkdayDate() {
     if (!nextWorkdayDate) nextWorkdayDate = calculateNextWorkday(now, workdays);
     return nextWorkdayDate;
+  }
+  function getMonthEndDate() {
+    if (!monthEndDate) monthEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, now.getHours(), now.getMinutes(), now.getSeconds());
+    return monthEndDate;
+  }
+  function getMonthLastWorkdayDate() {
+    if (!monthLastWorkdayDate) monthLastWorkdayDate = calculateMonthLastWorkdayDate(now, workdays);
+    return monthLastWorkdayDate;
   }
   function getNextWeekDaysObj() {
     if (!nextWeekDays) nextWeekDays = getNextWeekDays(now);
@@ -648,6 +678,9 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
         break;
       case 'date_short':
         val = formatDateShort(now);
+        break;
+      case 'date_short_with_day':
+        val = formatDateShortWithDay(now);
         break;
       case 'time':
         val = formatTime(now);
@@ -679,6 +712,12 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
       case 'yesterday':
         val = formatDate(getYesterday());
         break;
+      case 'yesterday_short':
+        val = formatDateShort(getYesterday());
+        break;
+      case 'yesterday_short_with_day':
+        val = formatDateShortWithDay(getYesterday());
+        break;
       case 'tomorrow_with_day':
         val = formatDateWithDay(getTomorrow());
         break;
@@ -688,11 +727,20 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
       case 'tomorrow_short':
         val = formatDateShort(getTomorrow());
         break;
+      case 'tomorrow_short_with_day':
+        val = formatDateShortWithDay(getTomorrow());
+        break;
       case 'next_workday_with_day':
         val = formatDateWithDay(getNextWorkdayDate());
         break;
       case 'next_workday':
         val = formatDate(getNextWorkdayDate());
+        break;
+      case 'next_workday_short':
+        val = formatDateShort(getNextWorkdayDate());
+        break;
+      case 'next_workday_short_with_day':
+        val = formatDateShortWithDay(getNextWorkdayDate());
         break;
       case 'next_week_with_day':
         val = formatDateWithDay(getNextWeek());
@@ -700,13 +748,35 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
       case 'next_week':
         val = formatDate(getNextWeek());
         break;
-      case 'month_end': {
-        const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        val = formatDate(monthEnd);
+      case 'next_week_short':
+        val = formatDateShort(getNextWeek());
         break;
-      }
+      case 'next_week_short_with_day':
+        val = formatDateShortWithDay(getNextWeek());
+        break;
+      case 'month_end':
+        val = formatDate(getMonthEndDate());
+        break;
+      case 'month_end_short':
+        val = formatDateShort(getMonthEndDate());
+        break;
+      case 'month_end_with_day':
+        val = formatDateWithDay(getMonthEndDate());
+        break;
+      case 'month_end_short_with_day':
+        val = formatDateShortWithDay(getMonthEndDate());
+        break;
       case 'month_last_workday':
-        val = calculateMonthLastWorkday(now, workdays);
+        val = formatDate(getMonthLastWorkdayDate());
+        break;
+      case 'month_last_workday_short':
+        val = formatDateShort(getMonthLastWorkdayDate());
+        break;
+      case 'month_last_workday_with_day':
+        val = formatDateWithDay(getMonthLastWorkdayDate());
+        break;
+      case 'month_last_workday_short_with_day':
+        val = formatDateShortWithDay(getMonthLastWorkdayDate());
         break;
       default: {
         if (varName.startsWith('next_week_')) {

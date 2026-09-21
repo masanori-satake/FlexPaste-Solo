@@ -467,5 +467,517 @@
   "dragToReorder": {
     "message": "ドラッグして順序変更",
     "description": "Tooltip for template handle"
+  },
+  "chipExampleLabel": {
+    "message": "例: ",
+    "description": "Prefix for chip example in tooltip"
+  },
+  "chipDesc_date": {
+    "message": "本日の日付を「年/月/日」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_date": {
+    "message": "2025/03/15",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_date_short": {
+    "message": "本日の日付を「月/日」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_date_short": {
+    "message": "3/15",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_date_with_day": {
+    "message": "本日の日付を「年月日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_date_with_day": {
+    "message": "2025年3月15日(土)",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_date_short_with_day": {
+    "message": "今日(短縮曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_date_short_with_day": {
+    "message": "本日の日付を「月/日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_date_short_with_day": {
+    "message": "3/15(土)",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_tomorrow": {
+    "message": "明日の日付を「年/月/日」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_tomorrow": {
+    "message": "2025/03/16",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_tomorrow_short": {
+    "message": "明日の日付を「月/日」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_tomorrow_short": {
+    "message": "3/16",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_tomorrow_with_day": {
+    "message": "明日の日付を「年月日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_tomorrow_with_day": {
+    "message": "2025年3月16日(日)",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_tomorrow_short_with_day": {
+    "message": "明日(短縮曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_tomorrow_short_with_day": {
+    "message": "明日の日付を「月/日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_tomorrow_short_with_day": {
+    "message": "3/16(日)",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_yesterday": {
+    "message": "昨日の日付を「年/月/日」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_yesterday": {
+    "message": "2025/03/14",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_yesterday_short": {
+    "message": "昨日(短縮)",
+    "description": "Chip label"
+  },
+  "chipDesc_yesterday_short": {
+    "message": "昨日の日付を「月/日」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_yesterday_short": {
+    "message": "3/14",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_yesterday_with_day": {
+    "message": "昨日の日付を「年月日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_yesterday_with_day": {
+    "message": "2025年3月14日(金)",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_yesterday_short_with_day": {
+    "message": "昨日(短縮曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_yesterday_short_with_day": {
+    "message": "昨日の日付を「月/日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_yesterday_short_with_day": {
+    "message": "3/14(金)",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_workday": {
+    "message": "「稼働曜日」設定に基づき、休日を除いた次の稼働日の日付を「年/月/日」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_workday": {
+    "message": "2025/03/17",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_workday_short": {
+    "message": "次稼働日(短縮)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_workday_short": {
+    "message": "「稼働曜日」設定に基づき、休日を除いた次の稼働日の日付を「月/日」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_workday_short": {
+    "message": "3/17",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_workday_with_day": {
+    "message": "「稼働曜日」設定に基づき、休日を除いた次の稼働日の日付を「年月日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_workday_with_day": {
+    "message": "2025年3月17日(月)",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_workday_short_with_day": {
+    "message": "次稼働日(短縮曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_workday_short_with_day": {
+    "message": "「稼働曜日」設定に基づき、休日を除いた次の稼働日の日付を「月/日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_workday_short_with_day": {
+    "message": "3/17(月)",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week": {
+    "message": "1週間後の日付を「年/月/日」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week": {
+    "message": "2025/03/22",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_short": {
+    "message": "一週間後(短縮)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_short": {
+    "message": "1週間後の日付を「月/日」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_short": {
+    "message": "3/22",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_with_day": {
+    "message": "1週間後の日付を「年月日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_with_day": {
+    "message": "2025年3月22日(土)",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_short_with_day": {
+    "message": "一週間後(短縮曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_short_with_day": {
+    "message": "1週間後の日付を「月/日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_short_with_day": {
+    "message": "3/22(土)",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_month_end": {
+    "message": "今月末の日付を「年/月/日」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_end": {
+    "message": "2025/03/31",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_month_end_short": {
+    "message": "月末(短縮)",
+    "description": "Chip label"
+  },
+  "chipDesc_month_end_short": {
+    "message": "今月末の日付を「月/日」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_end_short": {
+    "message": "3/31",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_month_end_with_day": {
+    "message": "月末(曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_month_end_with_day": {
+    "message": "今月末の日付を「年月日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_end_with_day": {
+    "message": "2025年3月31日(月)",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_month_end_short_with_day": {
+    "message": "月末(短縮曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_month_end_short_with_day": {
+    "message": "今月末の日付を「月/日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_end_short_with_day": {
+    "message": "3/31(月)",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_month_last_workday": {
+    "message": "「稼働曜日」設定に基づき、今月最終稼働日の日付を「年/月/日」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_last_workday": {
+    "message": "2025/03/31",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_month_last_workday_short": {
+    "message": "月末最終稼働日(短縮)",
+    "description": "Chip label"
+  },
+  "chipDesc_month_last_workday_short": {
+    "message": "「稼働曜日」設定に基づき、今月最終稼働日の日付を「月/日」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_last_workday_short": {
+    "message": "3/31",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_month_last_workday_with_day": {
+    "message": "月末最終稼働日(曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_month_last_workday_with_day": {
+    "message": "「稼働曜日」設定に基づき、今月最終稼働日の日付を「年月日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_last_workday_with_day": {
+    "message": "2025年3月31日(月)",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_month_last_workday_short_with_day": {
+    "message": "月末最終稼働日(短縮曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_month_last_workday_short_with_day": {
+    "message": "「稼働曜日」設定に基づき、今月最終稼働日の日付を「月/日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_last_workday_short_with_day": {
+    "message": "3/31(月)",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_monday_with_day": {
+    "message": "翌週月曜日の日付を「年月日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_monday_with_day": {
+    "message": "2025年3月17日(月)",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_monday_short_with_day": {
+    "message": "次月曜日(短縮曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_monday_short_with_day": {
+    "message": "翌週月曜日の日付を「月/日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_monday_short_with_day": {
+    "message": "3/17(月)",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_tuesday_with_day": {
+    "message": "翌週火曜日の日付を「年月日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_tuesday_with_day": {
+    "message": "2025年3月18日(火)",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_tuesday_short_with_day": {
+    "message": "次火曜日(短縮曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_tuesday_short_with_day": {
+    "message": "翌週火曜日の日付を「月/日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_tuesday_short_with_day": {
+    "message": "3/18(火)",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_wednesday_with_day": {
+    "message": "翌週水曜日の日付を「年月日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_wednesday_with_day": {
+    "message": "2025年3月19日(水)",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_wednesday_short_with_day": {
+    "message": "次水曜日(短縮曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_wednesday_short_with_day": {
+    "message": "翌週水曜日の日付を「月/日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_wednesday_short_with_day": {
+    "message": "3/19(水)",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_thursday_with_day": {
+    "message": "翌週木曜日の日付を「年月日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_thursday_with_day": {
+    "message": "2025年3月20日(木)",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_thursday_short_with_day": {
+    "message": "次木曜日(短縮曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_thursday_short_with_day": {
+    "message": "翌週木曜日の日付を「月/日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_thursday_short_with_day": {
+    "message": "3/20(木)",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_friday_with_day": {
+    "message": "翌週金曜日の日付を「年月日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_friday_with_day": {
+    "message": "2025年3月21日(金)",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_friday_short_with_day": {
+    "message": "次金曜日(短縮曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_friday_short_with_day": {
+    "message": "翌週金曜日の日付を「月/日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_friday_short_with_day": {
+    "message": "3/21(金)",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_saturday_with_day": {
+    "message": "翌週土曜日の日付を「年月日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_saturday_with_day": {
+    "message": "2025年3月22日(土)",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_saturday_short_with_day": {
+    "message": "次土曜日(短縮曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_saturday_short_with_day": {
+    "message": "翌週土曜日の日付を「月/日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_saturday_short_with_day": {
+    "message": "3/22(土)",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_sunday_with_day": {
+    "message": "翌週日曜日の日付を「年月日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_sunday_with_day": {
+    "message": "2025年3月23日(日)",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_sunday_short_with_day": {
+    "message": "次日曜日(短縮曜日有)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_sunday_short_with_day": {
+    "message": "翌週日曜日の日付を「月/日(曜日)」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_sunday_short_with_day": {
+    "message": "3/23(日)",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_time": {
+    "message": "現在時刻を「時:分」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_time": {
+    "message": "10:07",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_time_adj": {
+    "message": "現在時刻を設定された補正間隔（例: 15分）に一番近い時刻に四捨五入して挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_time_adj": {
+    "message": "10:00",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_time_prev_adj": {
+    "message": "現在時刻を設定された補正間隔（例: 15分）の直前の時刻に切り捨てて挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_time_prev_adj": {
+    "message": "10:00",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_time_next_adj": {
+    "message": "現在時刻を設定された補正間隔（例: 15分）の直後の時刻に切り上げて挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_time_next_adj": {
+    "message": "10:15",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_in_one_hour": {
+    "message": "1時間後の時刻を「時:分」形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_in_one_hour": {
+    "message": "11:07",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_in_one_hour_adj": {
+    "message": "1時間後の時刻を設定された補正間隔に一番近い時刻に四捨五入して挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_in_one_hour_adj": {
+    "message": "11:00",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_in_one_hour_prev_adj": {
+    "message": "1時間後の時刻を設定された補正間隔の直前の時刻に切り捨てて挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_in_one_hour_prev_adj": {
+    "message": "11:00",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_in_one_hour_next_adj": {
+    "message": "1時間後の時刻を設定された補正間隔の直後の時刻に切り上げて挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_in_one_hour_next_adj": {
+    "message": "11:15",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_def_1": {
+    "message": "カテゴリ設定で指定した定義文のテキストを挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_def_1": {
+    "message": "企画会議",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_def_2": {
+    "message": "カテゴリ設定で指定した定義文のテキストを挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_def_2": {
+    "message": "03-1234-5678",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_def_3": {
+    "message": "カテゴリ設定で指定した定義文のテキストを挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_def_3": {
+    "message": "補足説明",
+    "description": "Chip tooltip example value"
   }
 }

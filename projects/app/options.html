@@ -77,37 +77,81 @@
             <h2 id="i18n-chips-header">チップ (キャレット位置にクリックまたはドラッグで挿入)</h2>
           </div>
           <div id="chips-container" class="chips-container">
-            <!-- Row 1 -->
+            <!-- Group 1: Today -->
             <div class="chips-row">
               <div class="chip" draggable="true" data-tag="{{date}}"><span class="material-symbols-outlined chip-icon">calendar_today</span>今日</div>
               <div class="chip" draggable="true" data-tag="{{date_short}}"><span class="material-symbols-outlined chip-icon">calendar_today</span>今日(短縮)</div>
               <div class="chip" draggable="true" data-tag="{{date_with_day}}"><span class="material-symbols-outlined chip-icon">calendar_today</span>今日(曜日有)</div>
+              <div class="chip" draggable="true" data-tag="{{date_short_with_day}}"><span class="material-symbols-outlined chip-icon">calendar_today</span>今日(短縮曜日有)</div>
+            </div>
+            <div class="chips-divider"></div>
+            <!-- Group 2: Tomorrow -->
+            <div class="chips-row">
               <div class="chip" draggable="true" data-tag="{{tomorrow}}"><span class="material-symbols-outlined chip-icon">arrow_forward</span>明日</div>
               <div class="chip" draggable="true" data-tag="{{tomorrow_short}}"><span class="material-symbols-outlined chip-icon">arrow_forward</span>明日(短縮)</div>
               <div class="chip" draggable="true" data-tag="{{tomorrow_with_day}}"><span class="material-symbols-outlined chip-icon">arrow_forward</span>明日(曜日有)</div>
-              <div class="chip" draggable="true" data-tag="{{next_workday}}"><span class="material-symbols-outlined chip-icon">work</span>次稼働日</div>
-              <div class="chip" draggable="true" data-tag="{{next_workday_with_day}}"><span class="material-symbols-outlined chip-icon">work</span>次稼働日(曜日有)</div>
+              <div class="chip" draggable="true" data-tag="{{tomorrow_short_with_day}}"><span class="material-symbols-outlined chip-icon">arrow_forward</span>明日(短縮曜日有)</div>
             </div>
-            <!-- Row 2: 7..12 -->
+            <div class="chips-divider"></div>
+            <!-- Group 3: Yesterday -->
+            <div class="chips-row">
+              <div class="chip" draggable="true" data-tag="{{yesterday}}"><span class="material-symbols-outlined chip-icon">arrow_back</span>昨日</div>
+              <div class="chip" draggable="true" data-tag="{{yesterday_short}}"><span class="material-symbols-outlined chip-icon">arrow_back</span>昨日(短縮)</div>
+              <div class="chip" draggable="true" data-tag="{{yesterday_with_day}}"><span class="material-symbols-outlined chip-icon">arrow_back</span>昨日(曜日有)</div>
+              <div class="chip" draggable="true" data-tag="{{yesterday_short_with_day}}"><span class="material-symbols-outlined chip-icon">arrow_back</span>昨日(短縮曜日有)</div>
+            </div>
+            <div class="chips-divider"></div>
+            <!-- Group 4: Next Workday -->
+            <div class="chips-row">
+              <div class="chip" draggable="true" data-tag="{{next_workday}}"><span class="material-symbols-outlined chip-icon">work</span>次稼働日</div>
+              <div class="chip" draggable="true" data-tag="{{next_workday_short}}"><span class="material-symbols-outlined chip-icon">work</span>次稼働日(短縮)</div>
+              <div class="chip" draggable="true" data-tag="{{next_workday_with_day}}"><span class="material-symbols-outlined chip-icon">work</span>次稼働日(曜日有)</div>
+              <div class="chip" draggable="true" data-tag="{{next_workday_short_with_day}}"><span class="material-symbols-outlined chip-icon">work</span>次稼働日(短縮曜日有)</div>
+            </div>
+            <div class="chips-divider"></div>
+            <!-- Group 5: In 1 Week -->
             <div class="chips-row">
               <div class="chip" draggable="true" data-tag="{{next_week}}"><span class="material-symbols-outlined chip-icon">fast_forward</span>一週間後</div>
+              <div class="chip" draggable="true" data-tag="{{next_week_short}}"><span class="material-symbols-outlined chip-icon">fast_forward</span>一週間後(短縮)</div>
               <div class="chip" draggable="true" data-tag="{{next_week_with_day}}"><span class="material-symbols-outlined chip-icon">fast_forward</span>一週間後(曜日有)</div>
-              <div class="chip" draggable="true" data-tag="{{yesterday}}"><span class="material-symbols-outlined chip-icon">arrow_back</span>昨日</div>
-              <div class="chip" draggable="true" data-tag="{{yesterday_with_day}}"><span class="material-symbols-outlined chip-icon">arrow_back</span>昨日(曜日有)</div>
-              <div class="chip" draggable="true" data-tag="{{month_end}}"><span class="material-symbols-outlined chip-icon">calendar_month</span>月末</div>
-              <div class="chip" draggable="true" data-tag="{{month_last_workday}}"><span class="material-symbols-outlined chip-icon">domain</span>月末最終稼働日</div>
+              <div class="chip" draggable="true" data-tag="{{next_week_short_with_day}}"><span class="material-symbols-outlined chip-icon">fast_forward</span>一週間後(短縮曜日有)</div>
             </div>
-            <!-- Row 3: 13..19 -->
+            <div class="chips-divider"></div>
+            <!-- Group 6: Month End -->
+            <div class="chips-row">
+              <div class="chip" draggable="true" data-tag="{{month_end}}"><span class="material-symbols-outlined chip-icon">calendar_month</span>月末</div>
+              <div class="chip" draggable="true" data-tag="{{month_end_short}}"><span class="material-symbols-outlined chip-icon">calendar_month</span>月末(短縮)</div>
+              <div class="chip" draggable="true" data-tag="{{month_end_with_day}}"><span class="material-symbols-outlined chip-icon">calendar_month</span>月末(曜日有)</div>
+              <div class="chip" draggable="true" data-tag="{{month_end_short_with_day}}"><span class="material-symbols-outlined chip-icon">calendar_month</span>月末(短縮曜日有)</div>
+            </div>
+            <div class="chips-divider"></div>
+            <!-- Group 7: Month Last Workday -->
+            <div class="chips-row">
+              <div class="chip" draggable="true" data-tag="{{month_last_workday}}"><span class="material-symbols-outlined chip-icon">domain</span>月末最終稼働日</div>
+              <div class="chip" draggable="true" data-tag="{{month_last_workday_short}}"><span class="material-symbols-outlined chip-icon">domain</span>月末最終稼働日(短縮)</div>
+              <div class="chip" draggable="true" data-tag="{{month_last_workday_with_day}}"><span class="material-symbols-outlined chip-icon">domain</span>月末最終稼働日(曜日有)</div>
+              <div class="chip" draggable="true" data-tag="{{month_last_workday_short_with_day}}"><span class="material-symbols-outlined chip-icon">domain</span>月末最終稼働日(短縮曜日有)</div>
+            </div>
+            <div class="chips-divider"></div>
+            <!-- Group 8: Next Week Specified Weekday -->
             <div class="chips-row">
               <div class="chip" draggable="true" data-tag="{{next_week_monday_with_day}}"><span class="material-symbols-outlined chip-icon">event</span>次月曜日</div>
+              <div class="chip" draggable="true" data-tag="{{next_week_monday_short_with_day}}"><span class="material-symbols-outlined chip-icon">event</span>次月曜日(短縮曜日有)</div>
               <div class="chip" draggable="true" data-tag="{{next_week_tuesday_with_day}}"><span class="material-symbols-outlined chip-icon">event</span>次火曜日</div>
+              <div class="chip" draggable="true" data-tag="{{next_week_tuesday_short_with_day}}"><span class="material-symbols-outlined chip-icon">event</span>次火曜日(短縮曜日有)</div>
               <div class="chip" draggable="true" data-tag="{{next_week_wednesday_with_day}}"><span class="material-symbols-outlined chip-icon">event</span>次水曜日</div>
+              <div class="chip" draggable="true" data-tag="{{next_week_wednesday_short_with_day}}"><span class="material-symbols-outlined chip-icon">event</span>次水曜日(短縮曜日有)</div>
               <div class="chip" draggable="true" data-tag="{{next_week_thursday_with_day}}"><span class="material-symbols-outlined chip-icon">event</span>次木曜日</div>
+              <div class="chip" draggable="true" data-tag="{{next_week_thursday_short_with_day}}"><span class="material-symbols-outlined chip-icon">event</span>次木曜日(短縮曜日有)</div>
               <div class="chip" draggable="true" data-tag="{{next_week_friday_with_day}}"><span class="material-symbols-outlined chip-icon">event</span>次金曜日</div>
+              <div class="chip" draggable="true" data-tag="{{next_week_friday_short_with_day}}"><span class="material-symbols-outlined chip-icon">event</span>次金曜日(短縮曜日有)</div>
               <div class="chip" draggable="true" data-tag="{{next_week_saturday_with_day}}"><span class="material-symbols-outlined chip-icon">event</span>次土曜日</div>
+              <div class="chip" draggable="true" data-tag="{{next_week_saturday_short_with_day}}"><span class="material-symbols-outlined chip-icon">event</span>次土曜日(短縮曜日有)</div>
               <div class="chip" draggable="true" data-tag="{{next_week_sunday_with_day}}"><span class="material-symbols-outlined chip-icon">event</span>次日曜日</div>
+              <div class="chip" draggable="true" data-tag="{{next_week_sunday_short_with_day}}"><span class="material-symbols-outlined chip-icon">event</span>次日曜日(短縮曜日有)</div>
             </div>
-            <!-- Row 4: time chips -->
+            <div class="chips-divider"></div>
+            <!-- Group 9: Time & Adjustments -->
             <div class="chips-row">
               <div class="chip" draggable="true" data-tag="{{time}}"><span class="material-symbols-outlined chip-icon">schedule</span>現在時刻</div>
               <div class="chip" draggable="true" data-tag="{{time_adj}}"><span class="material-symbols-outlined chip-icon">schedule</span>現在時刻(補正)</div>
@@ -118,7 +162,8 @@
               <div class="chip" draggable="true" data-tag="{{in_one_hour_prev_adj}}"><span class="material-symbols-outlined chip-icon">schedule</span>一時間後(前補正)</div>
               <div class="chip" draggable="true" data-tag="{{in_one_hour_next_adj}}"><span class="material-symbols-outlined chip-icon">schedule</span>一時間後(後補正)</div>
             </div>
-            <!-- Row 5: def_1, def_2, def_3 -->
+            <div class="chips-divider"></div>
+            <!-- Group 10: Definitions -->
             <div class="chips-row">
               <div class="chip" draggable="true" data-tag="{{def_1}}"><span class="material-symbols-outlined chip-icon">edit_note</span>定義文1</div>
               <div class="chip" draggable="true" data-tag="{{def_2}}"><span class="material-symbols-outlined chip-icon">edit_note</span>定義文2</div>
@@ -210,6 +255,9 @@
       </section>
     </main>
   </div>
+
+  <!-- Chip Tooltip -->
+  <div id="chip-tooltip" class="chip-tooltip hidden"></div>
 
   <!-- Toast Notification -->
   <div id="toast" class="toast hidden"></div>

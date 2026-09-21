@@ -11,27 +11,53 @@ function getVariableMap() {
     '{{date}}': { label: getMessage('chipTag_date'), icon: 'calendar_today' },
     '{{date_short}}': { label: getMessage('chipTag_date_short'), icon: 'calendar_today' },
     '{{date_with_day}}': { label: getMessage('chipTag_date_with_day'), icon: 'calendar_today' },
+    '{{date_short_with_day}}': { label: getMessage('chipTag_date_short_with_day'), icon: 'calendar_today' },
+
     '{{tomorrow}}': { label: getMessage('chipTag_tomorrow'), icon: 'arrow_forward' },
     '{{tomorrow_short}}': { label: getMessage('chipTag_tomorrow_short'), icon: 'arrow_forward' },
     '{{tomorrow_with_day}}': { label: getMessage('chipTag_tomorrow_with_day'), icon: 'arrow_forward' },
-    '{{next_workday}}': { label: getMessage('chipTag_next_workday'), icon: 'work' },
-    '{{next_workday_with_day}}': { label: getMessage('chipTag_next_workday_with_day'), icon: 'work' },
-    '{{next_week}}': { label: getMessage('chipTag_next_week'), icon: 'fast_forward' },
-    '{{next_week_with_day}}': { label: getMessage('chipTag_next_week_with_day'), icon: 'fast_forward' },
+    '{{tomorrow_short_with_day}}': { label: getMessage('chipTag_tomorrow_short_with_day'), icon: 'arrow_forward' },
+
     '{{yesterday}}': { label: getMessage('chipTag_yesterday'), icon: 'arrow_back' },
+    '{{yesterday_short}}': { label: getMessage('chipTag_yesterday_short'), icon: 'arrow_back' },
     '{{yesterday_with_day}}': { label: getMessage('chipTag_yesterday_with_day'), icon: 'arrow_back' },
-    '{{next_week_monday_with_day}}': { label: getMessage('chipTag_next_week_monday_with_day'), icon: 'event' },
-    '{{next_week_tuesday_with_day}}': { label: getMessage('chipTag_next_week_tuesday_with_day'), icon: 'event' },
-    '{{next_week_wednesday_with_day}}': { label: getMessage('chipTag_next_week_wednesday_with_day'), icon: 'event' },
-    '{{next_week_thursday_with_day}}': { label: getMessage('chipTag_next_week_thursday_with_day'), icon: 'event' },
-    '{{next_week_friday_with_day}}': { label: getMessage('chipTag_next_week_friday_with_day'), icon: 'event' },
-    '{{next_week_saturday_with_day}}': { label: getMessage('chipTag_next_week_saturday_with_day'), icon: 'event' },
-    '{{next_week_sunday_with_day}}': { label: getMessage('chipTag_next_week_sunday_with_day'), icon: 'event' },
+    '{{yesterday_short_with_day}}': { label: getMessage('chipTag_yesterday_short_with_day'), icon: 'arrow_back' },
+
+    '{{next_workday}}': { label: getMessage('chipTag_next_workday'), icon: 'work' },
+    '{{next_workday_short}}': { label: getMessage('chipTag_next_workday_short'), icon: 'work' },
+    '{{next_workday_with_day}}': { label: getMessage('chipTag_next_workday_with_day'), icon: 'work' },
+    '{{next_workday_short_with_day}}': { label: getMessage('chipTag_next_workday_short_with_day'), icon: 'work' },
+
+    '{{next_week}}': { label: getMessage('chipTag_next_week'), icon: 'fast_forward' },
+    '{{next_week_short}}': { label: getMessage('chipTag_next_week_short'), icon: 'fast_forward' },
+    '{{next_week_with_day}}': { label: getMessage('chipTag_next_week_with_day'), icon: 'fast_forward' },
+    '{{next_week_short_with_day}}': { label: getMessage('chipTag_next_week_short_with_day'), icon: 'fast_forward' },
+
     '{{month_end}}': { label: getMessage('chipTag_month_end'), icon: 'calendar_month' },
+    '{{month_end_short}}': { label: getMessage('chipTag_month_end_short'), icon: 'calendar_month' },
+    '{{month_end_with_day}}': { label: getMessage('chipTag_month_end_with_day'), icon: 'calendar_month' },
+    '{{month_end_short_with_day}}': { label: getMessage('chipTag_month_end_short_with_day'), icon: 'calendar_month' },
+
     '{{month_last_workday}}': { label: getMessage('chipTag_month_last_workday'), icon: 'domain' },
-    '{{def_1}}': { label: getMessage('chipTag_def_1'), icon: 'edit_note' },
-    '{{def_2}}': { label: getMessage('chipTag_def_2'), icon: 'edit_note' },
-    '{{def_3}}': { label: getMessage('chipTag_def_3'), icon: 'edit_note' },
+    '{{month_last_workday_short}}': { label: getMessage('chipTag_month_last_workday_short'), icon: 'domain' },
+    '{{month_last_workday_with_day}}': { label: getMessage('chipTag_month_last_workday_with_day'), icon: 'domain' },
+    '{{month_last_workday_short_with_day}}': { label: getMessage('chipTag_month_last_workday_short_with_day'), icon: 'domain' },
+
+    '{{next_week_monday_with_day}}': { label: getMessage('chipTag_next_week_monday_with_day'), icon: 'event' },
+    '{{next_week_monday_short_with_day}}': { label: getMessage('chipTag_next_week_monday_short_with_day'), icon: 'event' },
+    '{{next_week_tuesday_with_day}}': { label: getMessage('chipTag_next_week_tuesday_with_day'), icon: 'event' },
+    '{{next_week_tuesday_short_with_day}}': { label: getMessage('chipTag_next_week_tuesday_short_with_day'), icon: 'event' },
+    '{{next_week_wednesday_with_day}}': { label: getMessage('chipTag_next_week_wednesday_with_day'), icon: 'event' },
+    '{{next_week_wednesday_short_with_day}}': { label: getMessage('chipTag_next_week_wednesday_short_with_day'), icon: 'event' },
+    '{{next_week_thursday_with_day}}': { label: getMessage('chipTag_next_week_thursday_with_day'), icon: 'event' },
+    '{{next_week_thursday_short_with_day}}': { label: getMessage('chipTag_next_week_thursday_short_with_day'), icon: 'event' },
+    '{{next_week_friday_with_day}}': { label: getMessage('chipTag_next_week_friday_with_day'), icon: 'event' },
+    '{{next_week_friday_short_with_day}}': { label: getMessage('chipTag_next_week_friday_short_with_day'), icon: 'event' },
+    '{{next_week_saturday_with_day}}': { label: getMessage('chipTag_next_week_saturday_with_day'), icon: 'event' },
+    '{{next_week_saturday_short_with_day}}': { label: getMessage('chipTag_next_week_saturday_short_with_day'), icon: 'event' },
+    '{{next_week_sunday_with_day}}': { label: getMessage('chipTag_next_week_sunday_with_day'), icon: 'event' },
+    '{{next_week_sunday_short_with_day}}': { label: getMessage('chipTag_next_week_sunday_short_with_day'), icon: 'event' },
+
     '{{time}}': { label: getMessage('chipTag_time'), icon: 'schedule' },
     '{{time_adj}}': { label: getMessage('chipTag_time_adj'), icon: 'schedule' },
     '{{time_prev_adj}}': { label: getMessage('chipTag_time_prev_adj'), icon: 'schedule' },
@@ -39,7 +65,11 @@ function getVariableMap() {
     '{{in_one_hour}}': { label: getMessage('chipTag_in_one_hour'), icon: 'schedule' },
     '{{in_one_hour_adj}}': { label: getMessage('chipTag_in_one_hour_adj'), icon: 'schedule' },
     '{{in_one_hour_prev_adj}}': { label: getMessage('chipTag_in_one_hour_prev_adj'), icon: 'schedule' },
-    '{{in_one_hour_next_adj}}': { label: getMessage('chipTag_in_one_hour_next_adj'), icon: 'schedule' }
+    '{{in_one_hour_next_adj}}': { label: getMessage('chipTag_in_one_hour_next_adj'), icon: 'schedule' },
+
+    '{{def_1}}': { label: getMessage('chipTag_def_1'), icon: 'edit_note' },
+    '{{def_2}}': { label: getMessage('chipTag_def_2'), icon: 'edit_note' },
+    '{{def_3}}': { label: getMessage('chipTag_def_3'), icon: 'edit_note' }
   };
 }
 
@@ -1581,11 +1611,61 @@ function setupEventHandlers() {
     });
   }
 
-  // Variable Chips (Click & Drag)
+  // Custom Tooltip for Variable Chips
+  const chipTooltip = document.getElementById('chip-tooltip');
+
+  function showChipTooltip(chip) {
+    if (!chipTooltip) return;
+    const tag = chip.dataset.tag;
+    if (!tag) return;
+    const key = tag.replace(/[\{\}]/g, '');
+    const desc = getMessage(`chipDesc_${key}`);
+    const ex = getMessage(`chipEx_${key}`);
+    const exLabel = getMessage('chipExampleLabel');
+
+    if (!desc) return;
+
+    let content = escapeHtml(desc);
+    if (ex) {
+      content += `<br><span>${escapeHtml(exLabel)}<strong>${escapeHtml(ex)}</strong></span>`;
+    }
+
+    chipTooltip.innerHTML = content;
+    chipTooltip.classList.remove('hidden');
+
+    const rect = chip.getBoundingClientRect();
+    const tooltipRect = chipTooltip.getBoundingClientRect();
+
+    let top = rect.top - tooltipRect.height - 8;
+    if (top < 8) {
+      top = rect.bottom + 8;
+    }
+
+    let left = rect.left + (rect.width - tooltipRect.width) / 2;
+    if (left < 8) left = 8;
+    if (left + tooltipRect.width > window.innerWidth - 8) {
+      left = window.innerWidth - tooltipRect.width - 8;
+    }
+
+    chipTooltip.style.top = `${top}px`;
+    chipTooltip.style.left = `${left}px`;
+  }
+
+  function hideChipTooltip() {
+    if (chipTooltip) {
+      chipTooltip.classList.add('hidden');
+    }
+  }
+
+  // Variable Chips (Click, Drag, & Tooltip Hover)
   document.querySelectorAll('.chip').forEach(chip => {
     const tag = chip.dataset.tag;
 
+    chip.addEventListener('mouseenter', () => showChipTooltip(chip));
+    chip.addEventListener('mouseleave', hideChipTooltip);
+
     chip.addEventListener('click', () => {
+      hideChipTooltip();
       const activeEl = document.activeElement;
       let targetEditor = null;
 
@@ -1605,9 +1685,15 @@ function setupEventHandlers() {
     });
 
     chip.addEventListener('dragstart', (e) => {
+      hideChipTooltip();
       e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'chip', tag }));
     });
   });
+
+  const chipsContainer = document.getElementById('chips-container');
+  if (chipsContainer) {
+    chipsContainer.addEventListener('scroll', hideChipTooltip, { passive: true });
+  }
 
   // Backup Export
   document.getElementById('btn-export').addEventListener('click', () => {
