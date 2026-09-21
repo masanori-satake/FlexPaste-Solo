@@ -479,6 +479,12 @@ export function formatDateWithDay(date) {
   }
 }
 
+/**
+ * 日付を年なしの短縮形式へ整形し、曜日を付加する。
+ *
+ * @param {Date} date 整形する日付。
+ * @returns {string} 現在の言語に合わせて整形した日付文字列。
+ */
 export function formatDateShortWithDay(date) {
   if (isJapaneseLocale()) {
     const weekdaysJa = ['日', '月', '火', '水', '木', '金', '土'];
@@ -558,6 +564,12 @@ export function calculateNextWorkday(now, workdays) {
   return d;
 }
 
+/**
+ * 翌週の月曜日から日曜日までを曜日付きの日付文字列へ整形する。
+ *
+ * @param {Date} now 基準日時。
+ * @returns {Object<string, string>} 各曜日の動的変数名と整形済み日付の対応表。
+ */
 export function getNextWeekDays(now) {
   const day = now.getDay();
   const isoDay = day === 0 ? 7 : day;
@@ -575,6 +587,13 @@ export function getNextWeekDays(now) {
   return result;
 }
 
+/**
+ * 指定した稼働日設定に基づき、当月の最終稼働日を取得する。
+ *
+ * @param {Date} now 基準日時。
+ * @param {Array<number|string>} workdays ISO 曜日番号で表した稼働日。
+ * @returns {Date} 当月の最終稼働日。
+ */
 export function calculateMonthLastWorkdayDate(now, workdays) {
   let activeWorkdays = Array.isArray(workdays)
     ? workdays
@@ -603,14 +622,26 @@ export function calculateMonthLastWorkdayDate(now, workdays) {
   return new Date(now.getFullYear(), now.getMonth() + 1, 0, now.getHours(), now.getMinutes(), now.getSeconds());
 }
 
+/**
+ * 当月の最終稼働日を年月日形式の文字列で返す。
+ *
+ * @param {Date} now 基準日時。
+ * @param {Array<number|string>} workdays ISO 曜日番号で表した稼働日。
+ * @returns {string} `YYYY/MM/DD` 形式の最終稼働日。
+ */
 export function calculateMonthLastWorkday(now, workdays) {
   return formatDate(calculateMonthLastWorkdayDate(now, workdays));
 }
 
-// ⚡ Bolt Optimization: Early return and lazy variable computation.
-// Pre-computing 30+ Date objects, workday calculations, and formatting for every call
-// causes ~10x performance overhead. Early return skips parsing entirely when no Mustache tags exist,
-// and lazy evaluation computes variables on demand and caches results per call.
+/**
+ * テンプレート内の動的変数をコンテキストと基準日時から解決する。
+ * 変数がない場合は早期終了し、日付計算は必要になった時点で一度だけ行う。
+ *
+ * @param {string} templateContent 解決対象のテンプレート文字列。
+ * @param {Object} [contextData={}] 稼働日、時刻調整値、定義値を含むコンテキスト。
+ * @param {Date} [now=new Date()] 動的変数の計算に使用する基準日時。
+ * @returns {string} 動的変数を置換したテンプレート文字列。
+ */
 export function resolveVariables(templateContent, contextData = {}, now = new Date()) {
   if (!templateContent || typeof templateContent !== 'string') return '';
   if (!templateContent.includes('{{')) return templateContent;
@@ -643,10 +674,14 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
     if (!nextWorkdayDate) nextWorkdayDate = calculateNextWorkday(now, workdays);
     return nextWorkdayDate;
   }
+
+  /** 当月末の日付を遅延生成し、同じ解決処理内で再利用する。 */
   function getMonthEndDate() {
     if (!monthEndDate) monthEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, now.getHours(), now.getMinutes(), now.getSeconds());
     return monthEndDate;
   }
+
+  /** 当月の最終稼働日を遅延計算し、同じ解決処理内で再利用する。 */
   function getMonthLastWorkdayDate() {
     if (!monthLastWorkdayDate) monthLastWorkdayDate = calculateMonthLastWorkdayDate(now, workdays);
     return monthLastWorkdayDate;
@@ -656,6 +691,12 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
     return nextWeekDays;
   }
 
+  /**
+   * 動的変数名に対応する値を計算し、同じ解決処理内でキャッシュする。
+   *
+   * @param {string} varName 波括弧を除いた動的変数名。
+   * @returns {string|undefined} 解決した値。未対応の変数の場合は undefined。
+   */
   function getValue(varName) {
     if (cache.has(varName)) return cache.get(varName);
 
