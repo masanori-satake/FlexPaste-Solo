@@ -1,10 +1,10 @@
 {
   "appName": {
-    "message": "FlexPaste-Solo - Smart Clipboard Text Formatter",
+    "message": "FlexPaste-Solo - Smart Clipboard Templates",
     "description": "App Name"
   },
   "appDesc": {
-    "message": "100% local & privacy-first text formatter. Clean up formatting and paste dynamic templates quickly into docs, chats & editors.",
+    "message": "100% local & privacy-first dynamic template inserter. Quickly paste custom templates with date & time chips from context menu.",
     "description": "App Description"
   },
   "headerSubtitle": {

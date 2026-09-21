@@ -1,10 +1,10 @@
 {
   "appName": {
-    "message": "FlexPaste-Solo - クリップボードテキストの改行・フォーマット柔軟変換",
+    "message": "FlexPaste-Solo - 定型文＆動的変数ペースト挿入",
     "description": "App Name"
   },
   "appDesc": {
-    "message": "コピーしたテキストの余計な改行除去やフォーマット調整をペースト前に瞬時に実行。チャットや資料作成時の不快なフォーマット崩れを防ぎます。",
+    "message": "右クリックからカテゴリ別定型文や日付・時刻などの動的変数を瞬時にペースト挿入。100%ローカル実行でプライバシー重視のテンプレートツール。",
     "description": "App Description"
   },
   "headerSubtitle": {
