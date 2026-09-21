@@ -5,3 +5,5 @@ releases/
 .DS_Store
 .vscode/
 .idea/
+_metadata/
+**/_metadata/

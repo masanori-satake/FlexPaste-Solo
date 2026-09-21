@@ -4,6 +4,8 @@ import json
 import sys
 
 def create_package():
+    """Chrome 拡張機能をバージョン付き ZIP アーカイブにまとめる。"""
+
     with open('projects/app/version.json', 'r', encoding='utf-8') as f:
         version = json.load(f)['version']
 
@@ -23,7 +25,11 @@ def create_package():
     zip_path = os.path.join('releases', output_filename)
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for root, dirs, files in os.walk('projects/app'):
+            # Filter dirs in-place to prevent traversing excluded directories (_metadata, hidden dirs, etc.)
+            dirs[:] = [d for d in dirs if d == '_locales' or (not d.startswith('_') and not d.startswith('.'))]
             for file in files:
+                if file.startswith('.') or file.lower() == 'thumbs.db':
+                    continue
                 filepath = os.path.join(root, file)
                 arcname = os.path.relpath(filepath, 'projects/app')
                 if arcname == 'manifest.chrome.json':
