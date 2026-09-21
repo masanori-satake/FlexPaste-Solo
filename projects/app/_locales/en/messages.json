@@ -467,5 +467,517 @@
   "dragToReorder": {
     "message": "Drag to reorder",
     "description": "Tooltip for template handle"
+  },
+  "chipExampleLabel": {
+    "message": "e.g. ",
+    "description": "Prefix for chip example in tooltip"
+  },
+  "chipDesc_date": {
+    "message": "Inserts today's date in YYYY/MM/DD format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_date": {
+    "message": "2025/03/15",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_date_short": {
+    "message": "Inserts today's date in M/D format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_date_short": {
+    "message": "3/15",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_date_with_day": {
+    "message": "Inserts today's date with year, month, day, and weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_date_with_day": {
+    "message": "Sat, Mar 15, 2025",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_date_short_with_day": {
+    "message": "Today (Short w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_date_short_with_day": {
+    "message": "Inserts today's date in M/D format with weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_date_short_with_day": {
+    "message": "Sat, Mar 15",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_tomorrow": {
+    "message": "Inserts tomorrow's date in YYYY/MM/DD format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_tomorrow": {
+    "message": "2025/03/16",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_tomorrow_short": {
+    "message": "Inserts tomorrow's date in M/D format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_tomorrow_short": {
+    "message": "3/16",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_tomorrow_with_day": {
+    "message": "Inserts tomorrow's date with year, month, day, and weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_tomorrow_with_day": {
+    "message": "Sun, Mar 16, 2025",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_tomorrow_short_with_day": {
+    "message": "Tomorrow (Short w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_tomorrow_short_with_day": {
+    "message": "Inserts tomorrow's date in M/D format with weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_tomorrow_short_with_day": {
+    "message": "Sun, Mar 16",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_yesterday": {
+    "message": "Inserts yesterday's date in YYYY/MM/DD format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_yesterday": {
+    "message": "2025/03/14",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_yesterday_short": {
+    "message": "Yesterday (Short)",
+    "description": "Chip label"
+  },
+  "chipDesc_yesterday_short": {
+    "message": "Inserts yesterday's date in M/D format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_yesterday_short": {
+    "message": "3/14",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_yesterday_with_day": {
+    "message": "Inserts yesterday's date with year, month, day, and weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_yesterday_with_day": {
+    "message": "Fri, Mar 14, 2025",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_yesterday_short_with_day": {
+    "message": "Yesterday (Short w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_yesterday_short_with_day": {
+    "message": "Inserts yesterday's date in M/D format with weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_yesterday_short_with_day": {
+    "message": "Fri, Mar 14",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_workday": {
+    "message": "Inserts next workday in YYYY/MM/DD format based on Workdays setting.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_workday": {
+    "message": "2025/03/17",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_workday_short": {
+    "message": "Next Workday (Short)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_workday_short": {
+    "message": "Inserts next workday in M/D format based on Workdays setting.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_workday_short": {
+    "message": "3/17",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_workday_with_day": {
+    "message": "Inserts next workday with year, month, day, and weekday based on Workdays setting.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_workday_with_day": {
+    "message": "Mon, Mar 17, 2025",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_workday_short_with_day": {
+    "message": "Next Workday (Short w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_workday_short_with_day": {
+    "message": "Inserts next workday in M/D format with weekday based on Workdays setting.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_workday_short_with_day": {
+    "message": "Mon, Mar 17",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week": {
+    "message": "Inserts date 1 week later in YYYY/MM/DD format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week": {
+    "message": "2025/03/22",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_short": {
+    "message": "In 1 Week (Short)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_short": {
+    "message": "Inserts date 1 week later in M/D format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_short": {
+    "message": "3/22",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_with_day": {
+    "message": "Inserts date 1 week later with year, month, day, and weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_with_day": {
+    "message": "Sat, Mar 22, 2025",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_short_with_day": {
+    "message": "In 1 Week (Short w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_short_with_day": {
+    "message": "Inserts date 1 week later in M/D format with weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_short_with_day": {
+    "message": "Sat, Mar 22",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_month_end": {
+    "message": "Inserts last day of current month in YYYY/MM/DD format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_end": {
+    "message": "2025/03/31",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_month_end_short": {
+    "message": "End of Month (Short)",
+    "description": "Chip label"
+  },
+  "chipDesc_month_end_short": {
+    "message": "Inserts last day of current month in M/D format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_end_short": {
+    "message": "3/31",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_month_end_with_day": {
+    "message": "End of Month (w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_month_end_with_day": {
+    "message": "Inserts last day of current month with year, month, day, and weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_end_with_day": {
+    "message": "Mon, Mar 31, 2025",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_month_end_short_with_day": {
+    "message": "End of Month (Short w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_month_end_short_with_day": {
+    "message": "Inserts last day of current month in M/D format with weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_end_short_with_day": {
+    "message": "Mon, Mar 31",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_month_last_workday": {
+    "message": "Inserts month's last workday in YYYY/MM/DD format based on Workdays setting.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_last_workday": {
+    "message": "2025/03/31",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_month_last_workday_short": {
+    "message": "Month Last Workday (Short)",
+    "description": "Chip label"
+  },
+  "chipDesc_month_last_workday_short": {
+    "message": "Inserts month's last workday in M/D format based on Workdays setting.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_last_workday_short": {
+    "message": "3/31",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_month_last_workday_with_day": {
+    "message": "Month Last Workday (w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_month_last_workday_with_day": {
+    "message": "Inserts month's last workday with year, month, day, and weekday based on Workdays setting.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_last_workday_with_day": {
+    "message": "Mon, Mar 31, 2025",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_month_last_workday_short_with_day": {
+    "message": "Month Last Workday (Short w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_month_last_workday_short_with_day": {
+    "message": "Inserts month's last workday in M/D format with weekday based on Workdays setting.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_month_last_workday_short_with_day": {
+    "message": "Mon, Mar 31",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_monday_with_day": {
+    "message": "Inserts next week's Monday in full date format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_monday_with_day": {
+    "message": "Mon, Mar 17, 2025",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_monday_short_with_day": {
+    "message": "Next Mon (Short w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_monday_short_with_day": {
+    "message": "Inserts next week's Monday in M/D format with weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_monday_short_with_day": {
+    "message": "Mon, Mar 17",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_tuesday_with_day": {
+    "message": "Inserts next week's Tuesday in full date format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_tuesday_with_day": {
+    "message": "Tue, Mar 18, 2025",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_tuesday_short_with_day": {
+    "message": "Next Tue (Short w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_tuesday_short_with_day": {
+    "message": "Inserts next week's Tuesday in M/D format with weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_tuesday_short_with_day": {
+    "message": "Tue, Mar 18",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_wednesday_with_day": {
+    "message": "Inserts next week's Wednesday in full date format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_wednesday_with_day": {
+    "message": "Wed, Mar 19, 2025",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_wednesday_short_with_day": {
+    "message": "Next Wed (Short w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_wednesday_short_with_day": {
+    "message": "Inserts next week's Wednesday in M/D format with weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_wednesday_short_with_day": {
+    "message": "Wed, Mar 19",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_thursday_with_day": {
+    "message": "Inserts next week's Thursday in full date format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_thursday_with_day": {
+    "message": "Thu, Mar 20, 2025",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_thursday_short_with_day": {
+    "message": "Next Thu (Short w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_thursday_short_with_day": {
+    "message": "Inserts next week's Thursday in M/D format with weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_thursday_short_with_day": {
+    "message": "Thu, Mar 20",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_friday_with_day": {
+    "message": "Inserts next week's Friday in full date format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_friday_with_day": {
+    "message": "Fri, Mar 21, 2025",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_friday_short_with_day": {
+    "message": "Next Fri (Short w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_friday_short_with_day": {
+    "message": "Inserts next week's Friday in M/D format with weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_friday_short_with_day": {
+    "message": "Fri, Mar 21",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_saturday_with_day": {
+    "message": "Inserts next week's Saturday in full date format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_saturday_with_day": {
+    "message": "Sat, Mar 22, 2025",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_saturday_short_with_day": {
+    "message": "Next Sat (Short w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_saturday_short_with_day": {
+    "message": "Inserts next week's Saturday in M/D format with weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_saturday_short_with_day": {
+    "message": "Sat, Mar 22",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_next_week_sunday_with_day": {
+    "message": "Inserts next week's Sunday in full date format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_sunday_with_day": {
+    "message": "Sun, Mar 23, 2025",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_next_week_sunday_short_with_day": {
+    "message": "Next Sun (Short w/ Day)",
+    "description": "Chip label"
+  },
+  "chipDesc_next_week_sunday_short_with_day": {
+    "message": "Inserts next week's Sunday in M/D format with weekday.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_next_week_sunday_short_with_day": {
+    "message": "Sun, Mar 23",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_time": {
+    "message": "Inserts current time in HH:MM format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_time": {
+    "message": "10:07",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_time_adj": {
+    "message": "Inserts current time rounded to nearest interval.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_time_adj": {
+    "message": "10:00",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_time_prev_adj": {
+    "message": "Inserts current time rounded down to previous interval.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_time_prev_adj": {
+    "message": "10:00",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_time_next_adj": {
+    "message": "Inserts current time rounded up to next interval.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_time_next_adj": {
+    "message": "10:15",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_in_one_hour": {
+    "message": "Inserts time 1 hour later in HH:MM format.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_in_one_hour": {
+    "message": "11:07",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_in_one_hour_adj": {
+    "message": "Inserts time 1 hour later rounded to nearest interval.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_in_one_hour_adj": {
+    "message": "11:00",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_in_one_hour_prev_adj": {
+    "message": "Inserts time 1 hour later rounded down to previous interval.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_in_one_hour_prev_adj": {
+    "message": "11:00",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_in_one_hour_next_adj": {
+    "message": "Inserts time 1 hour later rounded up to next interval.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_in_one_hour_next_adj": {
+    "message": "11:15",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_def_1": {
+    "message": "Inserts custom definition text set in Category Settings.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_def_1": {
+    "message": "Planning Meeting",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_def_2": {
+    "message": "Inserts custom definition text set in Category Settings.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_def_2": {
+    "message": "03-1234-5678",
+    "description": "Chip tooltip example value"
+  },
+  "chipDesc_def_3": {
+    "message": "Inserts custom definition text set in Category Settings.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_def_3": {
+    "message": "Note",
+    "description": "Chip tooltip example value"
   }
 }

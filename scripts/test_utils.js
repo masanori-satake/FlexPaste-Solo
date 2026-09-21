@@ -51,6 +51,29 @@ console.log('Running unit tests for utils.js & options.js...');
   assert.strictEqual(resolved, expected, `Resolved template mismatch.\nGot:      ${resolved}\nExpected: ${expected}`);
 }
 
+// 2b. Test new short and short_with_day variable tags
+{
+  const now = new Date(2025, 2, 15, 10, 7, 0); // Saturday, March 15, 2025
+  const contextData = { workdays: [1, 2, 3, 4, 5] };
+
+  // Note: Node environment defaults to EN locale ('Sat, Mar 15' / 'Sat, Mar 15, 2025') unless chrome.i18n is mocked
+  assert.strictEqual(resolveVariables('{{date_short_with_day}}', contextData, now), 'Sat, Mar 15');
+  assert.strictEqual(resolveVariables('{{tomorrow_short_with_day}}', contextData, now), 'Sun, Mar 16');
+  assert.strictEqual(resolveVariables('{{yesterday_short}}', contextData, now), '3/14');
+  assert.strictEqual(resolveVariables('{{yesterday_short_with_day}}', contextData, now), 'Fri, Mar 14');
+  assert.strictEqual(resolveVariables('{{next_workday_short}}', contextData, now), '3/17');
+  assert.strictEqual(resolveVariables('{{next_workday_short_with_day}}', contextData, now), 'Mon, Mar 17');
+  assert.strictEqual(resolveVariables('{{next_week_short}}', contextData, now), '3/22');
+  assert.strictEqual(resolveVariables('{{next_week_short_with_day}}', contextData, now), 'Sat, Mar 22');
+  assert.strictEqual(resolveVariables('{{month_end_short}}', contextData, now), '3/31');
+  assert.strictEqual(resolveVariables('{{month_end_with_day}}', contextData, now), 'Mon, Mar 31, 2025');
+  assert.strictEqual(resolveVariables('{{month_end_short_with_day}}', contextData, now), 'Mon, Mar 31');
+  assert.strictEqual(resolveVariables('{{month_last_workday_short}}', contextData, now), '3/31');
+  assert.strictEqual(resolveVariables('{{month_last_workday_with_day}}', contextData, now), 'Mon, Mar 31, 2025');
+  assert.strictEqual(resolveVariables('{{month_last_workday_short_with_day}}', contextData, now), 'Mon, Mar 31');
+  assert.strictEqual(resolveVariables('{{next_week_monday_short_with_day}}', contextData, now), 'Mon, Mar 17');
+}
+
 {
   const now = new Date(2025, 0, 1, 9, 25, 0);
   const contextData = { time_adj_interval: 30 };
