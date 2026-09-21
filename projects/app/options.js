@@ -1613,6 +1613,9 @@ function setupEventHandlers() {
 
   // Custom Tooltip for Variable Chips
   const chipTooltip = document.getElementById('chip-tooltip');
+  let activeTooltipChip = null;
+  let hoveredChip = null;
+  let focusedChip = null;
 
   /**
    * 指定された変数チップの説明と挿入例をツールチップへ表示する。
@@ -1638,6 +1641,13 @@ function setupEventHandlers() {
 
     chipTooltip.innerHTML = content;
     chipTooltip.classList.remove('hidden');
+    chipTooltip.setAttribute('aria-hidden', 'false');
+
+    if (activeTooltipChip && activeTooltipChip !== chip) {
+      activeTooltipChip.removeAttribute('aria-describedby');
+    }
+    activeTooltipChip = chip;
+    chip.setAttribute('aria-describedby', 'chip-tooltip');
 
     const rect = chip.getBoundingClientRect();
     const tooltipRect = chipTooltip.getBoundingClientRect();
@@ -1661,6 +1671,21 @@ function setupEventHandlers() {
   function hideChipTooltip() {
     if (chipTooltip) {
       chipTooltip.classList.add('hidden');
+      chipTooltip.setAttribute('aria-hidden', 'true');
+    }
+    if (activeTooltipChip) {
+      activeTooltipChip.removeAttribute('aria-describedby');
+      activeTooltipChip = null;
+    }
+  }
+
+  /** ホバー中またはフォーカス中の変数チップに合わせてツールチップを更新する。 */
+  function updateChipTooltip() {
+    const chip = focusedChip || hoveredChip;
+    if (chip) {
+      showChipTooltip(chip);
+    } else {
+      hideChipTooltip();
     }
   }
 
@@ -1672,15 +1697,35 @@ function setupEventHandlers() {
    */
   function setupVariableChip(chip) {
     const tag = chip.dataset.tag;
+    chip.setAttribute('tabindex', '0');
+    chip.setAttribute('role', 'button');
 
     /** チップにマウスポインターが入ったときにツールチップを表示する。 */
     function handleChipMouseEnter() {
-      showChipTooltip(chip);
+      hoveredChip = chip;
+      updateChipTooltip();
+    }
+
+    /** チップからマウスポインターが離れたときに表示状態を更新する。 */
+    function handleChipMouseLeave() {
+      if (hoveredChip === chip) hoveredChip = null;
+      updateChipTooltip();
+    }
+
+    /** チップがフォーカスされたときにツールチップを表示する。 */
+    function handleChipFocus() {
+      focusedChip = chip;
+      updateChipTooltip();
+    }
+
+    /** チップからフォーカスが外れたときに表示状態を更新する。 */
+    function handleChipBlur() {
+      if (focusedChip === chip) focusedChip = null;
+      updateChipTooltip();
     }
 
     /** チップをクリックしたときに、選択中のエディターへ変数を挿入する。 */
     function handleChipClick() {
-      hideChipTooltip();
       const activeEl = document.activeElement;
       let targetEditor = null;
 
@@ -1699,6 +1744,13 @@ function setupEventHandlers() {
       }
     }
 
+    /** Enter または Space キーでクリックと同じ挿入処理を実行する。 */
+    function handleChipKeyDown(event) {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      if (event.key === ' ') event.preventDefault();
+      handleChipClick();
+    }
+
     /**
      * ドラッグ開始時に変数チップの情報をデータ転送へ格納する。
      *
@@ -1711,12 +1763,15 @@ function setupEventHandlers() {
     }
 
     chip.addEventListener('mouseenter', handleChipMouseEnter);
-    chip.addEventListener('mouseleave', hideChipTooltip);
+    chip.addEventListener('mouseleave', handleChipMouseLeave);
+    chip.addEventListener('focus', handleChipFocus);
+    chip.addEventListener('blur', handleChipBlur);
     chip.addEventListener('click', handleChipClick);
+    chip.addEventListener('keydown', handleChipKeyDown);
     chip.addEventListener('dragstart', handleChipDragStart);
   }
 
-  // Variable Chips (Click, Drag, & Tooltip Hover)
+  // Variable Chips (Click, Keyboard, Drag, & Tooltip Hover/Focus)
   document.querySelectorAll('.chip').forEach(setupVariableChip);
 
   const chipsContainer = document.getElementById('chips-container');
