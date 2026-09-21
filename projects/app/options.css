@@ -713,6 +713,8 @@ input:checked + .slider:before {
   position: fixed;
   z-index: 3000;
   pointer-events: none;
+  box-sizing: border-box;
+  max-width: min(320px, calc(100vw - 16px));
   background-color: var(--md-sys-color-surface-container-highest);
   color: var(--md-sys-color-on-surface);
   border: 1px solid var(--md-sys-color-outline);
@@ -721,7 +723,6 @@ input:checked + .slider:before {
   font-size: 12px;
   line-height: 1.4;
   box-shadow: var(--md-elevation-2);
-  max-width: 320px;
   word-wrap: break-word;
   white-space: normal;
   transition: opacity 0.15s ease;

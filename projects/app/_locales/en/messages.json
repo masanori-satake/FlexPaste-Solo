@@ -501,7 +501,7 @@
     "description": "Chip label"
   },
   "chipDesc_date_short_with_day": {
-    "message": "Inserts today's date using an abbreviated weekday, abbreviated English month, and day.",
+    "message": "Inserts today's date in M/D format with weekday.",
     "description": "Chip tooltip description"
   },
   "chipEx_date_short_with_day": {
@@ -537,7 +537,7 @@
     "description": "Chip label"
   },
   "chipDesc_tomorrow_short_with_day": {
-    "message": "Inserts tomorrow's date using an abbreviated weekday, abbreviated English month, and day.",
+    "message": "Inserts tomorrow's date in M/D format with weekday.",
     "description": "Chip tooltip description"
   },
   "chipEx_tomorrow_short_with_day": {
@@ -577,7 +577,7 @@
     "description": "Chip label"
   },
   "chipDesc_yesterday_short_with_day": {
-    "message": "Inserts yesterday's date using an abbreviated weekday, abbreviated English month, and day.",
+    "message": "Inserts yesterday's date in M/D format with weekday.",
     "description": "Chip tooltip description"
   },
   "chipEx_yesterday_short_with_day": {
@@ -617,7 +617,7 @@
     "description": "Chip label"
   },
   "chipDesc_next_workday_short_with_day": {
-    "message": "Inserts the next workday using an abbreviated weekday, abbreviated English month, and day, based on the Workdays setting.",
+    "message": "Inserts next workday in M/D format with weekday based on Workdays setting.",
     "description": "Chip tooltip description"
   },
   "chipEx_next_workday_short_with_day": {
@@ -657,7 +657,7 @@
     "description": "Chip label"
   },
   "chipDesc_next_week_short_with_day": {
-    "message": "Inserts the date 1 week later using an abbreviated weekday, abbreviated English month, and day.",
+    "message": "Inserts date 1 week later in M/D format with weekday.",
     "description": "Chip tooltip description"
   },
   "chipEx_next_week_short_with_day": {
@@ -701,7 +701,7 @@
     "description": "Chip label"
   },
   "chipDesc_month_end_short_with_day": {
-    "message": "Inserts the last day of the current month using an abbreviated weekday, abbreviated English month, and day.",
+    "message": "Inserts last day of current month in M/D format with weekday.",
     "description": "Chip tooltip description"
   },
   "chipEx_month_end_short_with_day": {
@@ -745,7 +745,7 @@
     "description": "Chip label"
   },
   "chipDesc_month_last_workday_short_with_day": {
-    "message": "Inserts the month's last workday using an abbreviated weekday, abbreviated English month, and day, based on the Workdays setting.",
+    "message": "Inserts month's last workday in M/D format with weekday based on Workdays setting.",
     "description": "Chip tooltip description"
   },
   "chipEx_month_last_workday_short_with_day": {
@@ -765,7 +765,7 @@
     "description": "Chip label"
   },
   "chipDesc_next_week_monday_short_with_day": {
-    "message": "Inserts next week's Monday using an abbreviated weekday, abbreviated English month, and day.",
+    "message": "Inserts next week's Monday in M/D format with weekday.",
     "description": "Chip tooltip description"
   },
   "chipEx_next_week_monday_short_with_day": {
@@ -785,7 +785,7 @@
     "description": "Chip label"
   },
   "chipDesc_next_week_tuesday_short_with_day": {
-    "message": "Inserts next week's Tuesday using an abbreviated weekday, abbreviated English month, and day.",
+    "message": "Inserts next week's Tuesday in M/D format with weekday.",
     "description": "Chip tooltip description"
   },
   "chipEx_next_week_tuesday_short_with_day": {
@@ -805,7 +805,7 @@
     "description": "Chip label"
   },
   "chipDesc_next_week_wednesday_short_with_day": {
-    "message": "Inserts next week's Wednesday using an abbreviated weekday, abbreviated English month, and day.",
+    "message": "Inserts next week's Wednesday in M/D format with weekday.",
     "description": "Chip tooltip description"
   },
   "chipEx_next_week_wednesday_short_with_day": {
@@ -825,7 +825,7 @@
     "description": "Chip label"
   },
   "chipDesc_next_week_thursday_short_with_day": {
-    "message": "Inserts next week's Thursday using an abbreviated weekday, abbreviated English month, and day.",
+    "message": "Inserts next week's Thursday in M/D format with weekday.",
     "description": "Chip tooltip description"
   },
   "chipEx_next_week_thursday_short_with_day": {
@@ -845,7 +845,7 @@
     "description": "Chip label"
   },
   "chipDesc_next_week_friday_short_with_day": {
-    "message": "Inserts next week's Friday using an abbreviated weekday, abbreviated English month, and day.",
+    "message": "Inserts next week's Friday in M/D format with weekday.",
     "description": "Chip tooltip description"
   },
   "chipEx_next_week_friday_short_with_day": {
@@ -865,7 +865,7 @@
     "description": "Chip label"
   },
   "chipDesc_next_week_saturday_short_with_day": {
-    "message": "Inserts next week's Saturday using an abbreviated weekday, abbreviated English month, and day.",
+    "message": "Inserts next week's Saturday in M/D format with weekday.",
     "description": "Chip tooltip description"
   },
   "chipEx_next_week_saturday_short_with_day": {
@@ -885,7 +885,7 @@
     "description": "Chip label"
   },
   "chipDesc_next_week_sunday_short_with_day": {
-    "message": "Inserts next week's Sunday using an abbreviated weekday, abbreviated English month, and day.",
+    "message": "Inserts next week's Sunday in M/D format with weekday.",
     "description": "Chip tooltip description"
   },
   "chipEx_next_week_sunday_short_with_day": {
