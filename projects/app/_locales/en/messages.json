@@ -4,7 +4,7 @@
     "description": "App Name"
   },
   "appDesc": {
-    "message": "100% local & privacy-first dynamic template inserter. Quickly paste custom templates with date & time chips from context menu.",
+    "message": "Local-first. Paste templates with date/time chips from the context menu. Optional chrome.storage.sync syncs settings and templates.",
     "description": "App Description"
   },
   "headerSubtitle": {

@@ -4,7 +4,7 @@
     "description": "App Name"
   },
   "appDesc": {
-    "message": "右クリックからカテゴリ別定型文や日付・時刻などの動的変数を瞬時にペースト挿入。100%ローカル実行でプライバシー重視のテンプレートツール。",
+    "message": "右クリックからカテゴリ別定型文や日付・時刻などの動的変数を瞬時にペースト挿入。デフォルトではローカルに保存し、同期有効時は設定とテンプレートデータをchrome.storage.syncに保存します。",
     "description": "App Description"
   },
   "headerSubtitle": {
