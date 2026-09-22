@@ -1,0 +1,4 @@
+# アイコン生成 (generate_png_icons.py) 用の Playwright。
+# common-workflows の base-release.yml は requirements.txt に playwright が
+# 含まれる場合に chromium を導入する。
+playwright
