@@ -38,12 +38,19 @@ flexpaste-solo/
 │   ├── check_version.py
 │   ├── bump_version.py
 │   ├── create_package.py
-│   └── generate_png_icons.py
+│   ├── ci_checks.py
+│   └── test_utils.js
 └── .github/
     └── workflows/
-        ├── ci.yml
-        └── release.yml
+        ├── code-quality.yml
+        ├── security-scan.yml
+        ├── version-bump.yml
+        ├── release-package.yml
+        └── deploy-pages.yml
 ```
+
+> アイコン生成（SVG→PNG）は共通ワークフロー `common-workflows` の `generate-icons`
+> composite action に委譲したため、プロジェクト固有の `generate_png_icons.py` は持たない。
 
 ### Manifest 仕様 (`projects/app/manifest.json`)
 
