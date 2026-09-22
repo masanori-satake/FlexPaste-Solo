@@ -16,6 +16,9 @@ jobs:
     uses: masanori-satake/common-workflows/.github/workflows/base-release.yml@v1
     permissions:
       contents: write
-    # npm run build (= アイコン生成 → バージョン整合性 → create_package.py) が releases/*.zip を生成。
-    # requirements.txt に playwright を含むため base 側で chromium が導入される。
+    with:
+      # SVG からのアイコン生成は共通 action (generate-icons) に委譲する。
+      # 生成後に npm run build (= check_version.py → create_package.py) が releases/*.zip を作成。
+      generate_icons: true
+    # SVG パス/出力先は base 既定 (projects/app/assets/icon.svg → projects/app/icons) と一致するため指定不要。
     # create_package.py は GITHUB_REF のタグからバージョンを検証する。
