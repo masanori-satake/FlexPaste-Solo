@@ -18,7 +18,9 @@ jobs:
       contents: write
     with:
       # SVG からのアイコン生成は共通 action (generate-icons) に委譲する。
-      # 生成後に npm run build (= check_version.py → create_package.py) が releases/*.zip を作成。
       generate_icons: true
+      # リリース ZIP は base-release 側で {リポジトリ名}-v{version}.zip に統一生成する（方式A）。
+      package_source_dir: 'projects/app'
     # SVG パス/出力先は base 既定 (projects/app/assets/icon.svg → projects/app/icons) と一致するため指定不要。
-    # create_package.py は GITHUB_REF のタグからバージョンを検証する。
+    # マニフェストは projects/app/manifest.json のためリネーム不要。
+    # npm run build (= check_version.py) はリリース前のバージョン整合性検証のみを行う。
