@@ -29,3 +29,8 @@
 **Vulnerability:** Accepting unvalidated tag strings during Drag and Drop or programmatic chip creation can allow malformed or unexpected tag strings (e.g., HTML/script-like patterns or arbitrary string injections) to be rendered as DOM nodes or inserted into template content.
 **Learning:** `dataTransfer` payloads or UI event arguments in contenteditable editors bypass standard input fields, so validating the syntax (`/^\{\{[a-zA-Z0-9_]{1,100}\}\}$/`) at entry points (`createChipNode` and `insertTagAtCursor`) prevents corrupt tag structures from reaching storage or rendering logic.
 **Prevention:** Always validate tag payloads against a strict regex whitelist before creating DOM nodes or inserting them into rich text contenteditable editors.
+
+## 2026-08-25 - Validation and Normalization Bypass on Cloud Settings Sync
+**Vulnerability:** Ingesting remote cloud settings (`allSync.settings` or `chrome.storage.onChanged` settings updates) directly without passing through `validateAndNormalizeBackup` allows malformed or out-of-range workday values (e.g., strings, negative numbers, or integers outside 1-7) to be saved directly to extension state.
+**Learning:** Cloud storage updates can be modified by synced devices or manual storage manipulations. Bypassing normalization on settings sync events undermines local input constraints and causes unexpected behavior in workday calculations.
+**Prevention:** Always run all incoming cloud settings payloads through `validateAndNormalizeBackup` before merging them into local application state.

@@ -142,6 +142,19 @@ console.log('Running unit tests for utils.js & options.js...');
   assert.strictEqual(normalized.categories[0].templates[0].content, 'HelloWorld\nLine2', 'Control characters should be stripped from content while preserving newlines');
 }
 
+// 5b. Test validateAndNormalizeBackup normalization when categories property is omitted (e.g. settings-only sync)
+{
+  const settingsOnlyInput = {
+    settings: {
+      workdays: [1, '2', 3, 9, -1, 'invalid', 5]
+    }
+  };
+
+  const normalized = validateAndNormalizeBackup(settingsOnlyInput);
+  assert.notStrictEqual(normalized, null, 'Normalized result should not be null for settings-only input');
+  assert.deepStrictEqual(normalized.settings.workdays, [1, 2, 3, 5], 'Workdays should be filtered to valid 1-7 integers');
+}
+
 // 6. Test validateImportData for device sync data
 {
   const testData = {

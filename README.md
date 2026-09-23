@@ -1,7 +1,7 @@
 # FlexPaste-Solo - Smart Clipboard Templates
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/egmememialdjhohecnfkimpablkjfabg?logo=google-chrome&logoColor=white&label=Chrome%20Web%20Store)](https://chromewebstore.google.com/detail/egmememialdjhohecnfkimpablkjfabg)
-[![version](https://img.shields.io/badge/version-1.2.1-blue)](projects/app/manifest.json)
+[![version](https://img.shields.io/badge/version-1.2.2-blue)](projects/app/manifest.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Privacy: Local-First](https://img.shields.io/badge/Privacy-Local--First-brightgreen)](PRIVACY.md)
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-orange)](projects/app/manifest.json)

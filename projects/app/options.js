@@ -1328,7 +1328,7 @@ export function validateAndNormalizeBackup(data) {
         templates
       };
     });
-  } else {
+  } else if ('categories' in data) {
     return null;
   }
 
@@ -1382,7 +1382,9 @@ function setupEventHandlers() {
           // Handle Settings Sync
           if (settingsOpt === 'from_sync') {
             if (allSync.settings && typeof allSync.settings === 'object') {
-              const { syncEnabled, ...cloudSettings } = allSync.settings;
+              const normalized = validateAndNormalizeBackup({ settings: allSync.settings });
+              const safeSettings = normalized ? normalized.settings : allSync.settings;
+              const { syncEnabled, ...cloudSettings } = safeSettings;
               newSettings = {
                 ...DEFAULT_SETTINGS,
                 ...cloudSettings,
@@ -1745,7 +1747,8 @@ function setupEventHandlers() {
 
         if (normalized) {
           invalidateClipboardPermissionSync();
-          appState.settings = normalized.settings;
+          const currentSyncEnabled = appState.settings.syncEnabled;
+          appState.settings = { ...normalized.settings, syncEnabled: currentSyncEnabled };
           appState.categories = normalized.categories;
           appState.selectedCategoryId = appState.categories.length > 0 ? appState.categories[0].id : null;
           saveStorage(true);
@@ -1828,7 +1831,9 @@ if (typeof document !== 'undefined') {
 
         let shouldReRender = false;
         if (changes.settings?.newValue) {
-          appState.settings = { ...DEFAULT_SETTINGS, ...changes.settings.newValue };
+          const normalized = validateAndNormalizeBackup({ settings: changes.settings.newValue });
+          const safeSettings = normalized ? normalized.settings : changes.settings.newValue;
+          appState.settings = { ...DEFAULT_SETTINGS, ...safeSettings };
           renderWorkdays();
           updateAllPreviews();
           renderSyncControls();
