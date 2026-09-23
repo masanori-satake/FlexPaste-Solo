@@ -8,44 +8,44 @@
 [![Tests](https://img.shields.io/github/actions/workflow/status/masanori-satake/FlexPaste-Solo/code-quality.yml?branch=main&label=Tests)](https://github.com/masanori-satake/FlexPaste-Solo/actions/workflows/code-quality.yml)
 [![Pure Vanilla JS](https://img.shields.io/badge/Pure%20Vanilla%20JS-Zero%20Dependencies-informational?logo=javascript&logoColor=white)](PRIVACY.md)
 
-プライバシーを重視した **chrome-extension**、**clipboard-manager**、**text-formatter** で、事前設定したカテゴリ別テンプレートと動的変数を右クリックのコンテキストメニューから直接、瞬時に挿入できます。
+A privacy-focused **chrome-extension**, **clipboard-manager**, and **text-formatter** that allows you to instantly insert pre-configured categorized templates and dynamic variables directly from the right-click context menu.
 
-## 概要
+## Overview
 
-定型メッセージ、日付、時刻、構造化されたメモを何度も入力またはコピーすると、集中力や生産性が損なわれることがあります。**FlexPaste-Solo** では、カスタムテンプレートをカテゴリ別に整理し、日付、時刻、稼働日、カスタム定義などの動的変数を組み合わせることで、日々の作業を効率化できます。1回の右クリックで、動的に生成された整形済みテンプレートを **GitHub**、**Microsoft Loop**、**Google Docs**、オンラインチャットなどのWebアプリケーションにペーストできます。
+Repeatedly typing or copying repetitive messages, dates, times, or structured notes can drain focus and productivity. **FlexPaste-Solo** streamlines your daily workflow by organizing custom templates into categories and pairing them with dynamic variables such as dates, times, workdays, and custom definitions. In a single right-click, you can paste dynamically evaluated, pre-formatted templates into web applications like **GitHub**, **Microsoft Loop**, **Google Docs**, or online chats.
 
-## 主な機能
+## Key Features
 
-- **2階層コンテキストメニューからのペースト:** カスタムテンプレートをカテゴリ別にまとめ、右クリックですばやく選択して即座に挿入できます。
-- **動的変数エンジン:** `{{date_with_day}}`、`{{time}}`、`{{tomorrow}}`、`{{next_workday}}`、`{{month_last_workday}}`、カテゴリ定義 (`{{def_1}}`、`{{def_2}}`、`{{def_3}}`) などの変数チップを、挿入した瞬間に自動で展開します。
-- **幅広いペースト対応:** 標準的なDOMテキストノードの挿入を制限している最新のリッチテキストエディタやWebアプリケーション（Teams、Microsoft Loop、GitHub など）にも、組み込みのペーストモードでシームレスにテンプレートを挿入できます。
-- **ノーコードのチップUIとライブプレビュー:** 変数チップをクリックまたはドラッグ＆ドロップしてテンプレートエディタへ直接配置でき、生成結果をすぐにライブプレビューできます。
-- **ローカルファースト設計:** デフォルトではすべてのテンプレートと設定を `chrome.storage.local` にローカル保存します。任意の端末間同期 (β) を有効にすると、`chrome.storage.sync` を使用して、同じGoogleアカウントでログインしているブラウザ間で設定とテンプレートを同期できます。
-- **軽量な生産性向上ツール:** プライバシーとパフォーマンスを最大限に高めるため、外部依存関係のないPure Vanilla JSで構築された拡張機能です。
+- **2-Tier Context Menu Pasting:** Organize custom templates into categories and select them quickly via right-click for immediate insertion.
+- **Dynamic Variable Engine:** Automatically expands variable chips like `{{date_with_day}}`, `{{time}}`, `{{tomorrow}}`, `{{next_workday}}`, `{{month_last_workday}}`, and category definitions (`{{def_1}}`, `{{def_2}}`, `{{def_3}}`) at the moment of insertion.
+- **Broad Paste Compatibility:** Native paste mode seamlessly inserts templates even into modern rich text editors and web applications (e.g., Teams, Microsoft Loop, GitHub) that restrict standard DOM text node insertion.
+- **No-Code Chip UI & Live Preview:** Click or drag-and-drop variable chips directly into the template editor and inspect the generated output instantly with live preview.
+- **Local-First Design:** All templates and settings are stored locally in `chrome.storage.local` by default. Optional cross-device sync (β) uses `chrome.storage.sync` to keep settings and templates synchronized across browsers signed into the same Google account.
+- **Lightweight Productivity:** Built with Pure Vanilla JS without external dependencies to maximize privacy and performance.
 
-## 🔒 プライバシーとセキュリティ
+## 🔒 Privacy & Security
 
-- **ローカルファースト:** デフォルトではブラウザ内で動作し、設定とテンプレートを `chrome.storage.local` に保存します。同期を有効にした場合は、Chrome Sync (`chrome.storage.sync`) を通じて設定とテンプレートが端末外へ同期されます。このChrome Syncを除き、外部サーバー通信、トラッキング、テレメトリ、リモートアナリティクスは行いません。
-- **サードパーティ依存関係なし:** 外部ライブラリや大規模なビルドツールチェーンを使わず、Pure Vanilla JSで記述されています。
-- **データ収集なし:** 開発者はテンプレート、動的変数、クリップボードデータを収集しません。同期を有効にした場合のみ、設定とテンプレートがChrome Syncを通じて保存・同期されます。
+- **Local-First:** Operates within your browser by default and saves settings and templates in `chrome.storage.local`. When sync is enabled, settings and templates are synchronized off-device via Chrome Sync (`chrome.storage.sync`). Excluding Chrome Sync, no external server communication, tracking, telemetry, or remote analytics are performed.
+- **Zero Third-Party Dependencies:** Written in Pure Vanilla JS with no external libraries or heavy build toolchains.
+- **No Data Collection:** The developer does not collect your templates, dynamic variables, or clipboard data. Only when sync is enabled are settings and templates saved and synced via Chrome Sync.
 
-## インストール
+## Installation
 
-### 🚀 Chrome Web Store（推奨）
+### 🚀 Chrome Web Store (Recommended)
 
-[Chrome Web Store](https://chromewebstore.google.com/detail/egmememialdjhohecnfkimpablkjfabg) から直接インストールします。
+Install directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/egmememialdjhohecnfkimpablkjfabg).
 
-### 🛠️ デベロッパーモード（ソースから）
+### 🛠️ Developer Mode (From Source)
 
-1. Releasesから最新の `FlexPaste-Solo-vX.X.X.zip` をダウンロードするか、このリポジトリをクローンします。
-2. Chromeで `chrome://extensions` を開き、**デベロッパーモード**を有効にします。
-3. **パッケージ化されていない拡張機能を読み込む**をクリックし、`projects/app` フォルダを選択します。
+1. Download the latest `FlexPaste-Solo-vX.X.X.zip` from Releases or clone this repository.
+2. Open `chrome://extensions` in Chrome and enable **Developer mode**.
+3. Click **Load unpacked** and select the `projects/app` folder.
 
-## 使い方
+## Usage
 
-1. 拡張機能アイコンまたは右クリックのコンテキストメニューにある「⚙ Settings」から設定画面を開きます。
-2. カテゴリを作成し、稼働日や時刻の丸め間隔を設定して、変数チップを使ってテンプレートを編集します。
-3. 任意のテキストフィールド（`<input>`、`<textarea>`、`[contenteditable]`）を右クリックし、`FlexPaste` からテンプレートを選択して即座に挿入します。
+1. Open settings from the extension icon or "⚙ Settings" in the right-click context menu.
+2. Create categories, configure workday rules or time rounding intervals, and edit templates using variable chips.
+3. Right-click any text field (`<input>`, `<textarea>`, `[contenteditable]`), navigate to `FlexPaste`, and select your template for instant insertion.
 
 ---
 
