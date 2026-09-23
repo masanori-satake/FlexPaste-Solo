@@ -1,11 +1,12 @@
 # FlexPaste-Solo - Smart Clipboard Templates
 
-[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/egmememialdjhohecnfkimpablkjfabg)](https://chromewebstore.google.com/detail/egmememialdjhohecnfkimpablkjfabg)
-[![Manifest V3](https://img.shields.io/badge/Manifest-V3-orange)](projects/app/manifest.json)
-[![Privacy: Local-First](https://img.shields.io/badge/Privacy-Local--First-brightgreen)](PRIVACY.md)
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/egmememialdjhohecnfkimpablkjfabg?logo=google-chrome&logoColor=white&label=Chrome%20Web%20Store)](https://chromewebstore.google.com/detail/egmememialdjhohecnfkimpablkjfabg)
 [![version](https://img.shields.io/badge/version-1.2.1-blue)](projects/app/manifest.json)
-[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![CI](https://github.com/masanori-satake/FlexPaste-Solo/actions/workflows/ci.yml/badge.svg)](https://github.com/masanori-satake/FlexPaste-Solo/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Privacy: Local-First](https://img.shields.io/badge/Privacy-Local--First-brightgreen)](PRIVACY.md)
+[![Manifest V3](https://img.shields.io/badge/Manifest-V3-orange)](projects/app/manifest.json)
+[![Tests](https://img.shields.io/github/actions/workflow/status/masanori-satake/FlexPaste-Solo/code-quality.yml?branch=main&label=Tests)](https://github.com/masanori-satake/FlexPaste-Solo/actions/workflows/code-quality.yml)
+[![Pure Vanilla JS](https://img.shields.io/badge/Pure%20Vanilla%20JS-Zero%20Dependencies-informational?logo=javascript&logoColor=white)](PRIVACY.md)
 
 プライバシーを重視した **chrome-extension**、**clipboard-manager**、**text-formatter** で、事前設定したカテゴリ別テンプレートと動的変数を右クリックのコンテキストメニューから直接、瞬時に挿入できます。
 
