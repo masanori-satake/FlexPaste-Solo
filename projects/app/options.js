@@ -1748,8 +1748,10 @@ function setupEventHandlers() {
         if (normalized) {
           invalidateClipboardPermissionSync();
           appState.settings = normalized.settings;
-          appState.categories = normalized.categories;
-          appState.selectedCategoryId = appState.categories.length > 0 ? appState.categories[0].id : null;
+          if ('categories' in rawData) {
+            appState.categories = normalized.categories;
+            appState.selectedCategoryId = appState.categories.length > 0 ? appState.categories[0].id : null;
+          }
           saveStorage(true);
           syncClipboardPermissions();
           renderWorkdays();
@@ -1832,7 +1834,7 @@ if (typeof document !== 'undefined') {
         if (changes.settings?.newValue) {
           const normalized = validateAndNormalizeBackup({ settings: changes.settings.newValue });
           const safeSettings = normalized ? normalized.settings : changes.settings.newValue;
-          appState.settings = { ...DEFAULT_SETTINGS, ...safeSettings };
+          appState.settings = { ...DEFAULT_SETTINGS, ...safeSettings, syncEnabled: changes.settings.newValue.syncEnabled };
           renderWorkdays();
           updateAllPreviews();
           renderSyncControls();
