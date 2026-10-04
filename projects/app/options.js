@@ -298,7 +298,11 @@ function closeSyncModal() {
 /** Soloシリーズダイアログを開く。 */
 function openSoloModal() {
   const soloModalScrim = document.getElementById('solo-modal-scrim');
-  if (soloModalScrim) soloModalScrim.style.display = 'flex';
+  if (soloModalScrim) {
+    soloModalScrim.style.display = 'flex';
+    const closeSoloModalBtn = document.getElementById('close-solo-modal-btn');
+    if (closeSoloModalBtn) closeSoloModalBtn.focus();
+  }
 }
 
 /** Soloシリーズダイアログを閉じる。 */
