@@ -1014,10 +1014,81 @@ input:checked + .slider:before {
   gap: 16px;
 }
 
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .modal-title {
   font-size: 18px;
   font-weight: 600;
   color: var(--md-sys-color-on-surface);
+}
+
+.btn-icon-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--md-sys-color-on-surface-variant);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-icon-close:hover {
+  background-color: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface);
+}
+
+.solo-modal {
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.solo-category-section {
+  margin-bottom: 28px;
+}
+
+.solo-category-section:last-child {
+  margin-bottom: 0;
+}
+
+.solo-category-title {
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--md-sys-color-primary);
+  margin-bottom: 12px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.solo-badges-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.solo-badge-link {
+  display: inline-block;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.solo-badge-link:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.solo-badge-img {
+  height: 28px;
+  width: auto;
+  display: block;
 }
 
 .modal-content {

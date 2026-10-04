@@ -295,6 +295,22 @@ function closeSyncModal() {
   if (syncModalScrim) syncModalScrim.style.display = 'none';
 }
 
+/** Soloシリーズダイアログを開く。 */
+function openSoloModal() {
+  const soloModalScrim = document.getElementById('solo-modal-scrim');
+  if (soloModalScrim) {
+    soloModalScrim.style.display = 'flex';
+    const closeSoloModalBtn = document.getElementById('close-solo-modal-btn');
+    if (closeSoloModalBtn) closeSoloModalBtn.focus();
+  }
+}
+
+/** Soloシリーズダイアログを閉じる。 */
+function closeSoloModal() {
+  const soloModalScrim = document.getElementById('solo-modal-scrim');
+  if (soloModalScrim) soloModalScrim.style.display = 'none';
+}
+
 /** 同期方法が両方選択されている場合のみ確定ボタンを有効にする。 */
 function checkSyncFormValidation() {
   const settingsOpt = document.querySelector('input[name="sync-settings-option"]:checked');
@@ -685,6 +701,30 @@ function localizeStaticUI() {
 
   const elemSyncOptCategoriesToSync = document.getElementById('i18n-sync-option-categories-to-sync');
   if (elemSyncOptCategoriesToSync) elemSyncOptCategoriesToSync.textContent = getMessage('syncOptionCategoriesToSync');
+
+  const btnSoloSeries = document.getElementById('btn-solo-series');
+  if (btnSoloSeries) {
+    btnSoloSeries.title = getMessage('soloBtnTitle');
+    btnSoloSeries.setAttribute('aria-label', getMessage('soloBtnTitle'));
+  }
+
+  const elemSoloModalTitle = document.getElementById('i18n-solo-modal-title');
+  if (elemSoloModalTitle) elemSoloModalTitle.textContent = getMessage('soloModalTitle');
+
+  const elemSoloCatProductivity = document.getElementById('i18n-solo-cat-productivity');
+  if (elemSoloCatProductivity) elemSoloCatProductivity.textContent = getMessage('soloCategoryProductivity');
+
+  const elemSoloCatCollaboration = document.getElementById('i18n-solo-cat-collaboration');
+  if (elemSoloCatCollaboration) elemSoloCatCollaboration.textContent = getMessage('soloCategoryCollaboration');
+
+  const elemSoloCatDeveloper = document.getElementById('i18n-solo-cat-developer');
+  if (elemSoloCatDeveloper) elemSoloCatDeveloper.textContent = getMessage('soloCategoryDeveloper');
+
+  const btnCloseSoloModal = document.getElementById('close-solo-modal-btn');
+  if (btnCloseSoloModal) {
+    btnCloseSoloModal.title = getMessage('closeBtn');
+    btnCloseSoloModal.setAttribute('aria-label', getMessage('closeBtn'));
+  }
 
   const btnCancelSync = document.getElementById('cancel-sync-btn');
   if (btnCancelSync) btnCancelSync.textContent = getMessage('cancel');
@@ -1337,6 +1377,26 @@ export function validateAndNormalizeBackup(data) {
 
 /** 設定画面の操作に必要なイベントハンドラーを登録する。 */
 function setupEventHandlers() {
+  // Solo Series Modal Event Handlers
+  const btnSoloSeries = document.getElementById('btn-solo-series');
+  if (btnSoloSeries) {
+    btnSoloSeries.addEventListener('click', openSoloModal);
+  }
+
+  const closeSoloModalBtn = document.getElementById('close-solo-modal-btn');
+  if (closeSoloModalBtn) {
+    closeSoloModalBtn.addEventListener('click', closeSoloModal);
+  }
+
+  const soloModalScrim = document.getElementById('solo-modal-scrim');
+  if (soloModalScrim) {
+    soloModalScrim.addEventListener('click', (e) => {
+      if (e.target === soloModalScrim) {
+        closeSoloModal();
+      }
+    });
+  }
+
   // Device Sync Switch Handler
   const syncEnabledSwitch = document.getElementById('sync-enabled-switch');
   if (syncEnabledSwitch) {

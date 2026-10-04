@@ -22,6 +22,9 @@
         </div>
       </div>
       <div class="header-actions">
+        <button id="btn-solo-series" class="btn btn-outlined icon-btn" title="Soloシリーズ" aria-label="Soloシリーズ">
+          <span class="material-symbols-outlined">extension</span>
+        </button>
         <div class="header-workdays-container">
           <span class="workdays-label" id="i18n-workdays-label">稼働曜日</span>
           <div class="workday-pills">
@@ -261,6 +264,61 @@
 
   <!-- Toast Notification -->
   <div id="toast" class="toast hidden"></div>
+
+  <!-- Solo Series Modal -->
+  <div id="solo-modal-scrim" class="scrim" style="display: none;">
+    <div class="modal solo-modal" role="dialog" aria-modal="true" aria-labelledby="i18n-solo-modal-title">
+      <div class="modal-header">
+        <div class="modal-title" id="i18n-solo-modal-title">Soloシリーズ</div>
+        <button id="close-solo-modal-btn" class="btn-icon-close" aria-label="閉じる" title="閉じる">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-content solo-modal-content">
+        <!-- Category 1: 作業効率化 -->
+        <div class="solo-category-section">
+          <div class="solo-category-title" id="i18n-solo-cat-productivity">作業効率化</div>
+          <div class="solo-badges-container">
+            <a href="https://chromewebstore.google.com/detail/quicklog-solo-local-task/kllhfalcincleolgoepnailfjendigdh" target="_blank" rel="noopener noreferrer" class="solo-badge-link">
+              <img src="assets/badges/solo/quicklog-solo.svg" alt="QuickLog-Solo" class="solo-badge-img">
+            </a>
+            <a href="https://chromewebstore.google.com/detail/flexpaste-solo-smart-clip/egmememialdjhohecnfkimpablkjfabg" target="_blank" rel="noopener noreferrer" class="solo-badge-link">
+              <img src="assets/badges/solo/flexpaste-solo.svg" alt="FlexPaste-Solo" class="solo-badge-img">
+            </a>
+            <a href="https://chromewebstore.google.com/detail/replace-solo-microsoft-lo/iblfnonogpkajjfjfljngdaclhdinlfb" target="_blank" rel="noopener noreferrer" class="solo-badge-link">
+              <img src="assets/badges/solo/replace-solo.svg" alt="Replace-Solo" class="solo-badge-img">
+            </a>
+            <a href="https://chromewebstore.google.com/detail/tabmagnet-solo-smart-tab/lffgddghjafcjpfjdpknhfbonhnkdlmc" target="_blank" rel="noopener noreferrer" class="solo-badge-link">
+              <img src="assets/badges/solo/tabmagnet-solo.svg" alt="TabMagnet-Solo" class="solo-badge-img">
+            </a>
+          </div>
+        </div>
+
+        <!-- Category 2: 会議/授業支援 -->
+        <div class="solo-category-section">
+          <div class="solo-category-title" id="i18n-solo-cat-collaboration">会議/授業支援</div>
+          <div class="solo-badges-container">
+            <a href="https://chromewebstore.google.com/detail/omniview-solo-whiteboard/jnkmbcicplfobgllfljekhlaofkdooam" target="_blank" rel="noopener noreferrer" class="solo-badge-link">
+              <img src="assets/badges/solo/omniview-solo.svg" alt="OmniView-Solo" class="solo-badge-img">
+            </a>
+          </div>
+        </div>
+
+        <!-- Category 3: 開発者向け -->
+        <div class="solo-category-section">
+          <div class="solo-category-title" id="i18n-solo-cat-developer">開発者向け</div>
+          <div class="solo-badges-container">
+            <a href="https://chromewebstore.google.com/detail/issues-solo-jira-issues-s/cehkajdhieihmoghbneckifpkoafmbco" target="_blank" rel="noopener noreferrer" class="solo-badge-link">
+              <img src="assets/badges/solo/issues-solo.svg" alt="Issues-Solo" class="solo-badge-img">
+            </a>
+            <a href="https://chromewebstore.google.com/detail/actionsboard-solo-github/oofegjdjnldkikigimkadlleaiolionm" target="_blank" rel="noopener noreferrer" class="solo-badge-link">
+              <img src="assets/badges/solo/actionsboard-solo.svg" alt="ActionsBoard-Solo" class="solo-badge-img">
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Sync Settings Modal -->
   <div id="sync-modal-scrim" class="scrim" style="display: none;">

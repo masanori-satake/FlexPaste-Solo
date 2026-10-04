@@ -979,5 +979,29 @@
   "chipEx_def_3": {
     "message": "Note",
     "description": "Chip tooltip example value"
+  },
+  "soloBtnTitle": {
+    "message": "Solo Series",
+    "description": "Solo series button title"
+  },
+  "soloModalTitle": {
+    "message": "Solo Series",
+    "description": "Solo series modal title"
+  },
+  "soloCategoryProductivity": {
+    "message": "Productivity",
+    "description": "Solo series productivity category"
+  },
+  "soloCategoryCollaboration": {
+    "message": "Meetings & Classes",
+    "description": "Solo series collaboration category"
+  },
+  "soloCategoryDeveloper": {
+    "message": "Developer Tools",
+    "description": "Solo series developer category"
+  },
+  "closeBtn": {
+    "message": "Close",
+    "description": "Close button title"
   }
 }

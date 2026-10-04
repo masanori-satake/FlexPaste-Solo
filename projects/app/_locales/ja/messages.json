@@ -979,5 +979,29 @@
   "chipEx_def_3": {
     "message": "補足説明",
     "description": "Chip tooltip example value"
+  },
+  "soloBtnTitle": {
+    "message": "Soloシリーズ",
+    "description": "Solo series button title"
+  },
+  "soloModalTitle": {
+    "message": "Soloシリーズ",
+    "description": "Solo series modal title"
+  },
+  "soloCategoryProductivity": {
+    "message": "作業効率化",
+    "description": "Solo series productivity category"
+  },
+  "soloCategoryCollaboration": {
+    "message": "会議/授業支援",
+    "description": "Solo series collaboration category"
+  },
+  "soloCategoryDeveloper": {
+    "message": "開発者向け",
+    "description": "Solo series developer category"
+  },
+  "closeBtn": {
+    "message": "閉じる",
+    "description": "Close button title"
   }
 }
