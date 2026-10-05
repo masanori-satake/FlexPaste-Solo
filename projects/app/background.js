@@ -277,7 +277,15 @@ function injectTextToElement(textToInject, usePaste) {
   triggerEvents(activeEl);
 }
 
-// Function injected into the page to read clipboard and/or display interactive prompt dialog
+/**
+ * 対象ページでクリップボードを読み取り、必要に応じて入力ダイアログを表示する。
+ * 読み取りに失敗した場合は空文字を使い、キャンセル時は入力値を返さない。
+ *
+ * @param {string[]} promptTagSpecs テンプレート内の出現順に並べたプロンプトタグ名。
+ * @param {boolean} hasClipboardTags クリップボードの読み取りが必要かどうか。
+ * @param {Object<string, string>} i18nStrings ダイアログに表示する翻訳済み文字列。
+ * @returns {Promise<{cancelled: boolean, clipboardText?: string, promptValues?: string[]}>} 入力結果またはキャンセル結果。
+ */
 async function promptAndReadClipboardInPage(promptTagSpecs, hasClipboardTags, i18nStrings) {
   let clipboardText = '';
 
@@ -313,6 +321,11 @@ async function promptAndReadClipboardInPage(promptTagSpecs, hasClipboardTags, i1
   return new Promise((resolve) => {
     // Helper to format ISO date strings for default picker values
     const now = new Date();
+    /**
+     * 日時の各要素をゼロ埋めして2桁以上の文字列にする。
+     * @param {number} n 日時の数値要素。
+     * @returns {string} ゼロ埋めした文字列。
+     */
     const pad = (n) => String(n).padStart(2, '0');
     const defaultDate = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
     const defaultTime = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
@@ -542,12 +555,21 @@ async function promptAndReadClipboardInPage(promptTagSpecs, hasClipboardTags, i1
     shadow.appendChild(scrim);
     document.body.appendChild(host);
 
+    /**
+     * ダイアログのホスト要素をページから取り除く。
+     * @returns {void}
+     */
     const cleanup = () => {
       if (host.parentNode) {
         host.parentNode.removeChild(host);
       }
     };
 
+    /**
+     * 入力値を出現順に収集し、日時の区切りを空白に変換してダイアログを閉じる。
+     * 待機中の Promise をクリップボード文字列と入力値で解決する。
+     * @returns {void}
+     */
     const submitForm = () => {
       const promptValues = fieldInputs.map(({ spec, input }) => {
         let val = input.value || '';
@@ -560,6 +582,10 @@ async function promptAndReadClipboardInPage(promptTagSpecs, hasClipboardTags, i1
       resolve({ cancelled: false, clipboardText, promptValues });
     };
 
+    /**
+     * ダイアログを閉じ、待機中の Promise をキャンセル結果で解決する。
+     * @returns {void}
+     */
     const cancelForm = () => {
       cleanup();
       resolve({ cancelled: true });
