@@ -714,7 +714,13 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
       }
       case 'clipboard_numbered': {
         const cb = contextData.clipboard ?? '';
-        val = cb ? cb.split(/\r?\n/).map((line, idx) => `${idx + 1}: ${line}`).join('\n') : '';
+        if (!cb) {
+          val = '';
+        } else {
+          const lines = cb.split(/\r?\n/);
+          const maxDigits = String(lines.length).length;
+          val = lines.map((line, idx) => `${String(idx + 1).padStart(maxDigits, ' ')}: ${line}`).join('\n');
+        }
         break;
       }
       case 'clipboard_quote': {
