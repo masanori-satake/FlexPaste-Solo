@@ -287,6 +287,7 @@ function injectTextToElement(textToInject, usePaste) {
  * @returns {Promise<{cancelled: boolean, clipboardText?: string, promptValues?: string[]}>} 入力結果またはキャンセル結果。
  */
 async function promptAndReadClipboardInPage(promptTagSpecs, hasClipboardTags, i18nStrings) {
+  const originalActiveElement = document.activeElement;
   let clipboardText = '';
 
   // 1. Read clipboard if template has clipboard tags
@@ -297,17 +298,20 @@ async function promptAndReadClipboardInPage(promptTagSpecs, hasClipboardTags, i1
       }
     } catch (e) {
       // Fallback: create temporary textarea to trigger paste
+      let textarea;
       try {
-        const textarea = document.createElement('textarea');
+        textarea = document.createElement('textarea');
         textarea.style.position = 'fixed';
         textarea.style.opacity = '0';
         document.body.appendChild(textarea);
         textarea.focus();
         document.execCommand('paste');
         clipboardText = textarea.value;
-        document.body.removeChild(textarea);
       } catch (err) {
         clipboardText = '';
+      } finally {
+        textarea?.remove();
+        originalActiveElement?.focus();
       }
     }
   }
@@ -556,13 +560,14 @@ async function promptAndReadClipboardInPage(promptTagSpecs, hasClipboardTags, i1
     document.body.appendChild(host);
 
     /**
-     * ダイアログのホスト要素をページから取り除く。
+     * ダイアログのホスト要素をページから取り除き、元のフォーカスを復元する。
      * @returns {void}
      */
     const cleanup = () => {
       if (host.parentNode) {
         host.parentNode.removeChild(host);
       }
+      originalActiveElement?.focus();
     };
 
     /**
@@ -602,7 +607,7 @@ async function promptAndReadClipboardInPage(promptTagSpecs, hasClipboardTags, i1
       if (e.key === 'Escape') {
         e.preventDefault();
         cancelForm();
-      } else if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+      } else if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
         e.preventDefault();
         submitForm();
       }

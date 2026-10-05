@@ -287,7 +287,7 @@
     "description": "Chip tooltip description"
   },
   "chipEx_clipboard_numbered": {
-    "message": "1: Item 1\\n2: Item 2",
+    "message": "1: Item 1\n2: Item 2",
     "description": "Chip tooltip example value"
   },
   "chipTag_clipboard_quote": {
