@@ -62,6 +62,21 @@ console.log('Running unit tests for utils.js & options.js...');
   assert.strictEqual(resolveVariables('{{clipboard_quote}}', contextData), '>  Line 1 \n>  Line 2 \n>  Line 3 ');
   assert.strictEqual(resolveVariables('{{clipboard_trim}}', contextData), 'Line 1 \n Line 2 \n Line 3');
   assert.strictEqual(resolveVariables('{{clipboard_single_line}}', contextData), ' Line 1   Line 2   Line 3 ');
+
+  // Test clipboard_numbered with 2-digit line count (10 lines)
+  const lines10 = Array.from({ length: 10 }, (_, i) => `Line ${i + 1}`).join('\n');
+  const context10 = { clipboard: lines10 };
+  const res10 = resolveVariables('{{clipboard_numbered}}', context10);
+  assert.ok(res10.startsWith(' 1: Line 1\n 2: Line 2\n'), '1-digit line numbers should have 1 leading space when total lines is 10');
+  assert.ok(res10.includes('\n 9: Line 9\n10: Line 10'), '10th line number should be unpadded 10:');
+
+  // Test clipboard_numbered with 3-digit line count (100 lines)
+  const lines100 = Array.from({ length: 100 }, (_, i) => `Line ${i + 1}`).join('\n');
+  const context100 = { clipboard: lines100 };
+  const res100 = resolveVariables('{{clipboard_numbered}}', context100);
+  assert.ok(res100.startsWith('  1: Line 1\n  2: Line 2\n'), '1-digit line numbers should have 2 leading spaces when total lines is 100');
+  assert.ok(res100.includes('\n 10: Line 10\n'), '2-digit line numbers should have 1 leading space when total lines is 100');
+  assert.ok(res100.includes('\n100: Line 100'), '100th line number should be unpadded 100:');
 }
 
 // 2a2. Test interactive prompt tags in resolveVariables
