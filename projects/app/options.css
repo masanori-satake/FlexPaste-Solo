@@ -737,6 +737,7 @@ input:checked + .slider:before {
 .chip-tooltip strong {
   font-weight: 700;
   color: var(--md-sys-color-primary);
+  white-space: pre-line;
 }
 
 .chip {

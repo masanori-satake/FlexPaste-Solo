@@ -80,7 +80,25 @@
             <h2 id="i18n-chips-header">チップ (キャレット位置にクリックまたはドラッグで挿入)</h2>
           </div>
           <div id="chips-container" class="chips-container">
-            <!-- Group 1: Today -->
+            <!-- Group 1: Clipboard -->
+            <div class="chips-row">
+              <div class="chip" draggable="true" data-tag="{{clipboard}}"><span class="material-symbols-outlined chip-icon">content_paste</span>クリップボード</div>
+              <div class="chip" draggable="true" data-tag="{{clipboard_numbered}}"><span class="material-symbols-outlined chip-icon">format_list_numbered</span>行番号付き</div>
+              <div class="chip" draggable="true" data-tag="{{clipboard_quote}}"><span class="material-symbols-outlined chip-icon">format_quote</span>引用(>)</div>
+              <div class="chip" draggable="true" data-tag="{{clipboard_trim}}"><span class="material-symbols-outlined chip-icon">content_cut</span>トリム</div>
+              <div class="chip" draggable="true" data-tag="{{clipboard_single_line}}"><span class="material-symbols-outlined chip-icon">link</span>1行化</div>
+            </div>
+            <div class="chips-divider"></div>
+            <!-- Group 2: Interactive Input Prompts -->
+            <div class="chips-row">
+              <div class="chip" draggable="true" data-tag="{{prompt}}"><span class="material-symbols-outlined chip-icon">edit</span>入力プロンプト</div>
+              <div class="chip" draggable="true" data-tag="{{prompt_multiline}}"><span class="material-symbols-outlined chip-icon">description</span>長文プロンプト</div>
+              <div class="chip" draggable="true" data-tag="{{prompt_date}}"><span class="material-symbols-outlined chip-icon">calendar_month</span>日付選択</div>
+              <div class="chip" draggable="true" data-tag="{{prompt_time}}"><span class="material-symbols-outlined chip-icon">schedule</span>時刻選択</div>
+              <div class="chip" draggable="true" data-tag="{{prompt_datetime}}"><span class="material-symbols-outlined chip-icon">event</span>日時選択</div>
+            </div>
+            <div class="chips-divider"></div>
+            <!-- Group 3: Today -->
             <div class="chips-row">
               <div class="chip" draggable="true" data-tag="{{date}}"><span class="material-symbols-outlined chip-icon">calendar_today</span>今日</div>
               <div class="chip" draggable="true" data-tag="{{date_short}}"><span class="material-symbols-outlined chip-icon">calendar_today</span>今日(短縮)</div>

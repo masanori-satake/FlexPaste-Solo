@@ -258,6 +258,134 @@
     "message": "リアルタイムプレビューを切り替え",
     "description": "Preview toggle title"
   },
+  "promptModalTitle": {
+    "message": "入力プロンプト",
+    "description": "Interactive prompt modal header title"
+  },
+  "promptModalItemLabel": {
+    "message": "入力項目",
+    "description": "Interactive prompt item label prefix"
+  },
+  "chipTag_clipboard": {
+    "message": "クリップボード",
+    "description": "Chip label"
+  },
+  "chipDesc_clipboard": {
+    "message": "クリップボードのテキストをそのまま挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_clipboard": {
+    "message": "クリップボードの内容",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_clipboard_numbered": {
+    "message": "行番号付き",
+    "description": "Chip label"
+  },
+  "chipDesc_clipboard_numbered": {
+    "message": "クリップボードの各行の先頭に行番号（例: 1: , 2: ）を自動付与して挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_clipboard_numbered": {
+    "message": "1: 項目1\n2: 項目2",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_clipboard_quote": {
+    "message": "引用(>)",
+    "description": "Chip label"
+  },
+  "chipDesc_clipboard_quote": {
+    "message": "クリップボードの各行の先頭に「> 」を自動付与して引用形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_clipboard_quote": {
+    "message": "> 引用文",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_clipboard_trim": {
+    "message": "トリム",
+    "description": "Chip label"
+  },
+  "chipDesc_clipboard_trim": {
+    "message": "クリップボードテキストの前後の余計な空白・改行を削除して挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_clipboard_trim": {
+    "message": "トリム済みテキスト",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_clipboard_single_line": {
+    "message": "1行化",
+    "description": "Chip label"
+  },
+  "chipDesc_clipboard_single_line": {
+    "message": "クリップボードの改行コードをスペースに置換して1行に連結して挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_clipboard_single_line": {
+    "message": "1行に連結されたテキスト",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_prompt": {
+    "message": "入力プロンプト",
+    "description": "Chip label"
+  },
+  "chipDesc_prompt": {
+    "message": "テンプレート貼り付け時に1行テキスト入力ダイアログを表示して入力を求めます。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_prompt": {
+    "message": "ユーザー入力値",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_prompt_multiline": {
+    "message": "長文プロンプト",
+    "description": "Chip label"
+  },
+  "chipDesc_prompt_multiline": {
+    "message": "テンプレート貼り付け時に複数行テキスト入力ダイアログを表示して入力を求めます。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_prompt_multiline": {
+    "message": "複数行入力値",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_prompt_date": {
+    "message": "日付選択",
+    "description": "Chip label"
+  },
+  "chipDesc_prompt_date": {
+    "message": "テンプレート貼り付け時に日付選択ピッカーダイアログを表示します（デフォルト: 今日）。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_prompt_date": {
+    "message": "2025-03-15",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_prompt_time": {
+    "message": "時刻選択",
+    "description": "Chip label"
+  },
+  "chipDesc_prompt_time": {
+    "message": "テンプレート貼り付け時に時刻選択ピッカーダイアログを表示します（デフォルト: 現在時刻）。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_prompt_time": {
+    "message": "10:00",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_prompt_datetime": {
+    "message": "日時選択",
+    "description": "Chip label"
+  },
+  "chipDesc_prompt_datetime": {
+    "message": "テンプレート貼り付け時に日時選択ピッカーダイアログを表示します（デフォルト: 現在日時）。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_prompt_datetime": {
+    "message": "2025-03-15 10:00",
+    "description": "Chip tooltip example value"
+  },
   "chipTag_date": {
     "message": "今日",
     "description": "Chip label"

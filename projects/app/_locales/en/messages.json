@@ -258,6 +258,134 @@
     "message": "Toggle live preview",
     "description": "Preview toggle title"
   },
+  "promptModalTitle": {
+    "message": "Input Prompt",
+    "description": "Interactive prompt modal header title"
+  },
+  "promptModalItemLabel": {
+    "message": "Input Item",
+    "description": "Interactive prompt item label prefix"
+  },
+  "chipTag_clipboard": {
+    "message": "Clipboard",
+    "description": "Chip label"
+  },
+  "chipDesc_clipboard": {
+    "message": "Inserts text directly from the clipboard.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_clipboard": {
+    "message": "Clipboard content",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_clipboard_numbered": {
+    "message": "Numbered Lines",
+    "description": "Chip label"
+  },
+  "chipDesc_clipboard_numbered": {
+    "message": "Inserts clipboard text with line numbers (e.g. 1: , 2: ) automatically added.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_clipboard_numbered": {
+    "message": "1: Item 1\n2: Item 2",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_clipboard_quote": {
+    "message": "Quote (>)",
+    "description": "Chip label"
+  },
+  "chipDesc_clipboard_quote": {
+    "message": "Inserts clipboard text as block quotes by prefixing each line with '> '.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_clipboard_quote": {
+    "message": "> Quoted text",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_clipboard_trim": {
+    "message": "Trim",
+    "description": "Chip label"
+  },
+  "chipDesc_clipboard_trim": {
+    "message": "Inserts clipboard text after removing leading and trailing whitespace/newlines.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_clipboard_trim": {
+    "message": "Trimmed text",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_clipboard_single_line": {
+    "message": "Single Line",
+    "description": "Chip label"
+  },
+  "chipDesc_clipboard_single_line": {
+    "message": "Inserts clipboard text converted to a single line by replacing newlines with spaces.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_clipboard_single_line": {
+    "message": "Joined single line text",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_prompt": {
+    "message": "Input Prompt",
+    "description": "Chip label"
+  },
+  "chipDesc_prompt": {
+    "message": "Displays a single-line text input dialog when inserting template.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_prompt": {
+    "message": "User input value",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_prompt_multiline": {
+    "message": "Multiline Prompt",
+    "description": "Chip label"
+  },
+  "chipDesc_prompt_multiline": {
+    "message": "Displays a multiline textarea dialog when inserting template.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_prompt_multiline": {
+    "message": "Multiline input value",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_prompt_date": {
+    "message": "Select Date",
+    "description": "Chip label"
+  },
+  "chipDesc_prompt_date": {
+    "message": "Displays a date picker dialog when inserting template (default: today).",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_prompt_date": {
+    "message": "2025-03-15",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_prompt_time": {
+    "message": "Select Time",
+    "description": "Chip label"
+  },
+  "chipDesc_prompt_time": {
+    "message": "Displays a time picker dialog when inserting template (default: current time).",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_prompt_time": {
+    "message": "10:00",
+    "description": "Chip tooltip example value"
+  },
+  "chipTag_prompt_datetime": {
+    "message": "Select Date & Time",
+    "description": "Chip label"
+  },
+  "chipDesc_prompt_datetime": {
+    "message": "Displays a date-time picker dialog when inserting template (default: current date & time).",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_prompt_datetime": {
+    "message": "2025-03-15 10:00",
+    "description": "Chip tooltip example value"
+  },
   "chipTag_date": {
     "message": "Today",
     "description": "Chip label"

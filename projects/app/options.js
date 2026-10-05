@@ -8,6 +8,18 @@ import { DEFAULT_DATA, DEFAULT_SETTINGS, getMessage, resolveVariables, restoreCa
  */
 function getVariableMap() {
   return {
+    '{{clipboard}}': { label: getMessage('chipTag_clipboard'), icon: 'content_paste' },
+    '{{clipboard_numbered}}': { label: getMessage('chipTag_clipboard_numbered'), icon: 'format_list_numbered' },
+    '{{clipboard_quote}}': { label: getMessage('chipTag_clipboard_quote'), icon: 'format_quote' },
+    '{{clipboard_trim}}': { label: getMessage('chipTag_clipboard_trim'), icon: 'content_cut' },
+    '{{clipboard_single_line}}': { label: getMessage('chipTag_clipboard_single_line'), icon: 'link' },
+
+    '{{prompt}}': { label: getMessage('chipTag_prompt'), icon: 'edit' },
+    '{{prompt_multiline}}': { label: getMessage('chipTag_prompt_multiline'), icon: 'description' },
+    '{{prompt_date}}': { label: getMessage('chipTag_prompt_date'), icon: 'calendar_month' },
+    '{{prompt_time}}': { label: getMessage('chipTag_prompt_time'), icon: 'schedule' },
+    '{{prompt_datetime}}': { label: getMessage('chipTag_prompt_datetime'), icon: 'event' },
+
     '{{date}}': { label: getMessage('chipTag_date'), icon: 'calendar_today' },
     '{{date_short}}': { label: getMessage('chipTag_date_short'), icon: 'calendar_today' },
     '{{date_with_day}}': { label: getMessage('chipTag_date_with_day'), icon: 'calendar_today' },

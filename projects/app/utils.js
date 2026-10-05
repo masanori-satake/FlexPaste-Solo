@@ -509,10 +509,31 @@ export function formatDateShort(date) {
   return `${m}/${d}`;
 }
 
+/**
+ * ローカル時刻の日付を YYYY-MM-DD 形式に整形する。
+ * @param {Date} date 整形する日付。
+ * @returns {string} ハイフン区切りの日付文字列。
+ */
+export function formatDateIso(date) {
+  const y = date.getFullYear();
+  const m = padZero(date.getMonth() + 1);
+  const d = padZero(date.getDate());
+  return `${y}-${m}-${d}`;
+}
+
 export function formatTime(date) {
   const h = padZero(date.getHours());
   const m = padZero(date.getMinutes());
   return `${h}:${m}`;
+}
+
+/**
+ * ローカル時刻の日時を YYYY-MM-DD HH:mm 形式に整形する。
+ * @param {Date} date 整形する日時。
+ * @returns {string} 日付と時刻を空白で区切った文字列。
+ */
+export function formatDateTimeIso(date) {
+  return `${formatDateIso(date)} ${formatTime(date)}`;
 }
 
 export function adjustTime(date, intervalMinutes = 0, mode = 'prev') {
@@ -611,6 +632,17 @@ export function calculateMonthLastWorkday(now, workdays) {
 // Pre-computing 30+ Date objects, workday calculations, and formatting for every call
 // causes ~10x performance overhead. Early return skips parsing entirely when no Mustache tags exist,
 // and lazy evaluation computes variables on demand and caches results per call.
+/**
+ * テンプレート内の動的変数を解決し、未知のタグはそのまま残す。
+ * プロンプト値は出現順に使い、不足時は日付・時刻系を現在日時、それ以外を空文字で補う。
+ *
+ * @param {string} templateContent 置換対象のテンプレート。
+ * @param {Object} [contextData={}] 稼働日、時刻調整、定義済み変数などの置換設定。
+ * @param {string} [contextData.clipboard] クリップボードタグに使う文字列。
+ * @param {string[]} [contextData.promptsArray] 出現順に並べたプロンプトの入力値。
+ * @param {Date} [now=new Date()] 日時変数の基準日時。
+ * @returns {string} 置換後の文字列。入力が文字列でない場合は空文字。
+ */
 export function resolveVariables(templateContent, contextData = {}, now = new Date()) {
   if (!templateContent || typeof templateContent !== 'string') return '';
   if (!templateContent.includes('{{')) return templateContent;
@@ -619,6 +651,7 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
   const timeAdjInterval = Number(contextData.time_adj_interval) || 0;
 
   const cache = new Map();
+  let promptIndex = 0;
 
   // Lazy base date and object helpers to avoid redundant Date instantiations across variables
   let inOneHour, yesterday, tomorrow, nextWeek, nextWorkdayDate, monthEndDate, monthLastWorkdayDate, nextWeekDays;
@@ -656,6 +689,11 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
     return nextWeekDays;
   }
 
+  /**
+   * 変数を必要時に計算してキャッシュし、プロンプト値は出現ごとに順に取得する。
+   * @param {string} varName 波括弧を除いた変数名。
+   * @returns {string|undefined} 置換する値。未知の変数名では undefined。
+   */
   function getValue(varName) {
     if (cache.has(varName)) return cache.get(varName);
 
@@ -670,6 +708,50 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
       case 'def_3':
         val = contextData.def_3 ?? '';
         break;
+      case 'clipboard': {
+        val = contextData.clipboard ?? '';
+        break;
+      }
+      case 'clipboard_numbered': {
+        const cb = contextData.clipboard ?? '';
+        val = cb ? cb.split(/\r?\n/).map((line, idx) => `${idx + 1}: ${line}`).join('\n') : '';
+        break;
+      }
+      case 'clipboard_quote': {
+        const cb = contextData.clipboard ?? '';
+        val = cb ? cb.split(/\r?\n/).map(line => `> ${line}`).join('\n') : '';
+        break;
+      }
+      case 'clipboard_trim': {
+        const cb = contextData.clipboard ?? '';
+        val = cb.trim();
+        break;
+      }
+      case 'clipboard_single_line': {
+        const cb = contextData.clipboard ?? '';
+        val = cb.replace(/\r?\n/g, ' ');
+        break;
+      }
+      case 'prompt':
+      case 'prompt_multiline':
+      case 'prompt_date':
+      case 'prompt_time':
+      case 'prompt_datetime': {
+        if (Array.isArray(contextData.promptsArray) && promptIndex < contextData.promptsArray.length) {
+          val = contextData.promptsArray[promptIndex++];
+        } else {
+          if (varName === 'prompt_date') {
+            val = formatDateIso(now);
+          } else if (varName === 'prompt_time') {
+            val = formatTime(now);
+          } else if (varName === 'prompt_datetime') {
+            val = formatDateTimeIso(now);
+          } else {
+            val = '';
+          }
+        }
+        return val;
+      }
       case 'date_with_day':
         val = formatDateWithDay(now);
         break;

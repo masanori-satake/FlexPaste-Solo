@@ -51,6 +51,39 @@ console.log('Running unit tests for utils.js & options.js...');
   assert.strictEqual(resolved, expected, `Resolved template mismatch.\nGot:      ${resolved}\nExpected: ${expected}`);
 }
 
+// 2a. Test clipboard tags in resolveVariables
+{
+  const contextData = {
+    clipboard: ' Line 1 \n Line 2 \n Line 3 '
+  };
+
+  assert.strictEqual(resolveVariables('{{clipboard}}', contextData), ' Line 1 \n Line 2 \n Line 3 ');
+  assert.strictEqual(resolveVariables('{{clipboard_numbered}}', contextData), '1:  Line 1 \n2:  Line 2 \n3:  Line 3 ');
+  assert.strictEqual(resolveVariables('{{clipboard_quote}}', contextData), '>  Line 1 \n>  Line 2 \n>  Line 3 ');
+  assert.strictEqual(resolveVariables('{{clipboard_trim}}', contextData), 'Line 1 \n Line 2 \n Line 3');
+  assert.strictEqual(resolveVariables('{{clipboard_single_line}}', contextData), ' Line 1   Line 2   Line 3 ');
+}
+
+// 2a2. Test interactive prompt tags in resolveVariables
+{
+  const now = new Date(2025, 2, 15, 10, 0, 0);
+
+  // Case A: With promptsArray
+  const contextDataA = {
+    promptsArray: ['Alice', 'Bob\nCharlie', '2025-04-01', '14:30', '2025-04-01 14:30']
+  };
+  const templateA = 'Text: {{prompt}}, Multi: {{prompt_multiline}}, Date: {{prompt_date}}, Time: {{prompt_time}}, DateTime: {{prompt_datetime}}';
+  const resolvedA = resolveVariables(templateA, contextDataA, now);
+  const expectedA = 'Text: Alice, Multi: Bob\nCharlie, Date: 2025-04-01, Time: 14:30, DateTime: 2025-04-01 14:30';
+  assert.strictEqual(resolvedA, expectedA);
+
+  // Case B: Without promptsArray (Fallback default values)
+  const templateB = 'Date: {{prompt_date}}, Time: {{prompt_time}}, DateTime: {{prompt_datetime}}, Prompt: {{prompt}}';
+  const resolvedB = resolveVariables(templateB, {}, now);
+  const expectedB = 'Date: 2025-03-15, Time: 10:00, DateTime: 2025-03-15 10:00, Prompt: ';
+  assert.strictEqual(resolvedB, expectedB);
+}
+
 // 2b. Test new short and short_with_day variable tags
 {
   const now = new Date(2025, 2, 15, 10, 7, 0); // Saturday, March 15, 2025
