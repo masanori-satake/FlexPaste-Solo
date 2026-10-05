@@ -509,10 +509,21 @@ export function formatDateShort(date) {
   return `${m}/${d}`;
 }
 
+export function formatDateIso(date) {
+  const y = date.getFullYear();
+  const m = padZero(date.getMonth() + 1);
+  const d = padZero(date.getDate());
+  return `${y}-${m}-${d}`;
+}
+
 export function formatTime(date) {
   const h = padZero(date.getHours());
   const m = padZero(date.getMinutes());
   return `${h}:${m}`;
+}
+
+export function formatDateTimeIso(date) {
+  return `${formatDateIso(date)} ${formatTime(date)}`;
 }
 
 export function adjustTime(date, intervalMinutes = 0, mode = 'prev') {
@@ -619,6 +630,7 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
   const timeAdjInterval = Number(contextData.time_adj_interval) || 0;
 
   const cache = new Map();
+  let promptIndex = 0;
 
   // Lazy base date and object helpers to avoid redundant Date instantiations across variables
   let inOneHour, yesterday, tomorrow, nextWeek, nextWorkdayDate, monthEndDate, monthLastWorkdayDate, nextWeekDays;
@@ -670,6 +682,50 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
       case 'def_3':
         val = contextData.def_3 ?? '';
         break;
+      case 'clipboard': {
+        val = contextData.clipboard ?? '';
+        break;
+      }
+      case 'clipboard_numbered': {
+        const cb = contextData.clipboard ?? '';
+        val = cb ? cb.split(/\r?\n/).map((line, idx) => `${idx + 1}: ${line}`).join('\n') : '';
+        break;
+      }
+      case 'clipboard_quote': {
+        const cb = contextData.clipboard ?? '';
+        val = cb ? cb.split(/\r?\n/).map(line => `> ${line}`).join('\n') : '';
+        break;
+      }
+      case 'clipboard_trim': {
+        const cb = contextData.clipboard ?? '';
+        val = cb.trim();
+        break;
+      }
+      case 'clipboard_single_line': {
+        const cb = contextData.clipboard ?? '';
+        val = cb.replace(/\r?\n/g, ' ');
+        break;
+      }
+      case 'prompt':
+      case 'prompt_multiline':
+      case 'prompt_date':
+      case 'prompt_time':
+      case 'prompt_datetime': {
+        if (Array.isArray(contextData.promptsArray) && promptIndex < contextData.promptsArray.length) {
+          val = contextData.promptsArray[promptIndex++];
+        } else {
+          if (varName === 'prompt_date') {
+            val = formatDateIso(now);
+          } else if (varName === 'prompt_time') {
+            val = formatTime(now);
+          } else if (varName === 'prompt_datetime') {
+            val = formatDateTimeIso(now);
+          } else {
+            val = '';
+          }
+        }
+        return val;
+      }
       case 'date_with_day':
         val = formatDateWithDay(now);
         break;
