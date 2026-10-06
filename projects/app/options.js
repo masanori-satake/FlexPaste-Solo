@@ -268,16 +268,6 @@ export function getEditorContentString(container) {
 let saveDebounceTimer = null;
 
 const CLIPBOARD_PERMISSIONS = ['clipboardWrite', 'clipboardRead'];
-const pendingUsePasteStates = new Map();
-const pendingUsePasteCheckboxes = new Map();
-let clipboardPermissionSyncInProgress = false;
-let clipboardPermissionSyncPending = false;
-let clipboardPermissionSyncVersion = 0;
-let clipboardPermissionRemovalRetryCount = 0;
-let clipboardPermissionSyncOptions = {
-  showSaveNotification: false,
-  showPermissionDenied: false
-};
 
 // Toast notification
 function showToast(message) {
@@ -464,21 +454,6 @@ function hasPermissionsMethod(method) {
     && typeof chrome.permissions[method] === 'function';
 }
 
-function getDesiredUsePaste(category) {
-  return pendingUsePasteStates.has(category.id)
-    ? pendingUsePasteStates.get(category.id)
-    : Boolean(category.use_paste);
-}
-
-function refreshPendingUsePasteStates() {
-  pendingUsePasteCheckboxes.forEach((checkbox, categoryId) => {
-    if (appState.selectedCategoryId === categoryId
-      && document.getElementById('current-cat-use-paste') === checkbox) {
-      pendingUsePasteStates.set(categoryId, checkbox.checked);
-    }
-  });
-}
-
 /** 現在の設定に合わせて同期スイッチと同期中表示を更新する。 */
 function renderSyncControls() {
   const syncEnabledSwitch = document.getElementById('sync-enabled-switch');
@@ -500,138 +475,52 @@ function updateSelectedUsePasteCheckbox() {
   }
 }
 
-function commitPendingUsePasteStates(allowEnabledState) {
-  let changed = false;
+let clipboardPermissionSyncGeneration = 0;
 
-  pendingUsePasteStates.forEach((usePaste, categoryId) => {
-    if (usePaste && !allowEnabledState) return;
+/**
+ * 全カテゴリのペースト入力の使用状況に合わせてオプショナル権限（クリップボード権限）を同期する。
+ */
+function syncClipboardPermissions() {
+  const generation = ++clipboardPermissionSyncGeneration;
+  if (!hasPermissionsMethod('contains')) return;
 
-    const category = appState.categories.find(c => c.id === categoryId);
-    if (category && Boolean(category.use_paste) !== usePaste) {
-      category.use_paste = usePaste;
-      changed = true;
-    }
-    pendingUsePasteStates.delete(categoryId);
-    pendingUsePasteCheckboxes.delete(categoryId);
-  });
+  const needsPermissions = appState.categories.some(c => Boolean(c.use_paste));
 
-  updateSelectedUsePasteCheckbox();
-  return changed;
-}
-
-function disableAllPasteUsage() {
-  let changed = pendingUsePasteStates.size > 0;
-  appState.categories.forEach((category) => {
-    if (category.use_paste) {
-      category.use_paste = false;
-      changed = true;
-    }
-  });
-  pendingUsePasteStates.clear();
-  pendingUsePasteCheckboxes.clear();
-  updateSelectedUsePasteCheckbox();
-  return changed;
-}
-
-function finishClipboardPermissionSync(changed, showSaveNotification) {
-  if (changed) {
-    saveStorage(showSaveNotification);
-  }
-  clipboardPermissionSyncInProgress = false;
-  processClipboardPermissionSync();
-}
-
-function processClipboardPermissionSync() {
-  if (clipboardPermissionSyncInProgress || !clipboardPermissionSyncPending) return;
-
-  clipboardPermissionSyncInProgress = true;
-  clipboardPermissionSyncPending = false;
-  const syncVersion = clipboardPermissionSyncVersion;
-  const { showSaveNotification, showPermissionDenied } = clipboardPermissionSyncOptions;
-  clipboardPermissionSyncOptions = {
-    showSaveNotification: false,
-    showPermissionDenied: false
-  };
-
-  const shouldHaveClipboardPermissions = appState.categories.some(getDesiredUsePaste);
-
-  if (shouldHaveClipboardPermissions && hasPermissionsMethod('request')) {
-    chrome.permissions.request({
-      permissions: CLIPBOARD_PERMISSIONS
-    }, (granted) => {
-      const lastError = chrome.runtime && chrome.runtime.lastError;
-      if (syncVersion !== clipboardPermissionSyncVersion) {
-        finishClipboardPermissionSync(false, false);
-        return;
+  if (!needsPermissions && hasPermissionsMethod('remove')) {
+    chrome.permissions.contains({ permissions: CLIPBOARD_PERMISSIONS }, (hasPerms) => {
+      if (chrome.runtime && chrome.runtime.lastError) return;
+      if (generation !== clipboardPermissionSyncGeneration) return;
+      if (hasPerms) {
+        chrome.permissions.remove({ permissions: CLIPBOARD_PERMISSIONS }, () => {
+          if (chrome.runtime && chrome.runtime.lastError) {
+            // Ignore error on optional permission removal
+          }
+        });
       }
-
-      refreshPendingUsePasteStates();
-      const stillNeedsClipboardPermissions = appState.categories.some(getDesiredUsePaste);
-      if (lastError || !granted) {
-        const changed = stillNeedsClipboardPermissions
-          ? disableAllPasteUsage()
-          : commitPendingUsePasteStates(false);
-        if (showPermissionDenied && stillNeedsClipboardPermissions) {
-          showToast(getMessage('toastPermissionDenied'));
+    });
+  } else if (needsPermissions && hasPermissionsMethod('contains')) {
+    chrome.permissions.contains({ permissions: CLIPBOARD_PERMISSIONS }, (hasPerms) => {
+      if (chrome.runtime && chrome.runtime.lastError) return;
+      if (generation !== clipboardPermissionSyncGeneration) return;
+      if (!hasPerms) {
+        let changed = false;
+        appState.categories.forEach(c => {
+          if (c.use_paste) {
+            c.use_paste = false;
+            changed = true;
+          }
+        });
+        if (changed) {
+          updateSelectedUsePasteCheckbox();
+          saveStorage(false);
         }
-        finishClipboardPermissionSync(changed, false);
-        return;
       }
-
-      clipboardPermissionRemovalRetryCount = 0;
-      finishClipboardPermissionSync(commitPendingUsePasteStates(true), showSaveNotification);
     });
-    return;
   }
-
-  if (!shouldHaveClipboardPermissions && hasPermissionsMethod('remove')) {
-    chrome.permissions.remove({
-      permissions: CLIPBOARD_PERMISSIONS
-    }, (removed) => {
-      const lastError = chrome.runtime && chrome.runtime.lastError;
-      if (syncVersion !== clipboardPermissionSyncVersion) {
-        finishClipboardPermissionSync(false, false);
-        return;
-      }
-
-      refreshPendingUsePasteStates();
-      const changed = commitPendingUsePasteStates(false);
-      const removalFailed = Boolean(lastError) || !removed;
-      const stillNeedsClipboardPermissions = appState.categories.some(getDesiredUsePaste);
-
-      if (removalFailed && !stillNeedsClipboardPermissions && clipboardPermissionRemovalRetryCount < 1) {
-        clipboardPermissionRemovalRetryCount += 1;
-        clipboardPermissionSyncPending = true;
-      } else if (!removalFailed) {
-        clipboardPermissionRemovalRetryCount = 0;
-      }
-
-      finishClipboardPermissionSync(changed, showSaveNotification);
-    });
-    return;
-  }
-
-  const changed = commitPendingUsePasteStates(true);
-  finishClipboardPermissionSync(changed, showSaveNotification);
 }
 
-function syncClipboardPermissions(options = {}) {
-  clipboardPermissionSyncPending = true;
-  clipboardPermissionRemovalRetryCount = 0;
-  clipboardPermissionSyncOptions.showSaveNotification ||= Boolean(options.showSaveNotification);
-  clipboardPermissionSyncOptions.showPermissionDenied ||= Boolean(options.showPermissionDenied);
-  processClipboardPermissionSync();
-}
-
-function invalidateClipboardPermissionSync(categoryId = null) {
-  clipboardPermissionSyncVersion += 1;
-  if (categoryId) {
-    pendingUsePasteStates.delete(categoryId);
-    pendingUsePasteCheckboxes.delete(categoryId);
-  } else {
-    pendingUsePasteStates.clear();
-    pendingUsePasteCheckboxes.clear();
-  }
+function invalidateClipboardPermissionSync() {
+  clipboardPermissionSyncGeneration++;
 }
 
 // Helper: Update scroll shadows on templates scroll area boundaries
@@ -1547,12 +1436,39 @@ function setupEventHandlers() {
 
     if (!currentCat) return;
 
-    pendingUsePasteStates.set(currentCat.id, checkbox.checked);
-    pendingUsePasteCheckboxes.set(currentCat.id, checkbox);
-    syncClipboardPermissions({
-      showSaveNotification: true,
-      showPermissionDenied: true
-    });
+    const desiredUsePaste = checkbox.checked;
+    const categoryId = currentCat.id;
+    invalidateClipboardPermissionSync();
+
+    if (desiredUsePaste) {
+      if (hasPermissionsMethod('request')) {
+        chrome.permissions.request({
+          permissions: CLIPBOARD_PERMISSIONS
+        }, (granted) => {
+          const lastError = chrome.runtime && chrome.runtime.lastError;
+          const category = appState.categories.find(c => c.id === categoryId);
+          if (!category) return;
+          invalidateClipboardPermissionSync();
+          if (lastError || !granted) {
+            category.use_paste = false;
+            updateSelectedUsePasteCheckbox();
+            showToast(getMessage('toastPermissionDenied'));
+            saveStorage(false);
+          } else {
+            category.use_paste = true;
+            updateSelectedUsePasteCheckbox();
+            saveStorage(true);
+          }
+        });
+      } else {
+        currentCat.use_paste = true;
+        saveStorage(true);
+      }
+    } else {
+      currentCat.use_paste = false;
+      saveStorage(true);
+      syncClipboardPermissions();
+    }
   });
 
   // Category Definitions Changes

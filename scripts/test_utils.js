@@ -1,5 +1,6 @@
 // scripts/test_utils.js - Unit tests for FlexPaste-Solo utils.js
 import assert from 'node:assert';
+import './test_options_permissions.js';
 import { adjustTime, getByteLength, resolveVariables, restoreCategoriesFromSync, splitStringToByteChunks, syncFromCloudIfNeeded, validateImportData } from '../projects/app/utils.js';
 import { getEditorContentString, populateEditorFromText, validateAndNormalizeBackup } from '../projects/app/options.js';
 
@@ -631,6 +632,43 @@ console.log('Running unit tests for utils.js & options.js...');
 
   const restoredCats = restoreCategoriesFromSync(syncPayload);
   assert.deepStrictEqual(restoredCats, testCategories, 'Restored categories from byte-split sync payload must match original categories');
+}
+
+// 14. Test use_paste flag preservation and normalization in backup and import validation
+{
+  const pasteTestData = {
+    settings: { workdays: [1, 2, 3, 4, 5] },
+    categories: [
+      {
+        id: 'cat_paste_true',
+        title: 'Paste Enabled Category',
+        use_paste: true,
+        templates: []
+      },
+      {
+        id: 'cat_paste_str',
+        title: 'Paste String True Category',
+        use_paste: 'true',
+        templates: []
+      },
+      {
+        id: 'cat_paste_false',
+        title: 'Paste Disabled Category',
+        use_paste: false,
+        templates: []
+      }
+    ]
+  };
+
+  const normalized = validateAndNormalizeBackup(pasteTestData);
+  assert.strictEqual(normalized.categories[0].use_paste, true, 'use_paste boolean true must be preserved');
+  assert.strictEqual(normalized.categories[1].use_paste, true, 'use_paste string "true" must be normalized to boolean true');
+  assert.strictEqual(normalized.categories[2].use_paste, false, 'use_paste boolean false must be preserved');
+
+  validateImportData(pasteTestData);
+  assert.strictEqual(pasteTestData.categories[0].use_paste, true, 'validateImportData must preserve use_paste boolean true');
+  assert.strictEqual(pasteTestData.categories[1].use_paste, true, 'validateImportData must normalize use_paste string "true" to boolean true');
+  assert.strictEqual(pasteTestData.categories[2].use_paste, false, 'validateImportData must preserve use_paste boolean false');
 }
 
 console.log('All unit tests passed successfully!');
