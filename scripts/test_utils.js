@@ -1,5 +1,6 @@
 // scripts/test_utils.js - Unit tests for FlexPaste-Solo utils.js
 import assert from 'node:assert';
+import './test_options_permissions.js';
 import { adjustTime, getByteLength, resolveVariables, restoreCategoriesFromSync, splitStringToByteChunks, syncFromCloudIfNeeded, validateImportData } from '../projects/app/utils.js';
 import { getEditorContentString, populateEditorFromText, validateAndNormalizeBackup } from '../projects/app/options.js';
 

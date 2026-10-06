@@ -475,10 +475,13 @@ function updateSelectedUsePasteCheckbox() {
   }
 }
 
+let clipboardPermissionSyncGeneration = 0;
+
 /**
  * 全カテゴリのペースト入力の使用状況に合わせてオプショナル権限（クリップボード権限）を同期する。
  */
 function syncClipboardPermissions() {
+  const generation = ++clipboardPermissionSyncGeneration;
   if (!hasPermissionsMethod('contains')) return;
 
   const needsPermissions = appState.categories.some(c => Boolean(c.use_paste));
@@ -486,6 +489,7 @@ function syncClipboardPermissions() {
   if (!needsPermissions && hasPermissionsMethod('remove')) {
     chrome.permissions.contains({ permissions: CLIPBOARD_PERMISSIONS }, (hasPerms) => {
       if (chrome.runtime && chrome.runtime.lastError) return;
+      if (generation !== clipboardPermissionSyncGeneration) return;
       if (hasPerms) {
         chrome.permissions.remove({ permissions: CLIPBOARD_PERMISSIONS }, () => {
           if (chrome.runtime && chrome.runtime.lastError) {
@@ -497,6 +501,7 @@ function syncClipboardPermissions() {
   } else if (needsPermissions && hasPermissionsMethod('contains')) {
     chrome.permissions.contains({ permissions: CLIPBOARD_PERMISSIONS }, (hasPerms) => {
       if (chrome.runtime && chrome.runtime.lastError) return;
+      if (generation !== clipboardPermissionSyncGeneration) return;
       if (!hasPerms) {
         let changed = false;
         appState.categories.forEach(c => {
@@ -515,7 +520,7 @@ function syncClipboardPermissions() {
 }
 
 function invalidateClipboardPermissionSync() {
-  // Retained for backward compatibility
+  clipboardPermissionSyncGeneration++;
 }
 
 // Helper: Update scroll shadows on templates scroll area boundaries
@@ -1432,6 +1437,8 @@ function setupEventHandlers() {
     if (!currentCat) return;
 
     const desiredUsePaste = checkbox.checked;
+    const categoryId = currentCat.id;
+    invalidateClipboardPermissionSync();
 
     if (desiredUsePaste) {
       if (hasPermissionsMethod('request')) {
@@ -1439,13 +1446,17 @@ function setupEventHandlers() {
           permissions: CLIPBOARD_PERMISSIONS
         }, (granted) => {
           const lastError = chrome.runtime && chrome.runtime.lastError;
+          const category = appState.categories.find(c => c.id === categoryId);
+          if (!category) return;
+          invalidateClipboardPermissionSync();
           if (lastError || !granted) {
-            checkbox.checked = false;
-            currentCat.use_paste = false;
+            category.use_paste = false;
+            updateSelectedUsePasteCheckbox();
             showToast(getMessage('toastPermissionDenied'));
             saveStorage(false);
           } else {
-            currentCat.use_paste = true;
+            category.use_paste = true;
+            updateSelectedUsePasteCheckbox();
             saveStorage(true);
           }
         });
