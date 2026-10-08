@@ -738,6 +738,11 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
         val = cb.replace(/\r?\n/g, ' ');
         break;
       }
+      case 'clipboard_codeblock': {
+        const cb = contextData.clipboard ?? '';
+        val = `\`\`\`\`\`\n${cb}\n\`\`\`\`\``;
+        break;
+      }
       case 'prompt':
       case 'prompt_multiline':
       case 'prompt_date':

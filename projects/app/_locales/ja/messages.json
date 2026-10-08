@@ -326,6 +326,18 @@
     "message": "1行に連結されたテキスト",
     "description": "Chip tooltip example value"
   },
+  "chipTag_clipboard_codeblock": {
+    "message": "コードブロック",
+    "description": "Chip label"
+  },
+  "chipDesc_clipboard_codeblock": {
+    "message": "クリップボードのテキストを5つのバッククォートで囲んだコードブロック形式で挿入します。",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_clipboard_codeblock": {
+    "message": "`````\nコードブロック\n`````",
+    "description": "Chip tooltip example value"
+  },
   "chipTag_prompt": {
     "message": "入力プロンプト",
     "description": "Chip label"

@@ -13,6 +13,7 @@ function getVariableMap() {
     '{{clipboard_quote}}': { label: getMessage('chipTag_clipboard_quote'), icon: 'format_quote' },
     '{{clipboard_trim}}': { label: getMessage('chipTag_clipboard_trim'), icon: 'content_cut' },
     '{{clipboard_single_line}}': { label: getMessage('chipTag_clipboard_single_line'), icon: 'link' },
+    '{{clipboard_codeblock}}': { label: getMessage('chipTag_clipboard_codeblock'), icon: 'code' },
 
     '{{prompt}}': { label: getMessage('chipTag_prompt'), icon: 'edit' },
     '{{prompt_multiline}}': { label: getMessage('chipTag_prompt_multiline'), icon: 'description' },
