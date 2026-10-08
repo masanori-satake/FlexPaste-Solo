@@ -651,7 +651,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       if (!foundTemplate) return;
 
       const content = foundTemplate.content || '';
-      const hasClipboardTags = /\{\{\s*clipboard(_numbered|_quote|_trim|_single_line)?\s*\}\}/.test(content);
+      const hasClipboardTags = /\{\{\s*clipboard(_numbered|_quote|_trim|_single_line|_codeblock)?\s*\}\}/.test(content);
 
       const promptTagMatches = Array.from(content.matchAll(/\{\{\s*(prompt|prompt_multiline|prompt_date|prompt_time|prompt_datetime)\s*\}\}/g));
       const promptTagSpecs = promptTagMatches.map(m => m[1]);

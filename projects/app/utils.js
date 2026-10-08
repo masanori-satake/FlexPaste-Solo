@@ -738,6 +738,14 @@ export function resolveVariables(templateContent, contextData = {}, now = new Da
         val = cb.replace(/\r?\n/g, ' ');
         break;
       }
+      case 'clipboard_codeblock': {
+        const cb = contextData.clipboard ?? '';
+        let fenceLength = 5;
+        for (const match of cb.matchAll(/`+/g)) fenceLength = Math.max(fenceLength, match[0].length + 1);
+        const fence = '`'.repeat(fenceLength);
+        val = `${fence}\n${cb}\n${fence}`;
+        break;
+      }
       case 'prompt':
       case 'prompt_multiline':
       case 'prompt_date':

@@ -63,6 +63,10 @@ console.log('Running unit tests for utils.js & options.js...');
   assert.strictEqual(resolveVariables('{{clipboard_quote}}', contextData), '>  Line 1 \n>  Line 2 \n>  Line 3 ');
   assert.strictEqual(resolveVariables('{{clipboard_trim}}', contextData), 'Line 1 \n Line 2 \n Line 3');
   assert.strictEqual(resolveVariables('{{clipboard_single_line}}', contextData), ' Line 1   Line 2   Line 3 ');
+  assert.strictEqual(resolveVariables('{{clipboard_codeblock}}', contextData), '`````\n Line 1 \n Line 2 \n Line 3 \n`````');
+
+  const contextCode = { clipboard: 'const a = 10;' };
+  assert.strictEqual(resolveVariables('{{clipboard_codeblock}}', contextCode), '`````\nconst a = 10;\n`````');
 
   // Test clipboard_numbered with 2-digit line count (10 lines)
   const lines10 = Array.from({ length: 10 }, (_, i) => `Line ${i + 1}`).join('\n');

@@ -326,6 +326,18 @@
     "message": "Joined single line text",
     "description": "Chip tooltip example value"
   },
+  "chipTag_clipboard_codeblock": {
+    "message": "Code Block",
+    "description": "Chip label"
+  },
+  "chipDesc_clipboard_codeblock": {
+    "message": "Inserts clipboard text formatted as a code block enclosed in 5 backticks.",
+    "description": "Chip tooltip description"
+  },
+  "chipEx_clipboard_codeblock": {
+    "message": "`````\nCode Block\n`````",
+    "description": "Chip tooltip example value"
+  },
   "chipTag_prompt": {
     "message": "Input Prompt",
     "description": "Chip label"
