@@ -1,11 +1,15 @@
 {
   "appName": {
-    "message": "FlexPaste-Solo - Smart Clipboard Templates",
+    "message": "FlexPaste-Solo - Text Expander & Templates",
     "description": "App Name"
   },
   "appDesc": {
-    "message": "Local-first. Paste templates with date/time chips from the context menu. Optional chrome.storage.sync syncs settings and templates.",
+    "message": "Smart right-click text expander with dynamic variables, smart time rounding, and clipboard text formatting for pros & AI users.",
     "description": "App Description"
+  },
+  "appShortName": {
+    "message": "FlexPaste",
+    "description": "App Short Name"
   },
   "headerSubtitle": {
     "message": "Category Templates & Chips Settings",

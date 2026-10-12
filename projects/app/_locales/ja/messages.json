@@ -1,11 +1,15 @@
 {
   "appName": {
-    "message": "FlexPaste-Solo - 定型文＆動的変数ペースト挿入",
+    "message": "FlexPaste-Solo - 定型文＆動的変数テキスト拡張",
     "description": "App Name"
   },
   "appDesc": {
-    "message": "右クリックからカテゴリ別定型文や日付・時刻などの動的変数を瞬時にペースト挿入。デフォルトではローカルに保存し、同期有効時は設定とテンプレートデータをchrome.storage.syncに保存します。",
+    "message": "右クリックで定型文を高速ペースト。時刻の丸め、将来日付計算、コピー文字列の自動加工で日報やAIプロンプト入力を効率化。",
     "description": "App Description"
+  },
+  "appShortName": {
+    "message": "FlexPaste",
+    "description": "App Short Name"
   },
   "headerSubtitle": {
     "message": "カテゴリ別定型文 ＆ チップ 設定",
