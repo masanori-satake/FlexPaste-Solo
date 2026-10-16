@@ -151,8 +151,21 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 
 // Injection script function executed in target page context
 function injectTextToElement(textToInject, usePaste) {
-  const activeEl = document.activeElement;
-  if (!activeEl) return;
+  const markedEl = document.querySelector('[data-flexpaste-target="true"]');
+  let activeEl = document.activeElement;
+
+  if (markedEl) {
+    activeEl = markedEl;
+    try {
+      markedEl.removeAttribute('data-flexpaste-target');
+    } catch (e) {}
+  }
+
+  document.querySelectorAll('[data-flexpaste-target="true"]').forEach((el) => {
+    try { el.removeAttribute('data-flexpaste-target'); } catch (e) {}
+  });
+
+  if (!activeEl || activeEl === document.body) return;
 
   function triggerEvents(el) {
     el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -287,7 +300,17 @@ function injectTextToElement(textToInject, usePaste) {
  * @returns {Promise<{cancelled: boolean, clipboardText?: string, promptValues?: string[]}>} 入力結果またはキャンセル結果。
  */
 async function promptAndReadClipboardInPage(promptTagSpecs, hasClipboardTags, i18nStrings) {
+  document.querySelectorAll('[data-flexpaste-target="true"]').forEach((el) => {
+    try { el.removeAttribute('data-flexpaste-target'); } catch (e) {}
+  });
+
   const originalActiveElement = document.activeElement;
+  if (originalActiveElement && originalActiveElement !== document.body) {
+    try {
+      originalActiveElement.setAttribute('data-flexpaste-target', 'true');
+    } catch (e) {}
+  }
+
   let clipboardText = '';
 
   // 1. Read clipboard if template has clipboard tags
@@ -567,7 +590,11 @@ async function promptAndReadClipboardInPage(promptTagSpecs, hasClipboardTags, i1
       if (host.parentNode) {
         host.parentNode.removeChild(host);
       }
-      originalActiveElement?.focus();
+      if (originalActiveElement) {
+        try {
+          originalActiveElement.focus();
+        } catch (e) {}
+      }
     };
 
     /**
@@ -592,6 +619,11 @@ async function promptAndReadClipboardInPage(promptTagSpecs, hasClipboardTags, i1
      * @returns {void}
      */
     const cancelForm = () => {
+      if (originalActiveElement) {
+        try {
+          originalActiveElement.removeAttribute('data-flexpaste-target');
+        } catch (e) {}
+      }
       cleanup();
       resolve({ cancelled: true });
     };
@@ -693,6 +725,14 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
           const pageRes = results?.[0]?.result;
           if (!pageRes || pageRes.cancelled) {
+            chrome.scripting.executeScript({
+              target: targetConfig,
+              func: () => {
+                document.querySelectorAll('[data-flexpaste-target="true"]').forEach((el) => {
+                  try { el.removeAttribute('data-flexpaste-target'); } catch (e) {}
+                });
+              }
+            }).catch(() => {});
             return; // User cancelled or modal failed
           }
 

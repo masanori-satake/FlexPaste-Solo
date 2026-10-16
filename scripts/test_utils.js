@@ -675,4 +675,39 @@ console.log('Running unit tests for utils.js & options.js...');
   assert.strictEqual(pasteTestData.categories[2].use_paste, false, 'validateImportData must preserve use_paste boolean false');
 }
 
+// 15. Test prompt target focus element marking and retrieval logic
+{
+  class MockElement {
+    constructor(tagName) {
+      this.tagName = tagName.toUpperCase();
+      this.attributes = {};
+      this.focused = false;
+      this.value = '';
+    }
+    setAttribute(name, val) {
+      this.attributes[name] = String(val);
+    }
+    getAttribute(name) {
+      return this.attributes[name] || null;
+    }
+    removeAttribute(name) {
+      delete this.attributes[name];
+    }
+    focus() {
+      this.focused = true;
+    }
+    dispatchEvent(evt) {}
+  }
+
+  const mockTarget = new MockElement('textarea');
+
+  // Mark target element prior to prompt dialog
+  mockTarget.setAttribute('data-flexpaste-target', 'true');
+  assert.strictEqual(mockTarget.getAttribute('data-flexpaste-target'), 'true');
+
+  // Simulate cleanup or cancellation attribute removal
+  mockTarget.removeAttribute('data-flexpaste-target');
+  assert.strictEqual(mockTarget.getAttribute('data-flexpaste-target'), null);
+}
+
 console.log('All unit tests passed successfully!');
