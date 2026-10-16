@@ -149,7 +149,14 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   }
 });
 
-// Injection script function executed in target page context
+/**
+ * 対象ページで、マーカー付き要素を優先して文字列を挿入し、対象マーカーを削除する。
+ * マーカーがなければ現在のアクティブ要素を使い、ペースト失敗時は直接挿入を試みる。
+ *
+ * @param {string} textToInject 挿入する文字列。
+ * @param {boolean} usePaste クリップボード経由のペーストを試みるかどうか。
+ * @returns {void}
+ */
 function injectTextToElement(textToInject, usePaste) {
   const markedEl = document.querySelector('[data-flexpaste-target="true"]');
   let activeEl = document.activeElement;
