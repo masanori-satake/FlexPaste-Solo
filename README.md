@@ -8,11 +8,11 @@
 [![Tests](https://img.shields.io/github/actions/workflow/status/masanori-satake/FlexPaste-Solo/code-quality.yml?branch=main&label=Tests)](https://github.com/masanori-satake/FlexPaste-Solo/actions/workflows/code-quality.yml)
 [![Pure Vanilla JS](https://img.shields.io/badge/Pure%20Vanilla%20JS-Zero%20Dependencies-informational?logo=javascript&logoColor=white)](PRIVACY.md)
 
-A privacy-focused **chrome-extension**, **clipboard-manager**, and **text-formatter** that allows you to instantly insert pre-configured categorized templates and dynamic variables directly from the right-click context menu.
+A privacy-focused Chrome extension for instantly inserting categorized templates and dynamic variables via the right-click context menu.
 
 ## Overview
 
-Repeatedly typing or copying repetitive messages, dates, times, or structured notes can drain focus and productivity. **FlexPaste-Solo** streamlines your daily workflow by organizing custom templates into categories and pairing them with dynamic variables such as dates, times, workdays, and custom definitions. In a single right-click, you can paste dynamically evaluated, pre-formatted templates into web applications like **GitHub**, **Microsoft Loop**, **Google Docs**, or online chats.
+**FlexPaste-Solo** streamlines repetitive typing by organizing custom templates into categories with dynamic variables (dates, times, workdays, and custom definitions). With a single right-click, you can paste pre-formatted templates into any web application.
 
 ## Key Features
 
