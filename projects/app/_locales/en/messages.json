@@ -1,10 +1,10 @@
 {
   "appName": {
-    "message": "FlexPaste-Solo - Text Expander & Templates",
+    "message": "FlexPaste-Solo - Text Expander with Date & Time Variables",
     "description": "App Name"
   },
   "appDesc": {
-    "message": "Smart right-click text expander with dynamic variables, smart time rounding, and clipboard text formatting for pros & AI users.",
+    "message": "Right-click templates with dynamic date/time variables. Insert formatted clipboard text & AI prompts instantly - local by default.",
     "description": "App Description"
   },
   "appShortName": {
