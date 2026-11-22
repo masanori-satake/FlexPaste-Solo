@@ -29,6 +29,8 @@ jobs:
       stores: ${{ inputs.stores }}
       # FlexPaste-Solo の Chrome Web Store アイテム ID
       chrome_item_id: 'egmememialdjhohecnfkimpablkjfabg'
+      # FlexPaste-Solo の Edge 製品 ID（Partner Center、初回提出 2026-11-22）
+      edge_product_id: 'd534b03c-14b0-4fc9-90c1-dde716e64704'
       # アイコンは release-package と同じく base の generate-icons で生成する
       generate_icons: true
       # 提出 ZIP は release-package と同じく projects/app から base 側で生成する
