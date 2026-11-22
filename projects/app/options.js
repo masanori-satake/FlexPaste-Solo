@@ -622,6 +622,9 @@ function localizeStaticUI() {
   const elemSoloCatDeveloper = document.getElementById('i18n-solo-cat-developer');
   if (elemSoloCatDeveloper) elemSoloCatDeveloper.textContent = getMessage('soloCategoryDeveloper');
 
+  const elemSoloCatEditor = document.getElementById('i18n-solo-cat-editor');
+  if (elemSoloCatEditor) elemSoloCatEditor.textContent = getMessage('soloCategoryEditor');
+
   const btnCloseSoloModal = document.getElementById('close-solo-modal-btn');
   if (btnCloseSoloModal) {
     btnCloseSoloModal.title = getMessage('closeBtn');

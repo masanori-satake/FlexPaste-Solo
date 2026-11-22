@@ -1125,11 +1125,11 @@
     "description": "Chip tooltip example value"
   },
   "soloBtnTitle": {
-    "message": "Solo Series",
+    "message": "Solo/Duo Series",
     "description": "Solo series button title"
   },
   "soloModalTitle": {
-    "message": "Solo Series",
+    "message": "Solo/Duo Series",
     "description": "Solo series modal title"
   },
   "soloCategoryProductivity": {
@@ -1143,6 +1143,10 @@
   "soloCategoryDeveloper": {
     "message": "Developer Tools",
     "description": "Solo series developer category"
+  },
+  "soloCategoryEditor": {
+    "message": "Editor Extensions",
+    "description": "Editor extensions category"
   },
   "closeBtn": {
     "message": "Close",

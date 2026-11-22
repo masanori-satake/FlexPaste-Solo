@@ -1125,11 +1125,11 @@
     "description": "Chip tooltip example value"
   },
   "soloBtnTitle": {
-    "message": "Soloシリーズ",
+    "message": "Solo/Duoシリーズ",
     "description": "Solo series button title"
   },
   "soloModalTitle": {
-    "message": "Soloシリーズ",
+    "message": "Solo/Duoシリーズ",
     "description": "Solo series modal title"
   },
   "soloCategoryProductivity": {
@@ -1143,6 +1143,10 @@
   "soloCategoryDeveloper": {
     "message": "開発者向け",
     "description": "Solo series developer category"
+  },
+  "soloCategoryEditor": {
+    "message": "エディタ拡張",
+    "description": "エディタ拡張カテゴリ"
   },
   "closeBtn": {
     "message": "閉じる",
